@@ -1,0 +1,159 @@
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[margin=0.8in]{geometry}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage[hidelinks]{hyperref}
+\usepackage{float}
+
+%% Bibliography/references packages
+\usepackage[comma]{natbib}
+%%\bibliographystyle{agsm}
+\bibliographystyle{dcu}
+
+%% Make bibliography show in table of contents
+%% https://tex.stackexchange.com/questions/8458/making-the-bibliography-appear-in-the-table-of-contents
+\usepackage[nottoc,numbib]{tocbibind}
+%% ^^^ overwrites \bibname, so set it back
+\renewcommand{\bibname}{References}
+
+\RequirePackage{filecontents}
+\begin{filecontents}{soft354_bib.bib}
+@online{wikipedia:dft,
+  author = {Wikipedia},
+  title = {Discrete Fourier transform},
+  year = 2018,
+  url = {https://en.wikipedia.org/wiki/Discrete\_Fourier\_transform},
+  urldate = {2018-01-15}
+}
+@online{server:gpu,
+  author = {Amazon AWS},
+  title = {Introducing Amazon EC2 P2 Instances, the largest GPU-Powered virtual machine in the cloud},
+  year = 2018,
+  url = {https://aws.amazon.com/about-aws/whats-new/2016/09/introducing-amazon-ec2-p2-instances-the-largest-gpu-powered-virtual-machine-in-the-cloud/},
+  urldate = {2016-09-26}
+}
+@Book{fft_adv_dis,
+author = {James S. Walker},
+title = {Fast Fourier Transforms},
+publisher = {CRC Press},
+year = {1996},
+OPTedition = {2}
+}
+@misc{arndt2002algorithms,
+  title={Algorithms For Programmers},
+  author={Arndt, J{\"o}rg},
+  year = 2002
+}
+
+@misc{null,
+  title={NULL},
+  author={NULL},
+  year = 0000
+}
+
+\end{filecontents}
+
+%s comments
+\usepackage{verbatim}
+
+%inline graphs
+\usepackage{wrapfig}
+% multiple figures on line
+\usepackage{subfig}
+
+\usepackage{graphicx}
+\graphicspath{ {img/} }
+
+% Caption font size
+% https://tex.stackexchange.com/questions/86120/font-size-of-figure-caption-header
+\usepackage[font=scriptsize,labelfont=bf]{caption}
+
+\setlength{\belowcaptionskip}{-10pt}
+\setlength{\abovecaptionskip}{-5pt} % Chosen fairly arbitrarily
+
+
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\lhead{\rightmark}
+\chead{}
+\rhead{SOFT354 - Parallel Computing and Distributed Systems}
+\lfoot{\thepage}
+\cfoot{}
+\rfoot{Ben Lancaster 10424877}
+
+\renewcommand{\subsectionmark}[1]{\markright{\thesubsection\ #1}}
+
+
+\begin{document}
+
+\begin{titlepage}
+\begin{center}
+
+\vspace*{3cm}
+\Large
+\textbf{
+%%PRCO304 - Project Initiation Document
+Space optimised FPGA-based side-microprocessor.
+}
+
+\vspace{0.4cm}
+\large
+%%Space optimised FPGA-based side-microprocessor.
+PRCO304 - Project Initiation Document
+%%EMBEDDED CPU - FPGA-based RISC microprocessor
+
+\vspace{4cm}
+\textbf{Ben Lancaster}\\
+\today
+
+\vspace{4cm}
+\textbf{Abstract}\\
+\small
+The Discrete Fourier Transform algorithm is widely used in digital signal processing applications, particularly for converting time domain signals to the frequency domain. The algorithm has $O(n^2)$ complexity resulting in long computation times for large data sets. Introducing parallel concepts to this sequential algorithm, like dividing the input samples over multiple processes, and utilizing GPU hardware with CUDA, can greatly increase the performance. Results show that a performance increase of 5x to 10x can be seen on small to large datasets using both MPI and CUDA solutions. 
+
+
+\end{center}
+
+\end{titlepage}
+
+\renewcommand*\contentsname{Table of Contents}
+\tableofcontents
+\newpage
+
+\section{Introduction}
+Modern electronics equipment, like function generators, oscilloscopes, and spectrum analysers, use FPGAs to implement their compute intensive logic. These FPGAs are often accompanied by a small, low-cost, microprocessor to supervise and provide interfaces to external peripherals.
+
+The aim of this project is to implement this side-microprocessor into the FPGA to save on BOM costs, PCB space, and power costs, which contribute to higher development and product costs. While savings can be made by the lack of side microprocessor, the product may need a larger FPGA to accommodate the embedded microprocessor. The project will produce a small, soft-core, CPU design and compiler.
+
+\section{Business Case}
+The requirement of a side-microprocessor to control and provide external interfaces to FPGA-based applications carries a significant demand in both development and projects costs. 
+
+Firstly, the additional PCB space and design considerations to house the external microprocessor results in additional design planning and manufacturing costs. 
+
+Firstly, the inclusion of a external microprocessor in a project design will require 
+
+
+\section{Project Objectives}
+
+\section{Initial Scope}
+
+\section{Resources and Dependencies}
+
+\section{Method of Approach}
+
+\section{Initial Project Plan}
+
+\section{Initial Risk Assessment}
+
+\section{Quality Plan}
+
+\section{Legal, Social, and Ethical Considerations}
+
+\citep{null}
+\newpage
+
+\bibliography{soft354_bib} 
+\end{document}
