@@ -13,6 +13,9 @@
 %%\bibliographystyle{agsm}
 \bibliographystyle{dcu}
 
+%% https://en.wikibooks.org/wiki/LaTeX/List_Structures
+\usepackage{scrextend}
+
 %% Make bibliography show in table of contents
 %% https://tex.stackexchange.com/questions/8458/making-the-bibliography-appear-in-the-table-of-contents
 \usepackage[nottoc,numbib]{tocbibind}
@@ -20,7 +23,7 @@
 \renewcommand{\bibname}{References}
 
 \RequirePackage{filecontents}
-\begin{filecontents}{soft354_bib.bib}
+\begin{filecontents}{prco304.bib}
 @online{wikipedia:dft,
   author = {Wikipedia},
   title = {Discrete Fourier transform},
@@ -35,12 +38,17 @@
   url = {https://aws.amazon.com/about-aws/whats-new/2016/09/introducing-amazon-ec2-p2-instances-the-largest-gpu-powered-virtual-machine-in-the-cloud/},
   urldate = {2016-09-26}
 }
-@Book{fft_adv_dis,
-author = {James S. Walker},
-title = {Fast Fourier Transforms},
-publisher = {CRC Press},
-year = {1996},
-OPTedition = {2}
+@misc{scarabhardware,
+title={MiniSpartan6+}, 
+journal={{Scarab Hardware}},
+url={https://www.scarabhardware.com/minispartan6/},
+year=2014
+}
+@misc{arty,
+title={Arty Artix-7 FPGA Development Board}, 
+journal={{Avnet}},
+url={https://uk.rs-online.com/web/p/programmable-logic-development-kits/1346478/},
+year=2015
 }
 @misc{arndt2002algorithms,
   title={Algorithms For Programmers},
@@ -52,6 +60,13 @@ OPTedition = {2}
   title={NULL},
   author={NULL},
   year = 0000
+}
+
+@book{hdl,
+title={HDL Programming Fundamentals: VHDL and Verilog},
+author={Nazeih Botros},
+year={2006},
+publisher={Da Vinci Engineering Press}
 }
 
 \end{filecontents}
@@ -124,29 +139,117 @@ The Discrete Fourier Transform algorithm is widely used in digital signal proces
 \newpage
 
 \section{Introduction}
-Modern electronics equipment, like function generators, oscilloscopes, and spectrum analysers, use FPGAs to implement their compute intensive logic. These FPGAs are often accompanied by a small, low-cost, microprocessor to supervise and provide interfaces to external peripherals.
+Modern computing and electronics equipment, like function generators, oscilloscopes, and spectrum analysers, use FPGAs to implement their compute intensive logic. These FPGAs are often accompanied by a small, low-cost, microprocessor to supervise and provide interfaces to external peripherals.
 
 The aim of this project is to implement this side-microprocessor into the FPGA to save on BOM costs, PCB space, and power costs, which contribute to higher development and product costs. While savings can be made by the lack of side microprocessor, the product may need a larger FPGA to accommodate the embedded microprocessor. The project will produce a small, soft-core, CPU design and compiler.
 
 \section{Business Case}
 The requirement of a side-microprocessor to control and provide external interfaces to FPGA-based applications carries a significant demand in both development and projects costs. 
 
-Firstly, the additional PCB space and design considerations to house the external microprocessor results in additional design planning and manufacturing costs. 
+Firstly, the inclusion of a external microprocessor in a project design will require more PCB space and design considerations, adding to the development time and costs of the project. 
 
-Firstly, the inclusion of a external microprocessor in a project design will require 
+The external microprocessor may also require a licensed compiler to compile and load the code onto the microprocessor, adding to the cost of the project. In addition, the  microprocessor's on-chip memory may not be large enough to store the compiled code and an external flash memory chip may also be required.
+
+Moving to an integrated microprocessor on the FPGA brings many significant advantages.
+
+Releasing updates to embedded projects is a challenging problem. With the integrated solution, FPGA bitstreams and the soft-microprocessor code can be bundled together, making it much easier to update products in the field without sending an engineer to the location or providing complicated instructions which require specific equipment (e.g. in-circuit debuggers).
 
 
 \section{Project Objectives}
+The outcome of the project will be to design a small, portable, FPGA-based, CPU core that electronic Product Designers can choose as an alternative to a physical side-microprocessor to embed into their product.
+
+The embedded core will provide most of the functions of the side-microprocessor, including:
+\begin{enumerate}
+\item{(Core deliverable) To provide product designers with an affordable alternative to a side-microprocessor in their FPGA-based products.}
+\item{(Core deliverable) To provide embedded products a convenient solution to in-field updating.}
+\item{(Core deliverable) To provide easy interfacing between the FPGA design and the embedded core.} 
+\item{(Core deliverable) To provide a technical documentation and specification for the embedded core.} 
+\end{enumerate}
 
 \section{Initial Scope}
 
+\begin{enumerate}
+\item{(Core deliverable) A small, portable, instantiated, FPGA-based CPU core}
+\item{(Core deliverable) A C-like programming interface. A compiler taking input of a C-like grammar and outputting executable machine code for the embedded core. The machine code can be embedded into the FPGA bitstream and loaded onto the FPGA to run. Time estimate: 1 month.}\label{obj_compiler}
+\item{(Core deliverable) A 16-bit open RISC instruction set architecture (ISA). The core will decode and execute instructions encoded in this format. The compiler (\ref{obj_compiler}) will output machine code in this format. The ISA will support: fixed length instructions; 12-bit immediate values; primitive arithmetic instructions (ADD, SUB, MUL, etc.); GPIO read and write instructions; RAM stack operators (PUSH, POP).}
+\end{enumerate}
+
 \section{Resources and Dependencies}
+For the first half of the development cycle, the core can be developed and verified using the Verilog simulator and test suite, Verilator, and VHDL and Verilog simulator, iSim.
+
+The second half of development will require deploying and debugging on real hardware. This will require an FPGA development kit. To better emulate customer products, the development kit should feature common components such as LEDs, GPIO, USB interface, flash-based storage and memory, and optionally an analogue audio output port.
+
+The low-middle range of FPGA devices I am targeting is the popular and affordable yet feature rich Spartan-6 and Artix-7 FPGAs.
+
+\begin{enumerate}
+\item{Scarab Hardware - MiniSpartan6+ - £79 (owned) \citep{scarabhardware}. The MiniSpartan6+ features a Spartan-6 XC6SLX9 FPGA, 8 LEDs, 2 digital and analogue headers, FT2232 FTDI USB to JTAG, 64Mb SPI flash memory, 32MB SDRAM, an audio output jack, and a MicroSD socket.}
+
+\item{Digilent - Arty Artix-7 FPGA Development Board - £100 \citep{artry}. The Arty development board features a larger Artix-35T FPGA with over 20x the number of logic cells and block memory compared to the LX9 in the MiniSpartan6+. The board components include 256MB DDR3 RAM, 16MBx4 SPI flash memory, USB-JTAG, 8 LEDs (4 of which are RGB), 4 switches, 4 buttons, and multiple Pmod connectors.
+\\\\
+The greater number of IO options and larger FPGA make the Arty board better suited to emulating real customer products.
+}
+\end{enumerate}
 
 \section{Method of Approach}
+Development of the core and compiler will be done in separate stages of the project. The two deliverables will be split into 2 sub-projects. Both sub-projects will employ the Agile development process, using Agile's sprints to split up tasks into sub-tasks and Agile's scrums to discuss progress, features, and changes.
+
+Technologies used will be:
+\begin{enumerate}
+\item{Verilog - A hardware description language used to code the internal FPGA design.}
+
+\item{C - A low-level programming language to develop the compiler and assembler.}
+
+\item{Verilator - A C++ Verilog simulator and unit testing framework for verifying the FPGA design. Unit tests will be written for each component of the core: register set, decoder, arithmetic logic unit (ALU), and IO. This will aid the sprint approach by ensuring that requirements implied by the unit tests do not break over development iterations.}
+
+\item{iSim - A Verilog and VHDL Simulator. This will be used to visualize the timings of internal signals within the FPGA components such as the decoder and ALU.}
+\end{enumerate}
+
 
 \section{Initial Project Plan}
 
 \section{Initial Risk Assessment}
+The following section outlines potential projects risks their suitable management strategy.
+
+\begin{enumerate}
+\item{
+Real hardware synthesis. 
+
+A challenge involved in the development of FPGA, CPLD, and other programmable logic devices, is the realization of the HDL code on real hardware. This can result in different behaviour of the real implementation to the simulated design - a major (and expensive) problem. This issue is caused by not meeting physical constraints required by the FPGA. These include timing, space, and power constraints.
+
+To help reduce this issue, I will utilize the ISE Design Suite's constraint validator. Before deploying to real hardware, the design must meet the constraints I declare that enable it to run correctly on real hardware. I can use these constraints to identify how much space, time, and power, I have left to implement features.
+}
+\item{
+HDL Programming. 
+
+HDL (Hardware Description Language) is a text based language used to describe hardware components and their inter-connections. Verilog, a HDL language closer to C than VHDL, is what my FPGA core will be programmed in. This language is taught very little of in the Computer Science course and will require external learning resources so I can use it effectively. 
+
+My placement,  telecommunications signal generator company, Spirent Communications, heavily utilise FPGA devices in their products, in which I gained valuable knowledge on the FPGA development life cycle and deployment. To improve my knowledge of the tools required (ISE Design Suite) gained from my placement experience, I shall learn from HDL programming books such as HDL Programming Fundamentals: VHDL and Verilog \citep{hdl}.
+}
+
+\item{Compiler Development time. 
+
+A compiler will be required to provide an easy method of running user code on the FPGA core. The compiler is a lesser deliverable but will take considerable to time implement.
+
+If time is short, the compiler may only convert and assemble an assembly-like language with simple features (goto statements, stack management i.e. stack frames). If time is available, a better grammar can be developed with common language features such as if statements, scope blocks, and variables.
+
+The possibility also exists of using an existing compiler, such as GCC, LLVM, or 8CC, and creating a custom back-end for the FPGA core's architecture. My already brief experience with these compilers with their poor documentation means it may be quicker to build a compiler from scratch than create a custom back-end. A short period of time will be a given to allow exploration of compilers as it may allow using more language features (ANSI C) instead of a small subset. This will allow for a more complex demo of the FPGA core.
+}
+
+\item{
+Schedule overrun. 
+
+This is a complex project will multiple sub-projects (core \& compiler). Ensuring the large number of features will require a tight development schedule which is prone to over-running.
+
+I can identify and account for this by having weekly progress updates that will be scheduled with the project supervisor outlying feature progress and challenges. If the schedule slips largely due to an unforeseen problem or unreasonable requirement, this shall be brought up in the following meeting and a solution will be agreed upon, be it modifying deliverable or allowing extra time for the feature.
+}
+
+\item{Technology failure. 
+
+To overcome the risks of data loss all code and resources will be stored in local and remote Git repositories.
+In the event of the FPGA development kit failing, be it a component on the board or the FPGA itself, either: (a) A demo of the FPGA core not showing features of the failed component; or (b) A simulated design that meets constraints imposed by the physical FPGA will be provided and demonstrated.
+}
+\end{enumerate}
+
 
 \section{Quality Plan}
 
@@ -155,5 +258,5 @@ Firstly, the inclusion of a external microprocessor in a project design will req
 \citep{null}
 \newpage
 
-\bibliography{soft354_bib} 
+\bibliography{prco304} 
 \end{document}
