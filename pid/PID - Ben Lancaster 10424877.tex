@@ -55,13 +55,6 @@ year=2015
   author={Arndt, J{\"o}rg},
   year = 2002
 }
-
-@misc{null,
-  title={NULL},
-  author={NULL},
-  year = 0000
-}
-
 @book{hdl,
 title={HDL Programming Fundamentals: VHDL and Verilog},
 author={Nazeih Botros},
@@ -94,7 +87,7 @@ publisher={Da Vinci Engineering Press}
 \pagestyle{fancy}
 \lhead{\rightmark}
 \chead{}
-\rhead{SOFT354 - Parallel Computing and Distributed Systems}
+\rhead{FPGA-based Soft-Core CPU}
 \lfoot{\thepage}
 \cfoot{}
 \rfoot{Ben Lancaster 10424877}
@@ -139,16 +132,16 @@ The Discrete Fourier Transform algorithm is widely used in digital signal proces
 \newpage
 
 \section{Introduction}
+FPGA devices are an incredibly powerful and versatile solution to many electronics applications including digital signal processing and high-speed test and measurement tools. I will use this project opportunity to learn more about FPGA development and CPU architecture and apply knowledge learnt to create a solution to the need of a side-microprocessor in many FPGA-based applications.
+
 Modern computing and electronics equipment, like function generators, oscilloscopes, and spectrum analysers, use FPGAs to implement their compute intensive logic. These FPGAs are often accompanied by a small, low-cost, microprocessor to supervise and provide interfaces to external peripherals.
 
 The aim of this project is to implement this side-microprocessor into the FPGA to save on BOM costs, PCB space, and power costs, which contribute to higher development and product costs. While savings can be made by the lack of side microprocessor, the product may need a larger FPGA to accommodate the embedded microprocessor. The project will produce a small, soft-core, CPU design and compiler.
 
 \section{Business Case}
-The requirement of a side-microprocessor to control and provide external interfaces to FPGA-based applications carries a significant demand in both development and projects costs. 
+I will target my interest in FPGA development and apply my learning of such in tackling the issues resulting from the use of a side-microprocessor in FPGA based applications.
 
-Firstly, the inclusion of a external microprocessor in a project design will require more PCB space and design considerations, adding to the development time and costs of the project. 
-
-The external microprocessor may also require a licensed compiler to compile and load the code onto the microprocessor, adding to the cost of the project. In addition, the  microprocessor's on-chip memory may not be large enough to store the compiled code and an external flash memory chip may also be required.
+The requirement of a side-microprocessor to control and provide external interfaces to FPGA-based applications carries a significant demand in both development and projects costs. Firstly, the inclusion of a external microprocessor in a project design will require more PCB space and design considerations, adding to the development time and costs of the project. The external microprocessor may also require a licensed compiler to compile and load the code onto the microprocessor, adding to the cost of the project. In addition, the  microprocessor's on-chip memory may not be large enough to store the compiled code and an external flash memory chip may also be required.
 
 Moving to an integrated microprocessor on the FPGA brings many significant advantages.
 
@@ -158,20 +151,38 @@ Releasing updates to embedded projects is a challenging problem. With the integr
 \section{Project Objectives}
 The outcome of the project will be to design a small, portable, FPGA-based, CPU core that electronic Product Designers can choose as an alternative to a physical side-microprocessor to embed into their product.
 
+\subsection{Core Deliverables}
 The embedded core will provide most of the functions of the side-microprocessor, including:
 \begin{enumerate}
+\item{(Core deliverable) To improve my knowledge and experience of FPGA  development and CPU architecture.}
 \item{(Core deliverable) To provide product designers with an affordable alternative to a side-microprocessor in their FPGA-based products.}
+\item{(Core deliverable) To built a work and operational soft-core CPU core capable of simple tasks.}
 \item{(Core deliverable) To provide embedded products a convenient solution to in-field updating.}
 \item{(Core deliverable) To provide easy interfacing between the FPGA design and the embedded core.} 
 \item{(Core deliverable) To provide a technical documentation and specification for the embedded core.} 
 \end{enumerate}
 
 \section{Initial Scope}
+\subsection{Core Deliverables}
+These deliverables are the base requirement for the project to be released in a functional and worthwhile state.
 
 \begin{enumerate}
-\item{(Core deliverable) A small, portable, instantiated, FPGA-based CPU core}
-\item{(Core deliverable) A C-like programming interface. A compiler taking input of a C-like grammar and outputting executable machine code for the embedded core. The machine code can be embedded into the FPGA bitstream and loaded onto the FPGA to run. Time estimate: 1 month.}\label{obj_compiler}
-\item{(Core deliverable) A 16-bit open RISC instruction set architecture (ISA). The core will decode and execute instructions encoded in this format. The compiler (\ref{obj_compiler}) will output machine code in this format. The ISA will support: fixed length instructions; 12-bit immediate values; primitive arithmetic instructions (ADD, SUB, MUL, etc.); GPIO read and write instructions; RAM stack operators (PUSH, POP).}
+\item{(Core deliverable) A small, portable, instantiate-able, FPGA-based CPU core.}\label{scope_core}
+\item{(Core deliverable) A C-like programming interface. A compiler taking input of a C-like grammar and outputting executable machine code for the embedded core. The machine code can be embedded into the FPGA bitstream and loaded onto the FPGA to run. Time estimate: 1 month.}\label{scope_compiler}
+\item{(Core deliverable) A 16-bit RISC instruction set architecture (ISA). The core (\ref{scope_core}) will decode and execute instructions encoded in this format. The compiler (\ref{scope_compiler}) will output machine code in this format. The ISA will support: fixed length instructions; 12-bit immediate values; primitive arithmetic instructions (ADD, SUB, MUL, etc.); GPIO read and write instructions; RAM stack operators (PUSH, POP).}
+\end{enumerate}
+
+
+\subsection{Extended Deliverables}
+These deliverables may not be achievable in the time frame specific in section \ref{sect:plan}. These deliverables may require extra time to develop, require more experience and skill to develop, or require resources currently unattainable.
+
+\begin{enumerate}
+\item{GCC/LLVM/8CC compiler backend for C programming.}
+\item{Wishbone interface for easier modularity and inter-module communication.}\label{ext_wishbone}
+\item{Multi-core design with Wishbone (\ref{ext_wishbone}).}
+\item{Single-step debugging interface (with JTAG?).}
+\item{Configurable build options (register/bus widths, optimisations/pipelining, user/privileged user mode to support modern operating systems).}
+\item{Memory management modules to provide protected and virtual memory lookup tables.}
 \end{enumerate}
 
 \section{Resources and Dependencies}
@@ -182,9 +193,9 @@ The second half of development will require deploying and debugging on real hard
 The low-middle range of FPGA devices I am targeting is the popular and affordable yet feature rich Spartan-6 and Artix-7 FPGAs.
 
 \begin{enumerate}
-\item{Scarab Hardware - MiniSpartan6+ - £79 (owned) \citep{scarabhardware}. The MiniSpartan6+ features a Spartan-6 XC6SLX9 FPGA, 8 LEDs, 2 digital and analogue headers, FT2232 FTDI USB to JTAG, 64Mb SPI flash memory, 32MB SDRAM, an audio output jack, and a MicroSD socket.}
+\item{MiniSpartan6+ - Scarab Hardware - £79 (already owned) \citep{scarabhardware}. The MiniSpartan6+ features a Spartan-6 XC6SLX9 FPGA, 8 LEDs, 2 digital and analogue headers, FT2232 FTDI USB to JTAG, 64Mb SPI flash memory, 32MB SDRAM, an audio output jack, and a MicroSD socket.}
 
-\item{Digilent - Arty Artix-7 FPGA Development Board - £100 \citep{artry}. The Arty development board features a larger Artix-35T FPGA with over 20x the number of logic cells and block memory compared to the LX9 in the MiniSpartan6+. The board components include 256MB DDR3 RAM, 16MBx4 SPI flash memory, USB-JTAG, 8 LEDs (4 of which are RGB), 4 switches, 4 buttons, and multiple Pmod connectors.
+\item{Arty Artix-7 FPGA Development Board - Digilent - £100 \citep{arty}. The Arty development board features a larger Artix-35T FPGA with over 20x the number of logic cells and block memory compared to the LX9 in the MiniSpartan6+. The board components include 256MB DDR3 RAM, 16MBx4 SPI flash memory, USB-JTAG, 8 LEDs (4 of which are RGB), 4 switches, 4 buttons, and multiple Pmod connectors.
 \\\\
 The greater number of IO options and larger FPGA make the Arty board better suited to emulating real customer products.
 }
@@ -205,7 +216,7 @@ Technologies used will be:
 \end{enumerate}
 
 
-\section{Initial Project Plan}
+\section{Initial Project Plan}\label{sect:plan}
 
 \section{Initial Risk Assessment}
 The following section outlines potential projects risks their suitable management strategy.
@@ -219,14 +230,14 @@ A challenge involved in the development of FPGA, CPLD, and other programmable lo
 To help reduce this issue, I will utilize the ISE Design Suite's constraint validator. Before deploying to real hardware, the design must meet the constraints I declare that enable it to run correctly on real hardware. I can use these constraints to identify how much space, time, and power, I have left to implement features.
 }
 \item{
-HDL Programming. 
+HDL programming. 
 
 HDL (Hardware Description Language) is a text based language used to describe hardware components and their inter-connections. Verilog, a HDL language closer to C than VHDL, is what my FPGA core will be programmed in. This language is taught very little of in the Computer Science course and will require external learning resources so I can use it effectively. 
 
 My placement,  telecommunications signal generator company, Spirent Communications, heavily utilise FPGA devices in their products, in which I gained valuable knowledge on the FPGA development life cycle and deployment. To improve my knowledge of the tools required (ISE Design Suite) gained from my placement experience, I shall learn from HDL programming books such as HDL Programming Fundamentals: VHDL and Verilog \citep{hdl}.
 }
 
-\item{Compiler Development time. 
+\item{Compiler development time. 
 
 A compiler will be required to provide an easy method of running user code on the FPGA core. The compiler is a lesser deliverable but will take considerable to time implement.
 
@@ -255,8 +266,6 @@ In the event of the FPGA development kit failing, be it a component on the board
 
 \section{Legal, Social, and Ethical Considerations}
 
-\citep{null}
 \newpage
-
 \bibliography{prco304} 
 \end{document}
