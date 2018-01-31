@@ -1,5 +1,9 @@
 \documentclass[11pt,a4paper]{article}
 
+% font
+\renewcommand{\familydefault}{\sfdefault}
+
+
 \usepackage[margin=0.8in]{geometry}
 \usepackage[utf8]{inputenc}
 \usepackage{amsmath}
@@ -15,6 +19,33 @@
 
 %% https://en.wikibooks.org/wiki/LaTeX/List_Structures
 \usepackage{scrextend}
+
+% tables, row colour
+\usepackage{tabularx,colortbl}
+
+\usepackage{array,booktabs,arydshln,xcolor}
+\usepackage{xcolor}% http://ctan.org/pkg/xcolor
+\usepackage{fancyhdr}% http://ctan.org/pkg/fancyhdr
+\fancypagestyle{main}{%
+	\renewcommand{\headrulewidth}{2pt}
+	\renewcommand{\headrule}{\hbox to\headwidth{%
+		\color{red}\leaders\hrule height \headrulewidth\hfill}}
+	\renewcommand{\footrulewidth}{2pt}
+	\renewcommand{\footrule}{\hbox to\headwidth{%
+		\color{red}\leaders\hrule height \headrulewidth\hfill}}
+		
+	\fancyhf{}
+	\fancyhead[LE]{\textbf{\leftmark}}
+	\fancyhead[RE]{\textbf{CCC}}
+	\fancyhead[LO]{\textbf{CCC}}
+	\fancyhead[RO]{\textbf{\rightmark}}
+
+	\fancyfoot[LE]{\textbf{\thepage}}
+	\fancyfoot[RE]{\textbf{CCC Configuration Guide}}
+	\fancyfoot[LO]{\textbf{CCC Configuration Guide}}
+	\fancyfoot[RO]{\textbf{\thepage}}
+}
+
 
 %% Make bibliography show in table of contents
 %% https://tex.stackexchange.com/questions/8458/making-the-bibliography-appear-in-the-table-of-contents
@@ -79,8 +110,8 @@ publisher={Da Vinci Engineering Press}
 % https://tex.stackexchange.com/questions/86120/font-size-of-figure-caption-header
 \usepackage[font=scriptsize,labelfont=bf]{caption}
 
-\setlength{\belowcaptionskip}{-10pt}
-\setlength{\abovecaptionskip}{-5pt} % Chosen fairly arbitrarily
+%\setlength{\belowcaptionskip}{-10pt}
+%\setlength{\abovecaptionskip}{-5pt} % Chosen fairly arbitrarily
 
 
 \usepackage{fancyhdr}
@@ -152,9 +183,8 @@ Releasing updates to embedded projects is a challenging problem. With the integr
 The outcome of the project will be to design a small, portable, FPGA-based, CPU core that electronic Product Designers can choose as an alternative to a physical side-microprocessor to embed into their product.
 
 \subsection{Core Deliverables}
-The embedded core will provide most of the functions of the side-microprocessor, including:
 \begin{enumerate}
-\item{(Core deliverable) To improve my knowledge and experience of FPGA  development and CPU architecture.}
+\item{(Core deliverable) To improve my knowledge and experience of FPGA  development, CPU architecture, and low-level programming.}
 \item{(Core deliverable) To provide product designers with an affordable alternative to a side-microprocessor in their FPGA-based products.}
 \item{(Core deliverable) To built a work and operational soft-core CPU core capable of simple tasks.}
 \item{(Core deliverable) To provide embedded products a convenient solution to in-field updating.}
@@ -190,7 +220,7 @@ For the first half of the development cycle, the core can be developed and verif
 
 The second half of development will require deploying and debugging on real hardware. This will require an FPGA development kit. To better emulate customer products, the development kit should feature common components such as LEDs, GPIO, USB interface, flash-based storage and memory, and optionally an analogue audio output port.
 
-The low-middle range of FPGA devices I am targeting is the popular and affordable yet feature rich Spartan-6 and Artix-7 FPGAs.
+The low-middle range of FPGA devices I am targeting is the popular and affordable yet feature rich Spartan-6 and Artix-7 FPGAs. From my placement, I have gained experience in Xilinx FPGA and so will be targeting them for this project to reduce risk and development time.
 
 \begin{enumerate}
 \item{MiniSpartan6+ - Scarab Hardware - £79 (already owned) \citep{scarabhardware}. The MiniSpartan6+ features a Spartan-6 XC6SLX9 FPGA, 8 LEDs, 2 digital and analogue headers, FT2232 FTDI USB to JTAG, 64Mb SPI flash memory, 32MB SDRAM, an audio output jack, and a MicroSD socket.}
@@ -215,10 +245,62 @@ Technologies used will be:
 \item{iSim - A Verilog and VHDL Simulator. This will be used to visualize the timings of internal signals within the FPGA components such as the decoder and ALU.}
 \end{enumerate}
 
-
+\newpage
 \section{Initial Project Plan}\label{sect:plan}
 
-\section{Initial Risk Assessment}
+\subsection{Project time-line breakdown}
+The project will be split into 4 parts: 1) Project information gathering and requirement generation; 2) Active development sprints; 3) Test and verification; 4) Final report and clean up.
+
+The following table breaks down the 4 parts into sub-tasks and provides their descriptions and estimated start and end times.
+
+%\newcolumntype{b}{X}
+%\newcolumntype{s}{>{\hsize=.5\hsize}X}
+\begin{table}[h]
+    \begin{tabularx}{\textwidth}{|p{5cm}|l|l|X|}
+    \hline
+    Stage & Start Date* & End Date* & Project Deliverables \\
+	\specialrule{2pt}{-2pt}{0pt}
+    %Type 2 & 15-11 & 10-8 & \multicolumn{2}{c|}{7-0} & Semantics \\
+    %\specialrule{2pt}{-2pt}{0pt}
+	1.0. Project Initiation & & 02 Feb & Process Initiation Document\\ \hline
+	1.1. Research and requirement gathering & 02 Feb & 09 Feb & Existing soft-core processor designs, constraints, features, implementation.
+	\\ \hline
+	1.2. Core high level design & 10 Feb & 17 Feb & Soft-core CPU architecture; Register definitions; Bus widths; Initial ISA instruction table.
+	\\ \hline
+	\specialrule{2pt}{-2pt}{0pt}
+	2.1. Core development sprints & 18 Feb & 10 Mar & Iterative soft-core development sprints
+	\\ \hline
+	\rowcolor{lightgray}
+	2.1.1. Core testing and verification & 11 Mar & 15 Mar & Any tasks required to meet design constraints.
+	\\ \hline
+	2.2. Compiler development sprints & 15 Mar & 31 Mar & Iterative compiler development sprints
+	\\ \hline
+	\rowcolor{lightgray}
+	2.2.1. Compiler testing and verification & 10 Apr & 14 Apr & Any tasks required for compiler to produce correct code generation.
+	\\ \hline
+	\specialrule{2pt}{-2pt}{0pt}
+	3.1. Real hardware deployment & 15 Apr & 19 Apr & Deployment of Verilog code to a real FPGA device.
+	\\ \hline
+	3.2. Final verification & 20 Apr & 24 Apr & Verification for FPGA design and compiler.
+	\\ \hline
+	\specialrule{2pt}{-2pt}{0pt}
+	4.1. Complete final report & 25 Apr & 4 May & PRCO304 Report.
+	\\ \hline
+    \end{tabularx}
+    \caption{Initial Project Plan time breakdown\\ *Expected time.\\Shaded rows are time varying periods for bug fixing.}
+\end{table}
+
+\subsection{Control Plan}
+Management of the project will be done using the PRINCE2 technique. 
+
+The project initiation document (this) describes high-level requirements, objectives, and business cases.
+
+Weekly highlight reports and meetings will be held to ensure task proficiency and to identify any challenges that need attention.
+
+Project risks and challenges are identified in section \ref{sect:risk} along with proposed solutions for their occurrence.
+
+\newpage
+\section{Initial Risk Assessment}\label{sect:risk}
 The following section outlines potential projects risks their suitable management strategy.
 
 \begin{enumerate}
@@ -227,7 +309,7 @@ Real hardware synthesis.
 
 A challenge involved in the development of FPGA, CPLD, and other programmable logic devices, is the realization of the HDL code on real hardware. This can result in different behaviour of the real implementation to the simulated design - a major (and expensive) problem. This issue is caused by not meeting physical constraints required by the FPGA. These include timing, space, and power constraints.
 
-To help reduce this issue, I will utilize the ISE Design Suite's constraint validator. Before deploying to real hardware, the design must meet the constraints I declare that enable it to run correctly on real hardware. I can use these constraints to identify how much space, time, and power, I have left to implement features.
+To help reduce this issue, I will utilise the ISE Design Suite's constraint validator tool. Before deploying to real hardware, the design must meet the constraints I declare that enable it to run correctly on real hardware. I can use these constraints to identify how much space, time, and power, I have left to implement features.
 }
 \item{
 HDL programming. 
