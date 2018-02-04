@@ -1,0 +1,340 @@
+\documentclass[11pt,a4paper]{article}
+
+% font
+\renewcommand{\familydefault}{\sfdefault}
+
+
+\usepackage[margin=0.8in]{geometry}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage[hidelinks]{hyperref}
+\usepackage{float}
+
+\usepackage{lipsum}% http://ctan.org/pkg/lipsum
+
+%% Bibliography/references packages
+\usepackage[comma]{natbib}
+%%\bibliographystyle{agsm}
+\bibliographystyle{dcu}
+
+%% https://en.wikibooks.org/wiki/LaTeX/List_Structures
+\usepackage{scrextend}
+
+% tables, row colour
+\usepackage{tabularx,colortbl}
+
+% https://tex.stackexchange.com/questions/22751/how-to-force-table-caption-on-top
+%\usepackage[tableposition=top]{caption}
+\usepackage{float}
+\floatstyle{plaintop}
+\restylefloat{table}
+
+% https://en.wikibooks.org/wiki/LaTeX/List_Structures
+\usepackage{enumitem}
+
+
+%% Report variables
+\newcommand{\scname}{BSC-1816}
+\newcommand{\dlatestv}{1.00}
+
+\usepackage{array,booktabs,arydshln,xcolor}
+\usepackage{xcolor}% http://ctan.org/pkg/xcolor
+\usepackage{fancyhdr}% http://ctan.org/pkg/fancyhdr
+\fancypagestyle{main}{%
+	\renewcommand{\headrulewidth}{2pt}
+	\renewcommand{\headrule}{\hbox to\headwidth{%
+		\color{red}\leaders\hrule height \headrulewidth\hfill}}
+	\renewcommand{\footrulewidth}{2pt}
+	\renewcommand{\footrule}{\hbox to\headwidth{%
+		\color{red}\leaders\hrule height \headrulewidth\hfill}}
+	
+	%\fancyhf{}
+	%\fancyhead[LE]{\textbf{\leftmark}}
+	%\fancyhead[RE]{\textbf{\scname{}}}
+	%\fancyhead[LO]{\textbf{\scname{}}}
+	%\fancyhead[RO]{\textbf{\rightmark}}
+
+	%\fancyfoot[LE]{\textbf{\thepage}}
+	%\fancyfoot[RE]{\textbf{\scname{} Configuration Guide}}
+	%\fancyfoot[LO]{\textbf{\scname{} Configuration Guide}}
+	%\fancyfoot[RO]{\textbf{\thepage}}
+}
+
+
+%% Make bibliography show in table of contents
+%% https://tex.stackexchange.com/questions/8458/making-the-bibliography-appear-in-the-table-of-contents
+\usepackage[nottoc,numbib]{tocbibind}
+%% ^^^ overwrites \bibname, so set it back
+\renewcommand{\bibname}{References}
+
+\RequirePackage{filecontents}
+\begin{filecontents}{prco304.bib}
+@online{wikipedia:dft,
+  author = {Wikipedia},
+  title = {Discrete Fourier transform},
+  year = 2018,
+  url = {https://en.wikipedia.org/wiki/Discrete\_Fourier\_transform},
+  urldate = {2018-01-15}
+}
+@online{server:gpu,
+  author = {Amazon AWS},
+  title = {Introducing Amazon EC2 P2 Instances, the largest GPU-Powered virtual machine in the cloud},
+  year = 2018,
+  url = {https://aws.amazon.com/about-aws/whats-new/2016/09/introducing-amazon-ec2-p2-instances-the-largest-gpu-powered-virtual-machine-in-the-cloud/},
+  urldate = {2016-09-26}
+}
+@misc{scarabhardware,
+title={MiniSpartan6+}, 
+journal={{Scarab Hardware}},
+url={https://www.scarabhardware.com/minispartan6/},
+year=2014
+}
+@misc{arty,
+title={Arty Artix-7 FPGA Development Board}, 
+journal={{Avnet}},
+url={https://uk.rs-online.com/web/p/programmable-logic-development-kits/1346478/},
+year=2015
+}
+@misc{arndt2002algorithms,
+  title={Algorithms For Programmers},
+  author={Arndt, J{\"o}rg},
+  year = 2002
+}
+@book{hdl,
+title={HDL Programming Fundamentals: VHDL and Verilog},
+author={Nazeih Botros},
+year={2006},
+publisher={Da Vinci Engineering Press}
+}
+
+@misc{arm, title={ARM in the World of FPGA-Based Prototyping}, url={https://community.arm.com/processors/b/blog/posts/arm-in-the-world-of-fpga-based-prototyping}, journal={Arm Community},
+year={2016}}
+
+@book{microblaze,
+title={MicroBlaze 
+Processor Reference 
+Guide},
+journal={Xilinx},
+year={2017}
+} 
+
+\end{filecontents}
+
+%s comments
+\usepackage{verbatim}
+
+%inline graphs
+\usepackage{wrapfig}
+% multiple figures on line
+\usepackage{subfig}
+
+\usepackage{graphicx}
+\graphicspath{ {img/} }
+
+% Caption font size
+% https://tex.stackexchange.com/questions/86120/font-size-of-figure-caption-header
+\usepackage[font=scriptsize,labelfont=bf]{caption}
+
+%\setlength{\belowcaptionskip}{-10pt}
+%\setlength{\abovecaptionskip}{-5pt} % Chosen fairly arbitrarily
+
+
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\lhead{\rightmark}
+\chead{}
+\rhead{FPGA-based Soft-Core CPU (Rev. \dlatestv{})}
+\lfoot{Page \thepage}
+\cfoot{}
+\rfoot{Ben Lancaster 10424877}
+
+\renewcommand{\subsectionmark}[1]{\markright{\thesubsection\ #1}}
+
+
+\begin{document}
+
+\begin{titlepage}
+\begin{center}
+
+\vspace*{5cm}
+\Large
+\textbf{
+%%PRCO304 - Project Initiation Document
+\scname{} - Processor Documentation
+}
+
+\vspace{0.4cm}
+\large
+%%Space optimised FPGA-based side-microprocessor.
+PRCO304 - Processor Documentation
+%%EMBEDDED CPU - FPGA-based RISC microprocessor
+
+\vspace{4cm}
+\textbf{Ben Lancaster}\\
+\today 
+
+
+\end{center}
+
+\end{titlepage}
+
+\pagestyle{main}
+
+\section*{Revision History}
+\begin{table}[h]
+\def\arraystretch{1.5}%  1 is the default, change whatever you need
+    \begin{tabularx}{\textwidth}{|l|l|X|}
+    \hline
+    Date & Version & Changes \\
+	\specialrule{2pt}{-2pt}{0pt}
+	04/02/2018 & 1.00 & Initial revision. Processor introduction. Initial ISA. Initial Register definitions.
+	\\ \hline
+    \end{tabularx}
+    \caption{Document revisions.}
+\end{table}
+\newpage
+
+\renewcommand*\contentsname{Table of Contents}
+\tableofcontents
+\newpage
+
+\section{\scname{} Processor}
+The \scname{} processor is a soft-microprocessor design targeted for general purpose computing and co-processing. 
+
+\subsection{Features}
+\begin{itemize}
+\item{Small, embeddable, Verilog core.}
+\item{16-bit RISC instruction set.}
+\item{16-bit register, ALU, and IO, bus widths.}
+\item{12+12 general purpose IO inputs and outputs.}
+\item{9 special IO pins.}
+\begin{itemize}
+\item{4 PWM pins.}
+\item{2 RS232 pins.}
+\item{3 SPI pins.}
+\end{itemize}
+
+\end{itemize}
+
+\newpage
+\section{\scname{} Architecture}
+\subsection{Registers}
+\scname{} has a total of 6 addressable, read and write, registers. These registers are identified by letters A through F.
+
+\subsubsection{General Purpose Registers}
+Registers A through D are designed for general purpose use and are safe to store user values over the run-time of the processor.
+
+\begin{table}[h]
+\def\arraystretch{1.5}%  1 is the default, change whatever you need
+    \begin{tabularx}{\textwidth}{|p{2cm}|l|X|}
+    \hline
+    Registers & Bits & Description \\
+	\specialrule{2pt}{-2pt}{0pt}
+	A through D & 15:0 & 4 General purpose registers
+	\\ \hline
+    \end{tabularx}
+    \caption{General purpose registers.}
+\end{table}
+
+Instructions that require a destination register, such as CMP, can reference any register (even special registers if that is your requirement). For the CMP instruction as an example, the processor will put the result of the comparison instruction in the destination register, overwriting any value present in that register.
+
+\subsubsection{Special Registers}
+Registers E and F are special registers within the processor. The processor cannot guarantee that a value written or read in these registers will persist over the run-time of the processor. Erroneously writing to these registers may severely affect program and processor behaviour.
+
+Even though all registers can be used at the will of the programmer, it is recommended to isolate a few registers to provide special features, such as RAM stack management, interrupts, and IO multiplexing.
+
+\begin{table}[h]
+\def\arraystretch{1.5}%  1 is the default, change whatever you need
+    \begin{tabularx}{\textwidth}{|p{2cm}|l|X|}
+    \hline
+    Registers & Bits & Description \\
+	\specialrule{2pt}{-2pt}{0pt}
+	E & 15:0 & RAM Stack pointer
+	\\ \hline
+	F & 15:0 & RAM Base pointer
+	\\ \hline
+    \end{tabularx}
+    \caption{Special registers.}
+\end{table}
+
+
+\subsection{Interrupts and Exceptions}
+
+\newpage
+\section{\scname{} Instruction Set Architecture}
+This section describes instructions available on the \scname{} processor.
+
+\subsection{General Instructions}
+The term, general instruction, is given to instructions that are common to primitive operations such as arithmetic and comparison instructions.
+
+
+\subsection*{ADD}
+\begin{description}[align=right,labelwidth=4cm]
+\item [Description] The ADD instruction adds an immediate value to a destination register, Rd.
+\item [Assembly] ADD Rd, 255
+\item [Pseudocode]Rd $<=$ Rd + Imm8
+\item [Registers altered] Rd
+\end{description}
+
+\begin{table}[h]
+\def\arraystretch{1.5}%  1 is the default, change whatever you need
+    \begin{tabularx}{\textwidth}{|p{4cm}|p{3cm}|X|}
+    \hline
+    15:12 & 11:9 & 8:0 \\
+	\specialrule{2pt}{-2pt}{0pt}
+	0001 & Rd & Imm8
+	\\ \hline
+    \end{tabularx}
+\end{table}
+
+
+\subsection*{SUB}
+\begin{description}[align=right,labelwidth=4cm]
+\item [Description] The SUB instruction subtracts an immediate value from a destination register, Rd.
+\item [Assembly] SUB Rd, 255
+\item [Pseudocode]Rd $<=$ Rd - Imm8
+\item [Registers altered] Rd
+\end{description}
+
+\begin{table}[h]
+\def\arraystretch{1.5}%  1 is the default, change whatever you need
+    \begin{tabularx}{\textwidth}{|p{4cm}|p{3cm}|X|}
+    \hline
+    15:12 & 11:9 & 8:0 \\
+	\specialrule{2pt}{-2pt}{0pt}
+	0002 & Rd & Imm8
+	\\ \hline
+    \end{tabularx}
+\end{table}
+
+\subsection*{CMP}
+\begin{description}[align=right,labelwidth=4cm]
+\item [Description] Sets register, Rd, to the value of Ra - Rb.
+\item [Assembly] CMP Rd, Ra, Rb
+\item [Pseudocode]Rd $<=$ CMP(Ra, Rb)
+\item [Registers altered] Rd
+\end{description}
+
+\begin{table}[h]
+\def\arraystretch{1.5}%  1 is the default, change whatever you need
+    \begin{tabularx}{\textwidth}{|p{4cm}|p{2cm}|p{2cm}|p{2cm}|X|}
+    \hline
+    15:12 & 11:9 & 8:6 & 5:3 & 2:0 \\
+	\specialrule{2pt}{-2pt}{0pt}
+	0003 & Rd & Ra & Rb & X
+	\\ \hline
+    \end{tabularx}
+\end{table}
+
+\subsection{Special Instructions}
+
+\newpage
+\section{Compiler}
+\subsection{}
+
+
+\newpage
+\bibliography{prco304} 
+\end{document}
