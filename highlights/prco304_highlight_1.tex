@@ -162,13 +162,13 @@ year={2017}
 \Large
 \textbf{
 %%PRCO304 - Project Initiation Document
-\scname{} - Processor Documentation
+Highlight Reports
 }
 
 \vspace{0.4cm}
 \large
 %%Space optimised FPGA-based side-microprocessor.
-PRCO304 - Processor Documentation
+PRCO304 - FPGA-based RISC microprocessor
 %%EMBEDDED CPU - FPGA-based RISC microprocessor
 
 \vspace{4cm}
@@ -187,9 +187,9 @@ PRCO304 - Processor Documentation
 \def\arraystretch{1.5}%  1 is the default, change whatever you need
     \begin{tabularx}{\textwidth}{|l|l|X|}
     \hline
-    Date & Version & Changes \\
+    Date & Highlight & Changes \\
 	\specialrule{2pt}{-2pt}{0pt}
-	04/02/2018 & 1.00 & Initial revision. Processor introduction. Initial ISA. Initial Register definitions.
+	06/02/2018 & 1 & Highlight report 1.
 	\\ \hline
     \end{tabularx}
     \caption{Document revisions.}
@@ -200,139 +200,59 @@ PRCO304 - Processor Documentation
 \tableofcontents
 \newpage
 
-\section{\scname{} Processor}
-The \scname{} processor is a soft-microprocessor design targeted for general purpose computing and co-processing. 
-
-\subsection{Features}
-\begin{itemize}
-\item{Small, embeddable, Verilog core.}
-\item{16-bit RISC instruction set.}
-\item{16-bit register, ALU, and IO, bus widths.}
-\item{12+12 general purpose IO inputs and outputs.}
-\item{9 special IO pins.}
-\begin{itemize}
-\item{4 PWM pins.}
-\item{2 RS232 pins.}
-\item{3 SPI pins.}
-\end{itemize}
-
-\end{itemize}
-
-\newpage
-\section{\scname{} Architecture}
-\subsection{Registers}
-\scname{} has a total of 6 addressable, read and write, registers. These registers are identified by letters A through F.
-
-\subsubsection{General Purpose Registers}
-Registers A through D are designed for general purpose use and are safe to store user values over the run-time of the processor.
-
-\begin{table}[h]
+\section{Highlight Reports}
+\subsection{Highlight Report 1}
+\begin{table}[H]
 \def\arraystretch{1.5}%  1 is the default, change whatever you need
-    \begin{tabularx}{\textwidth}{|p{2cm}|l|X|}
-    \hline
-    Registers & Bits & Description \\
+    \begin{tabularx}{\textwidth}{|X|}
+    \hline 
+	\multicolumn{1}{|c|}{\textbf{PRCO304: Highlight Report 1}}
+    \\
 	\specialrule{2pt}{-2pt}{0pt}
-	A through D & 15:0 & 4 General purpose registers
+    \textbf{Name:} Ben Lancaster
+    \\ \specialrule{2pt}{-2pt}{0pt}
+	\textbf{Date:} 06/02/2018
+	\\ \specialrule{2pt}{-2pt}{0pt}
+	\textbf{Active project stage:} Stage 1.1:  Research  and  Requirement Gathering
+	\\ \specialrule{2pt}{-2pt}{0pt}
+	\textbf{Review of work undertaken:}\newline
+	This week was assigned to work on stage 1.1:  Research  and  requirement
+gathering. \newline\newline
+	\textbf{Research and requirement gathering:}\newline
+	Research into existing soft-core processor designs has been started to identify their features, targets, and advantages and disadvantages. Key existing soft-core processors found are:\newline
+	-  Xilinx' MicroBlaze: a 32-bit Xilinx FPGA embeddable core capable of running operating systems, like Linux. Exposes a configurable GUI to customise the build of the processor to suit designers requirements (like number of GPIO, interrupts, timers, etc.).\newline
+	- ARM Cortex-A9: a 32-bit Xilinx and Altera FPGA core. Features out-of-order execution, compatible with existing ARM Thumb2 C compilers, and multi-core processing.\newline\newline
+	I have used this research to aim my soft-core processor's requirements and architecture. To document and finalize my processors design and requirements, I have started a processor specification and reference document. This document outlines the processors features, architecture, compatibility, and instructions.
+	\newline\newline
+	Additional progress:\newline
+	- Version control set up for documentation, highlight reports, and code bases.
+		
+	\\ \hline
+	\textbf{Risks and Challenges:}\newline
+	{\color{red} Urgent risks:}\newline
+	{\color{orange} New risks:}\newline
+	{\color{purple} Existing risks:}\newline
+	\\ \hline
+	\textbf{Plan of work for the next week:}\newline
+	Work will begin on Stage 1.2: Core high level design.\newline\newline
+	Finalised specifications and architecture of the soft-core processor will be put into a processor specification and reference document.
+	\newline
+	Architecture, control, pipelines, will be visualised in this document.
+	
+	\\ \hline
+	\textbf{Date(s) of supervisory meeting(s) since last Highlight:}\newline
+	This is the 1st highlight report.\newline
+	30/01/18 - An introductory meeting was held to discuss the project initiation document (PID) and gain feedback on the project.
+	\\ \hline
+	\textbf{Notes from supervisory meeting(s) held since last Highlight:}\newline
+	Ensure risks are carefully explored and project core deliverables are realistic and achievable.
+	\\ \hline
+	\textbf{Stage review:}\newline
+	N/A
 	\\ \hline
     \end{tabularx}
-    \caption{General purpose registers.}
+    %\caption{Document revisions.}
 \end{table}
-
-Instructions that require a destination register, such as CMP, can reference any register (even special registers if that is your requirement). For the CMP instruction as an example, the processor will put the result of the comparison instruction in the destination register, overwriting any value present in that register.
-
-\subsubsection{Special Registers}
-Registers E and F are special registers within the processor. The processor cannot guarantee that a value written or read in these registers will persist over the run-time of the processor. Erroneously writing to these registers may severely affect program and processor behaviour.
-
-Even though all registers can be used at the will of the programmer, it is recommended to isolate a few registers to provide special features, such as RAM stack management, interrupts, and IO multiplexing.
-
-\begin{table}[h]
-\def\arraystretch{1.5}%  1 is the default, change whatever you need
-    \begin{tabularx}{\textwidth}{|p{2cm}|l|X|}
-    \hline
-    Registers & Bits & Description \\
-	\specialrule{2pt}{-2pt}{0pt}
-	E & 15:0 & RAM Stack pointer
-	\\ \hline
-	F & 15:0 & RAM Base pointer
-	\\ \hline
-    \end{tabularx}
-    \caption{Special registers.}
-\end{table}
-
-
-\subsection{Interrupts and Exceptions}
-
-\newpage
-\section{\scname{} Instruction Set Architecture}
-This section describes instructions available on the \scname{} processor.
-
-\subsection{General Instructions}
-The term, general instruction, is given to instructions that are common to primitive operations such as arithmetic and comparison instructions.
-
-
-\subsection*{ADD}
-\begin{description}[align=right,labelwidth=4cm]
-\item [Description] The ADD instruction adds an immediate value to a destination register, Rd.
-\item [Assembly] ADD Rd, 255
-\item [Pseudocode]Rd $<=$ Rd + Imm8
-\item [Registers altered] Rd
-\end{description}
-
-\begin{table}[h]
-\def\arraystretch{1.5}%  1 is the default, change whatever you need
-    \begin{tabularx}{\textwidth}{|p{4cm}|p{3cm}|X|}
-    \hline
-    15:12 & 11:9 & 8:0 \\
-	\specialrule{2pt}{-2pt}{0pt}
-	0001 & Rd & Imm8
-	\\ \hline
-    \end{tabularx}
-\end{table}
-
-
-\subsection*{SUB}
-\begin{description}[align=right,labelwidth=4cm]
-\item [Description] The SUB instruction subtracts an immediate value from a destination register, Rd.
-\item [Assembly] SUB Rd, 255
-\item [Pseudocode]Rd $<=$ Rd - Imm8
-\item [Registers altered] Rd
-\end{description}
-
-\begin{table}[h]
-\def\arraystretch{1.5}%  1 is the default, change whatever you need
-    \begin{tabularx}{\textwidth}{|p{4cm}|p{3cm}|X|}
-    \hline
-    15:12 & 11:9 & 8:0 \\
-	\specialrule{2pt}{-2pt}{0pt}
-	0002 & Rd & Imm8
-	\\ \hline
-    \end{tabularx}
-\end{table}
-
-\subsection*{CMP}
-\begin{description}[align=right,labelwidth=4cm]
-\item [Description] Sets register, Rd, to the value of Ra - Rb.
-\item [Assembly] CMP Rd, Ra, Rb
-\item [Pseudocode]Rd $<=$ CMP(Ra, Rb)
-\item [Registers altered] Rd
-\end{description}
-
-\begin{table}[h]
-\def\arraystretch{1.5}%  1 is the default, change whatever you need
-    \begin{tabularx}{\textwidth}{|p{4cm}|p{2cm}|p{2cm}|p{2cm}|X|}
-    \hline
-    15:12 & 11:9 & 8:6 & 5:3 & 2:0 \\
-	\specialrule{2pt}{-2pt}{0pt}
-	0003 & Rd & Ra & Rb & X
-	\\ \hline
-    \end{tabularx}
-\end{table}
-
-\subsection{Special Instructions}
-
-\newpage
-\section{Compiler}
-\subsection{}
 
 
 \newpage
