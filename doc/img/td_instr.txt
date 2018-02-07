@@ -1,0 +1,13 @@
+{ signal: [
+  { name: "i_clk", 		wave: "P.......", },
+  { name: 's_fetch',    wave: "x=xxxxx=x", data: ["FETCH", "FETCH"], node: "..a....b."},
+  { name: 's_decode',    wave: "xx=xxxxxx", data: ["DECODE"]},
+  { name: 's_read',    wave: "xxx=xxxxx", data: ["REG READ"]},
+  { name: 's_exec',    wave: "xxxx=xxxx", data: ["EXECUTE"], node: ".....c..."},
+  { name: 's_ram',    wave: "xxxxx=xxx", data: ["RAM"], node: ".....d...."},
+  { name: 's_write',    wave: "xxxxxx=xx", data: ["WRITE"], node: "......e."},
+  ],
+  config: {hscale: 2},
+  head: {text: 'Instruction Cycle', tick:0,},
+  edge: ["a~>b Max 7 clocks per intsruction", "c~>d", "c-|>e Skip RAM"],
+}
