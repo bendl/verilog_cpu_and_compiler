@@ -19,7 +19,7 @@
 
   <properties>
     <property xil_pn:name="Project Description" xil_pn:value=""/>
-    <property xil_pn:name="Working Directory" xil_pn:value="Z:/uni/prco304/prco_cpu"/>
+    <property xil_pn:name="Working Directory" xil_pn:value="Z:/uni/prco304/prco_core/ise"/>
     <property xil_pn:name="Top-Level Source Type" xil_pn:value="HDL"/>
     <property xil_pn:name="Synthesis Tool" xil_pn:value="XST (VHDL/Verilog)"/>
     <property xil_pn:name="Simulator" xil_pn:value="ISim (VHDL/Verilog)"/>
