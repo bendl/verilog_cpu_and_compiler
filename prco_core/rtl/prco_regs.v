@@ -19,7 +19,9 @@ module prco_regs (
     input [15:0]        i_datd
 );
     // 8 16-bit registers
-    reg [15:0] r_regs[0:7];
+    reg [15:0] r_regs[0:7]/*verilator public_flat*/;
+
+    reg [7:0] foo /*verilator public_flat*/;
     
     // Reset interator
     integer i;
