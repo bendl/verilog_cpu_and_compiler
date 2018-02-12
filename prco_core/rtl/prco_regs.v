@@ -42,6 +42,8 @@ module prco_regs (
             else begin
                 // Write to a register
                 if(i_we == 1) begin
+                    $display("Writing register %d value: %h",
+                        i_seld, i_datd);
                     r_regs[i_seld] <= i_datd;
                 end
 

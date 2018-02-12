@@ -25,30 +25,33 @@ module prco_decoder (
 
         case (ti_op)
             `PRCO_OP_NOP: begin
-                $display("PRCO_OP_NOP");
                 q_sela <= i_instr[7:5];
                 q_reg_we <= 0;
+                $display("PRCO_OP_NOP");
                 end
+                
             `PRCO_OP_MOVI: begin
+                q_sela <= i_instr[7:5];
+                q_reg_we <= 1;
                 $display("PRCO_OP_MOVI\t%d, %d", q_imm8, q_seld);
-                q_sela <= i_instr[7:5];
-                q_reg_we <= 1;
                 end
+                
             `PRCO_OP_MOV: begin
+                q_sela <= i_instr[7:5];
+                q_reg_we <= 1;
                 $display("PRCO_OP_MOV\t%d, %d", q_sela, q_seld);
-                q_sela <= i_instr[7:5];
-                q_reg_we <= 1;
                 end
+                
             `PRCO_OP_ADD: begin
-                $display("PRCO_OP_ADD\t%d, %d", q_sela, q_seld);
                 q_sela <= i_instr[7:5];
                 q_reg_we <= 1;
+                $display("PRCO_OP_ADD\t%d, %d", q_sela, q_seld);
                 end
 
             default: begin
-                $display("Unknown op: %h", ti_op);
                 q_sela <= i_instr[7:5];
                 q_reg_we <= 0;
+                $display("Unknown op: %h", ti_op);
                 end
         endcase
     endtask

@@ -1,5 +1,7 @@
 `timescale 1ns / 1ps
 
+`include "../inc/prco_test.v"
+
 module tb_prco_regs;
 
     // Inputs

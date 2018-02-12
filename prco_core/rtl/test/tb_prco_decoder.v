@@ -2,11 +2,7 @@
 
 `include "../inc/prco_constants.v"
 `include "../inc/prco_isa.v"
-
-`define assert(condition) \
-    if(!condition) begin \
-        $display("Assertion failed!"); $finish(1); \
-    end
+`include "../inc/prco_test.v"
 
 module tb_prco_decoder;
 

@@ -1,6 +1,9 @@
 // prco_constants.v
 
-// Register definitions
+// Register widths
+`define REG_WIDTH       15
+
+// Register names
 `define REG_AX          0
 `define REG_BX          1
 `define REG_CX          2
