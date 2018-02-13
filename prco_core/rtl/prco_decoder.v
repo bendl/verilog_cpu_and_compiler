@@ -5,7 +5,20 @@
 
 module prco_decoder (
     input i_clk,
+    input i_reset,
+    
     input i_en,
+    
+    // Pipeline control
+    input               i_p_cp,
+    input               i_p_stalled,
+    input               i_p_valid,
+    output              q_p_stalled,
+    output reg          q_p_valid,
+    input               i_p_ce,
+    output              q_p_ce,
+
+    input               i_p_block,
     
     input [15:0]                i_instr,
 
@@ -19,6 +32,7 @@ module prco_decoder (
     output reg                  q_req_alu,
     output reg                  q_req_ram
 );
+    reg [15:0] b_instr;
 
     /// Task to set appropriate output signals for the
     /// incoming i_instr[15:0]
@@ -59,8 +73,37 @@ module prco_decoder (
     endtask
 
     // TODO(ben): Should sensitivity list include i_instr?
-    always @(posedge i_clk, posedge i_en, i_instr) begin
+    always @(posedge i_clk, posedge i_en) begin
         if(i_en == 1) begin
+            
+        end
+    end
+
+    // Pipeline control
+    // We are stalled if we are ready but the next stage isn't ready (stalled)
+    assign q_p_stalled = q_p_valid && (i_p_stalled || i_p_block);
+
+    // Ready to progress if: previous stage is ready (valid)
+    // and next stage isn't stalled.
+    assign q_p_ce = i_p_valid && !q_p_stalled;
+
+    always @(posedge i_clk) begin
+        if (q_p_stalled) begin
+            $display("DEC: Stalled because of mem!");
+        end
+
+        if (q_p_ce) begin
+            $display("DEC: doing...");
+        end
+    end
+
+    always @(posedge i_clk) begin
+        if (i_reset || i_p_cp) begin
+            q_p_valid <= 0;
+        end else if (q_p_ce) begin
+            q_p_valid <= i_p_valid;
+
+            b_instr <= i_instr;
             q_op <= i_instr[15:11];
             q_seld <= i_instr[10:8];
             q_imm8 <= i_instr[7:0];
@@ -68,6 +111,9 @@ module prco_decoder (
             
             // Decode opcode and set outputs
             handle_opcode(i_instr[15:11]);
+
+        end else if (i_p_ce) begin
+            q_p_valid <= 0;
         end
     end
 

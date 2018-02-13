@@ -6,6 +6,17 @@ module prco_regs (
     input               i_clk,
     input               i_en,
     input               i_reset,
+    
+    // Pipeline control
+    input               i_p_cp,
+    output reg          q_p_cp,
+
+    input               i_p_stalled,
+    input               i_p_valid,
+    output              q_p_stalled,
+    output reg          q_p_valid,
+    input               i_p_ce,
+    output              q_p_ce,
 
     // Dual port memory access
     input [2:0]         i_sela,
@@ -28,7 +39,7 @@ module prco_regs (
 
     always @(posedge i_clk, posedge i_reset, posedge i_en)
     begin
-        if(i_en == 1) begin
+        if(i_en == 1 && q_p_ce) begin
             // Reset the register set
             if(i_reset == 1) begin
                 $display("Resetting Registers");
@@ -51,10 +62,41 @@ module prco_regs (
                     r_regs[i_seld] <= i_datd;
                 end
 
-                // Write output
+                // Writeking output
                 q_data <= r_regs[i_sela];
                 q_datb <= r_regs[i_selb];
             end
+        end
+    end
+
+    // Pipeline control
+    // We are stalled if we are ready but the next stage isn't ready (stalled)
+    assign q_p_stalled = q_p_valid && i_p_stalled;
+
+    // Ready to progress if: previous stage is ready (valid)
+    // and next stage isn't stalled.
+    assign q_p_ce       = i_p_valid && !q_p_stalled;
+
+    always @(posedge i_clk) begin
+        if (q_p_stalled) begin
+            $display("REG: Stalled because of dec!");
+        end
+
+        if (q_p_ce) begin
+            $display("REG: doing...");
+            q_p_cp <= 1;
+        end else begin
+            q_p_cp <= 0;
+        end
+    end
+    
+    always @(posedge i_clk) begin
+        if (i_reset || i_p_cp) begin
+            q_p_valid <= 0;
+        end else if (q_p_ce) begin
+            q_p_valid <= i_p_valid;
+        end else if (i_p_ce) begin
+            q_p_valid <= 0;
         end
     end
 

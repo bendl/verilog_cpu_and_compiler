@@ -228,3 +228,4 @@ TSWLatexianTemp*
 
 # End of https://www.gitignore.io/api/latex
 /prco_core/rtl/test/verilator/obj_dir
+/prco_compiler/build

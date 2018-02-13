@@ -4,6 +4,16 @@
 
 module prco_lmem (
     input           i_clk,
+    input           i_reset,
+    
+    // Pipeline control
+    input               i_p_cp,
+    input               i_p_stalled,
+    input               i_p_valid,
+    output              q_p_stalled,
+    output reg          q_p_valid,
+    input               i_p_ce,
+    output              q_p_ce,
 
     input           i_mem_we,
     input [15:0]    i_mem_addr,
@@ -13,6 +23,8 @@ module prco_lmem (
 );
     /// Define the on chip memory size
     parameter P_LMEM_DEPTH = 255;
+
+    reg r_p_blocked = 0;
     
     reg [`REG_WIDTH:0] r_lmem[0:P_LMEM_DEPTH];
     integer i = 0;
@@ -44,5 +56,39 @@ module prco_lmem (
     end
 
     assign q_mem_douta = r_lmem[i_mem_addr];
+
+    // Pipeline control
+    // We are stalled if we are ready but the next stage isn't ready (stalled)
+    assign q_p_stalled  = q_p_valid && (i_p_stalled || (r_p_blocked));
+
+    //assign    stage[n]_stalled = (stage[n]_valid) && 
+    // (
+        // (stage[n+1]_stalled)
+    //  ||(things that would stall this stage)
+    //);
+
+    // Ready to progress if: previous stage is ready (valid)
+    // and next stage isn't stalled.
+    assign q_p_ce       = i_p_valid && !q_p_stalled;
+
+    always @(posedge i_clk) begin
+        if (q_p_stalled) begin
+            $display("MEM: Stalled because of core!");
+        end
+
+        if (q_p_ce) begin
+            $display("MEM: doing...");
+        end
+    end
+
+    always @(posedge i_clk) begin
+        if (i_reset || i_p_cp) begin
+            q_p_valid <= 0;
+        end else if (q_p_ce) begin
+            q_p_valid <= i_p_valid;
+        end else if (i_p_ce) begin
+            q_p_valid <= 0;
+        end
+    end
 
 endmodule
