@@ -37,6 +37,10 @@ module prco_regs (
                 end
                 r_regs[`REG_SP] <= 16'h00FF;
                 r_regs[`REG_BP] <= 16'h00FF;
+
+                // Output something so we don't latch
+                q_data <= 16'h0;
+                q_datb <= 16'h0;
             end 
             // Return values
             else begin
@@ -47,6 +51,7 @@ module prco_regs (
                     r_regs[i_seld] <= i_datd;
                 end
 
+                // Write output
                 q_data <= r_regs[i_sela];
                 q_datb <= r_regs[i_selb];
             end

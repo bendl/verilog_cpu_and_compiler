@@ -15,7 +15,9 @@ module prco_decoder (
     output reg unsigned [7:0]   q_imm8,
     output reg signed [4:0]     q_simm5,
 
-    output reg                  q_reg_we
+    output reg                  q_reg_we,
+    output reg                  q_req_alu,
+    output reg                  q_req_ram
 );
 
     /// Task to set appropriate output signals for the
