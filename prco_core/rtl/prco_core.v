@@ -59,6 +59,8 @@ module prco_core(
         r_cor_i_p_valid = 1;
     end
 
+    reg r_can_do_once = 0;
+
     reg [15:0]  r_mem_addr;
     always @(posedge i_clk) begin
         if (states[0] == 1) begin
@@ -74,8 +76,16 @@ module prco_core(
         if (i_reset == 1) begin
             pc <= 0;
             states = 6'h1;
-        end else if (r_cor_q_p_valid) begin
-            pc <= pc + 1;
+            r_can_do_once = 1;
+        end else if (r_reg_q_p_cp) begin
+            r_can_do_once <= 1;
+        end else if (r_cor_q_p_ce) begin
+            if (r_can_do_once) begin
+                pc <= pc + 1;
+                r_can_do_once <= 0;
+            end
+        end else begin
+            r_can_do_once = 1;
         end
     end
     

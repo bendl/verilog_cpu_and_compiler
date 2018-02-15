@@ -34,6 +34,8 @@ module prco_decoder (
 );
     reg [15:0] b_instr;
 
+    reg r_decode_stall = 0;
+
     /// Task to set appropriate output signals for the
     /// incoming i_instr[15:0]
     task handle_opcode;
@@ -44,6 +46,7 @@ module prco_decoder (
                 q_sela <= i_instr[7:5];
                 q_reg_we <= 0;
                 $display("PRCO_OP_NOP");
+                r_decode_stall = 1;
                 end
                 
             `PRCO_OP_MOVI: begin
@@ -75,13 +78,13 @@ module prco_decoder (
     // TODO(ben): Should sensitivity list include i_instr?
     always @(posedge i_clk, posedge i_en) begin
         if(i_en == 1) begin
-            
+            if(r_decode_stall) r_decode_stall = 0;
         end
     end
 
     // Pipeline control
     // We are stalled if we are ready but the next stage isn't ready (stalled)
-    assign q_p_stalled = q_p_valid && (i_p_stalled || i_p_block);
+    assign q_p_stalled = q_p_valid && (i_p_stalled || i_p_block || r_decode_stall);
 
     // Ready to progress if: previous stage is ready (valid)
     // and next stage isn't stalled.
@@ -102,7 +105,13 @@ module prco_decoder (
             q_p_valid <= 0;
         end else if (q_p_ce) begin
             q_p_valid <= i_p_valid;
+        end else if (i_p_ce) begin
+            q_p_valid <= 0;
+        end
+    end
 
+    always @(posedge i_clk) begin
+        if (q_p_ce) begin
             b_instr <= i_instr;
             q_op <= i_instr[15:11];
             q_seld <= i_instr[10:8];
@@ -111,9 +120,6 @@ module prco_decoder (
             
             // Decode opcode and set outputs
             handle_opcode(i_instr[15:11]);
-
-        end else if (i_p_ce) begin
-            q_p_valid <= 0;
         end
     end
 

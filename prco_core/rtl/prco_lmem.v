@@ -48,7 +48,7 @@ module prco_lmem (
     end
 
     always @(posedge i_clk) begin
-        if (i_mem_we == 1) begin
+        if (q_p_ce && i_mem_we == 1) begin
             $display("Writing 0x%h to RAM[0x%h]", 
                 i_mem_dina, i_mem_addr);
             r_lmem[i_mem_addr] <= i_mem_dina;

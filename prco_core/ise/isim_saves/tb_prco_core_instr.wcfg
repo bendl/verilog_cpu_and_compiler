@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wave_config>
+   <wave_state>
+   </wave_state>
+   <db_ref_list>
+      <db_ref path="Z:/uni/prco304/prco_core/ise/tb_prco_core_isim_beh.wdb" id="1" type="auto">
+         <top_modules>
+            <top_module name="glbl" />
+            <top_module name="tb_prco_core" />
+         </top_modules>
+      </db_ref>
+   </db_ref_list>
+   <WVObjectSize size="9" />
+   <wvobject fp_name="/tb_prco_core/q_debug" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">q_debug[7:0]</obj_property>
+      <obj_property name="ObjectShortName">q_debug[7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_prco_core/i_clk" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">i_clk</obj_property>
+      <obj_property name="ObjectShortName">i_clk</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_prco_core/i_en" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">i_en</obj_property>
+      <obj_property name="ObjectShortName">i_en</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_prco_core/i_reset" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">i_reset</obj_property>
+      <obj_property name="ObjectShortName">i_reset</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_prco_core/i_p_stalled" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">i_p_stalled</obj_property>
+      <obj_property name="ObjectShortName">i_p_stalled</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_prco_core/q_p_ce" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">q_p_ce</obj_property>
+      <obj_property name="ObjectShortName">q_p_ce</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_prco_core/dec_block" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">dec_block</obj_property>
+      <obj_property name="ObjectShortName">dec_block</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_prco_core/uut/pc" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">pc[15:0]</obj_property>
+      <obj_property name="ObjectShortName">pc[15:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_prco_core/uut/inst_lmem/q_mem_douta" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">q_mem_douta[15:0]</obj_property>
+      <obj_property name="ObjectShortName">q_mem_douta[15:0]</obj_property>
+   </wvobject>
+</wave_config>
