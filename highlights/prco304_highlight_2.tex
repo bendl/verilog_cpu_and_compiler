@@ -1,0 +1,316 @@
+\documentclass[11pt,a4paper]{article}
+
+% font
+\renewcommand{\familydefault}{\sfdefault}
+
+
+\usepackage[margin=0.8in]{geometry}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage[hidelinks]{hyperref}
+\usepackage{float}
+
+\usepackage{lipsum}% http://ctan.org/pkg/lipsum
+
+%% Bibliography/references packages
+\usepackage[comma]{natbib}
+%%\bibliographystyle{agsm}
+\bibliographystyle{dcu}
+
+%% https://en.wikibooks.org/wiki/LaTeX/List_Structures
+\usepackage{scrextend}
+
+% tables, row colour
+\usepackage{tabularx,colortbl}
+
+% https://tex.stackexchange.com/questions/22751/how-to-force-table-caption-on-top
+%\usepackage[tableposition=top]{caption}
+\usepackage{float}
+\floatstyle{plaintop}
+\restylefloat{table}
+
+% https://en.wikibooks.org/wiki/LaTeX/List_Structures
+\usepackage{enumitem}
+
+% https://jansoehlke.com/2010/06/strikethrough-in-latex/
+\usepackage{ulem}
+
+
+%% Report variables
+\newcommand{\scname}{BEN-1816}
+\newcommand{\dlatestv}{1.00}
+
+\definecolor{babyblueeyes}{rgb}{0.63, 0.79, 0.95}
+\definecolor{ballblue}{rgb}{0.13, 0.67, 0.8}
+\definecolor{beaublue}{rgb}{0.74, 0.83, 0.9}
+
+\usepackage{array,booktabs,arydshln,xcolor}
+\usepackage{xcolor}% http://ctan.org/pkg/xcolor
+\usepackage{fancyhdr}% http://ctan.org/pkg/fancyhdr
+\fancypagestyle{main}{%
+	\renewcommand{\headrulewidth}{2pt}
+	\renewcommand{\headrule}{\hbox to\headwidth{%
+		\color{babyblueeyes}\leaders\hrule height \headrulewidth\hfill}}
+	\renewcommand{\footrulewidth}{2pt}
+	\renewcommand{\footrule}{\hbox to\headwidth{%
+		\color{babyblueeyes}\leaders\hrule height \headrulewidth\hfill}}
+	
+	%\fancyhf{}
+	%\fancyhead[LE]{\textbf{\leftmark}}
+	%\fancyhead[RE]{\textbf{\scname{}}}
+	%\fancyhead[LO]{\textbf{\scname{}}}
+	%\fancyhead[RO]{\textbf{\rightmark}}
+
+	%\fancyfoot[LE]{\textbf{\thepage}}
+	%\fancyfoot[RE]{\textbf{\scname{} Configuration Guide}}
+	%\fancyfoot[LO]{\textbf{\scname{} Configuration Guide}}
+	%\fancyfoot[RO]{\textbf{\thepage}}
+}
+
+
+%% Make bibliography show in table of contents
+%% https://tex.stackexchange.com/questions/8458/making-the-bibliography-appear-in-the-table-of-contents
+\usepackage[nottoc,numbib]{tocbibind}
+%% ^^^ overwrites \bibname, so set it back
+\renewcommand{\bibname}{References}
+
+\RequirePackage{filecontents}
+\begin{filecontents}{prco304_h2.bib}
+@online{wikipedia:dft,
+  author = {Wikipedia},
+  title = {Discrete Fourier transform},
+  year = 2018,
+  url = {https://en.wikipedia.org/wiki/Discrete\_Fourier\_transform},
+  urldate = {2018-01-15}
+}
+@online{server:gpu,
+  author = {Amazon AWS},
+  title = {Introducing Amazon EC2 P2 Instances, the largest GPU-Powered virtual machine in the cloud},
+  year = 2018,
+  url = {https://aws.amazon.com/about-aws/whats-new/2016/09/introducing-amazon-ec2-p2-instances-the-largest-gpu-powered-virtual-machine-in-the-cloud/},
+  urldate = {2016-09-26}
+}
+@misc{scarabhardware,
+title={MiniSpartan6+}, 
+journal={{Scarab Hardware}},
+url={https://www.scarabhardware.com/minispartan6/},
+year=2014
+}
+@misc{arty,
+title={Arty Artix-7 FPGA Development Board}, 
+journal={{Avnet}},
+url={https://uk.rs-online.com/web/p/programmable-logic-development-kits/1346478/},
+year=2015
+}
+@misc{arndt2002algorithms,
+  title={Algorithms For Programmers},
+  author={Arndt, J{\"o}rg},
+  year = 2002
+}
+@book{hdl,
+title={HDL Programming Fundamentals: VHDL and Verilog},
+author={Nazeih Botros},
+year={2006},
+publisher={Da Vinci Engineering Press}
+}
+
+@misc{arm, title={ARM in the World of FPGA-Based Prototyping}, url={https://community.arm.com/processors/b/blog/posts/arm-in-the-world-of-fpga-based-prototyping}, journal={Arm Community},
+year={2016}}
+
+@book{microblaze,
+title={MicroBlaze 
+Processor Reference 
+Guide},
+journal={Xilinx},
+year={2017}
+} 
+
+\end{filecontents}
+
+%s comments
+\usepackage{verbatim}
+
+%inline graphs
+\usepackage{wrapfig}
+% multiple figures on line
+\usepackage{subfig}
+
+\usepackage{graphicx}
+\graphicspath{ {img/} }
+
+% Caption font size
+% https://tex.stackexchange.com/questions/86120/font-size-of-figure-caption-header
+\usepackage[font=scriptsize,labelfont=bf]{caption}
+
+%\setlength{\belowcaptionskip}{-10pt}
+%\setlength{\abovecaptionskip}{-5pt} % Chosen fairly arbitrarily
+
+
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\lhead{\rightmark}
+\chead{}
+\rhead{FPGA-based Soft-Core CPU (Rev. \dlatestv{})}
+\lfoot{Page \thepage}
+\cfoot{}
+\rfoot{Ben Lancaster 10424877}
+
+\renewcommand{\subsectionmark}[1]{\markright{\thesubsection\ #1}}
+
+
+\begin{document}
+
+\begin{titlepage}
+\begin{center}
+
+\vspace*{5cm}
+\Large
+\textbf{
+%%PRCO304 - Project Initiation Document
+Highlight Reports
+}
+
+\vspace{0.4cm}
+\large
+%%Space optimised FPGA-based side-microprocessor.
+PRCO304 - FPGA-based RISC microprocessor
+%%EMBEDDED CPU - FPGA-based RISC microprocessor
+
+\vspace{4cm}
+\textbf{Ben Lancaster}\\
+\today 
+
+
+\end{center}
+
+\end{titlepage}
+
+\pagestyle{main}
+
+\section*{Revision History}
+\begin{table}[h]
+\def\arraystretch{1.5}%  1 is the default, change whatever you need
+    \begin{tabularx}{\textwidth}{|l|l|X|}
+    \hline
+    Date & Highlight & Changes \\
+	\specialrule{2pt}{-2pt}{0pt}
+	14/02/2018 & 2 & Highlight report 2. \\ \hline
+	06/02/2018 & 1 & Highlight report 1. \\ \hline
+    \end{tabularx}
+    \caption{Document revisions.}
+\end{table}
+\newpage
+
+\renewcommand*\contentsname{Table of Contents}
+\tableofcontents
+\newpage
+
+\section{Highlight Reports}
+\subsection{Highlight Report 1}
+\begin{table}[H]
+\def\arraystretch{1.5}%  1 is the default, change whatever you need
+    \begin{tabularx}{\textwidth}{|X|}
+    \hline 
+	\multicolumn{1}{|c|}{\textbf{PRCO304: Highlight Report 1}}
+    \\
+	\specialrule{2pt}{-2pt}{0pt}
+    \textbf{Name:} Ben Lancaster
+    \\ \specialrule{2pt}{-2pt}{0pt}
+	\textbf{Date:} 06/02/2018
+	\\ \specialrule{2pt}{-2pt}{0pt}
+	\textbf{Active project stage:} Stage 1.1:  Research  and  Requirement Gathering
+	\\ \specialrule{2pt}{-2pt}{0pt}
+	\textbf{Review of work undertaken:}\newline
+	This week was assigned to work on stage 1.1:  Research  and  requirement
+gathering. \newline\newline
+	\textbf{Research and requirement gathering:}\newline
+	Research into existing soft-core processor designs has been started to identify their features, targets, and advantages and disadvantages. Key existing soft-core processors found are:\newline
+	-  Xilinx' MicroBlaze: a 32-bit Xilinx FPGA embeddable core capable of running operating systems, like Linux. Exposes a configurable GUI to customise the build of the processor to suit designers requirements (like number of GPIO, interrupts, timers, etc.).\newline
+	- ARM Cortex-A9: a 32-bit Xilinx and Altera FPGA core. Features out-of-order execution, compatible with existing ARM Thumb2 C compilers, and multi-core processing.\newline\newline
+	I have used this research to aim my soft-core processor's requirements and architecture. To document and finalize my processors design and requirements, I have started a processor specification and reference document. This document outlines the processors features, architecture, compatibility, and instructions.
+	\newline\newline
+	Additional progress:\newline
+	- Version control set up for documentation, highlight reports, and code bases.
+		
+	\\ \hline
+	\textbf{Risks and Challenges:}\newline
+	{\color{red} Urgent risks:}\newline
+	{\color{orange} New risks:}\newline
+	{\color{purple} Existing risks:\newline
+	RC4: Schedule overrun. A gantt time chart has been created to better visualize task durations and requirements.}\newline
+	\\ \hline
+	\textbf{Plan of work for the next week:}\newline
+	Work will begin on Stage 1.2: Core high level design.\newline\newline
+	Finalised specifications and architecture of the soft-core processor will be put into a processor specification and reference document.
+	\newline
+	Architecture, control, pipelines, will be visualised in this document.
+	
+	\\ \hline
+	\textbf{Date(s) of supervisory meeting(s) since last Highlight:}\newline
+	This is the 1st highlight report.\newline
+	30/01/18 - An introductory meeting was held to discuss the project initiation document (PID) and gain feedback on the project.
+	\\ \hline
+	\textbf{Notes from supervisory meeting(s) held since last Highlight:}\newline
+	Ensure risks are carefully explored and project core deliverables are realistic and achievable.
+	\\ \hline
+    \end{tabularx}
+    %\caption{Document revisions.}
+\end{table}
+
+
+\subsection{Highlight Report 2}
+\begin{table}[H]
+\def\arraystretch{1.5}%  1 is the default, change whatever you need
+    \begin{tabularx}{\textwidth}{|X|}
+    \hline 
+	\multicolumn{1}{|c|}{\textbf{PRCO304: Highlight Report 2}}
+    \\
+	\specialrule{2pt}{-2pt}{0pt}
+    \textbf{Name:} Ben Lancaster
+    \\ \specialrule{2pt}{-2pt}{0pt}
+	\textbf{Date:} 15/02/2018
+	\\ \specialrule{2pt}{-2pt}{0pt}
+	\textbf{Active project stage:} Stage 1.2:  Core high level design
+	\\ \specialrule{2pt}{-2pt}{0pt}
+	\textbf{Review of work undertaken:}\newline
+	This week was assigned to work on stage 1.2:  Core high level design.
+gathering. \newline\newline
+	\textbf{Core high level design:}\newline
+	I have spent this week defining a processor specification and creating a processor specification/reference guide booklet (see attached). This booklet will contain both high-level and technical details regarding the design and implementation of the processor, including: register sets, control and pipelining strategies, the ISA and each instruction, and the compiler and how to use it.	
+	\newline\newline
+	This booklet will be developed over the life cycle of the project. Although the specification has been clearly defined, the booklet will be incrementally updated as processor features/requirements are added to the implementation (such as instructions, modules, and compiler features).
+	\newline\newline
+	Currently the reference booklet contains: register set definitions, several primitive instructions, and a brief introduction to instruction cycle timing.
+	
+	\\ \hline
+	\textbf{Risks and Challenges:}\newline
+	{\color{red} Urgent risks:}\newline
+	{\color{orange} New risks:}\newline
+	{\color{purple} Existing risks:\newline
+	\sout{RC4: Schedule overrun. A gantt time chart has been created to better visualize task durations and requirements.}}\newline
+	{\color{gray} Resolved risks:\newline
+	RC4: Schedule overrun. A gantt time chart has been created to better visualize task durations and requirements. (See attached time management chart indev.)}\newline
+	\\ \hline
+	\textbf{Plan of work for the next week:}\newline
+	Work will begin on Stage 2.0: Core dev. Register set implementation.\newline\newline
+	The register set module will be implemented in Verilog for the processor. Unit tests will be created to verify the timing/behaviour of the module.
+	\newline
+	The processor specification/reference booklet will be updated to describe how the register set has been implemented in the processor.
+	
+	\\ \hline
+	\textbf{Date(s) of supervisory meeting(s) since last Highlight:}\newline
+	08/02/18 15:00 - 15:40
+	\\ \hline
+	\textbf{Notes from supervisory meeting(s) held since last Highlight:}\newline
+	Discussion included comparing existing processor's (ARM, x86) features (privileged instructions, interrupts, IO, variable-length ISA) and designs (ISA and pipelining) to this processor.
+	\\ \hline
+    \end{tabularx}
+    %\caption{Document revisions.}
+\end{table}
+
+
+\newpage
+\bibliography{prco304_h2} 
+\end{document}
