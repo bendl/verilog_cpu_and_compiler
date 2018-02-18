@@ -7,6 +7,9 @@ module prco_regs (
     input               i_en,
     input               i_reset,
 
+    // Pipeline signals
+    input           i_ce,
+
     // Dual port memory access
     input [2:0]         i_sela,
     output reg [15:0]   q_data,
@@ -28,7 +31,7 @@ module prco_regs (
 
     always @(posedge i_clk, posedge i_reset, posedge i_en)
     begin
-        if(i_en == 1) begin
+        if(i_ce) begin
             // Reset the register set
             if(i_reset == 1) begin
                 $display("Resetting Registers");
