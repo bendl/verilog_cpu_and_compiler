@@ -13,9 +13,6 @@ module prco_core(
     // program counter
     reg [15:0] pc = 0;
 
-    reg [5:0] states = 6'h1;
-    
-    reg         r_dec_en = 1;
     wire [5:0]  r_dec_op;
     wire [2:0]  r_dec_seld;
     wire [2:0]  r_dec_sela;
@@ -27,35 +24,18 @@ module prco_core(
     wire [15:0] r_reg_douta;
     reg         r_reg_en = 1;
     reg [15:0]  r_reg_dina;
+    
+    reg         r_dec_en = 1;
     wire        r_reg_we = r_dec_we & (r_reg_q_ce_fetch || r_mem_q_ce_reg);
 
     wire [15:0] r_alu_result;
 
     reg [15:0]  r_mem_addr;
     always @(posedge i_clk) begin
-        if (states[0] == 1) begin
-            r_mem_addr = pc;
-        end else begin
-            r_mem_addr = 0;
-        end
-    end
-
-    always @(posedge i_clk) begin
-        if (r_state_ram) r_reg_dina <= r_mem_douta;
-        else r_reg_dina <= r_alu_result;
+        r_mem_addr = pc;
     end
     
     wire [15:0] r_mem_douta;
-
-    reg [7:0] r_state;
-    wire r_state_reset = r_state[0];
-    wire r_state_fetch = r_state[1];
-    wire r_state_decode = r_state[2];
-    wire r_state_read = r_state[3];
-    wire r_state_exec = r_state[4];
-    wire r_state_ram = r_state[5];
-    wire r_state_write = r_state[6];
-    wire r_state_halt = r_state[7];
 
     // Pipeline signals
     wire          i_ce = r_reg_q_ce_fetch || r_dec_q_fetch;
@@ -64,7 +44,6 @@ module prco_core(
     always @(posedge i_clk, posedge i_reset) begin
         if (i_reset == 1) begin
             pc <= 0;
-            states = 6'h1;
         end else begin
             if(q_ce) q_ce <= 0;
 
@@ -131,7 +110,7 @@ module prco_core(
         .q_datb(r_reg_douta), 
         .i_we(r_reg_we), 
         .i_seld(r_dec_seld), 
-        .i_datd(r_reg_dina)
+        .i_datd(r_alu_result)
     );
     
     // Instantiate the module

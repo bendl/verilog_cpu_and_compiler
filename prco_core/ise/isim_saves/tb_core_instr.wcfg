@@ -10,7 +10,7 @@
          </top_modules>
       </db_ref>
    </db_ref_list>
-   <WVObjectSize size="29" />
+   <WVObjectSize size="31" />
    <wvobject fp_name="/tb_prco_core/q_debug" type="array" db_ref_id="1">
       <obj_property name="ElementShortName">q_debug[7:0]</obj_property>
       <obj_property name="ObjectShortName">q_debug[7:0]</obj_property>
@@ -70,6 +70,14 @@
    <wvobject fp_name="/tb_prco_core/uut/inst_decoder/q_imm8" type="array" db_ref_id="1">
       <obj_property name="ElementShortName">q_imm8[7:0]</obj_property>
       <obj_property name="ObjectShortName">q_imm8[7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_prco_core/uut/inst_decoder/q_seld" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">q_seld[2:0]</obj_property>
+      <obj_property name="ObjectShortName">q_seld[2:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_prco_core/uut/inst_decoder/q_sela" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">q_sela[2:0]</obj_property>
+      <obj_property name="ObjectShortName">q_sela[2:0]</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_prco_core/uut/inst_decoder/q_req_ram" type="logic" db_ref_id="1">
       <obj_property name="ElementShortName">q_req_ram</obj_property>
