@@ -9,6 +9,8 @@ module prco_decoder (
 
     // Pipeline signals
     input           i_ce,
+    output reg      q_ce,
+    output reg      q_fetch,
     
     input [15:0]                i_instr,
 
@@ -32,6 +34,8 @@ module prco_decoder (
                 q_sela <= i_instr[7:5];
                 q_reg_we <= 0;
                 q_req_ram <= 0;
+                q_fetch <= 1;
+                q_ce <= 0;
                 $display("PRCO_OP_NOP");
                 end
                 
@@ -39,6 +43,8 @@ module prco_decoder (
                 q_sela <= i_instr[7:5];
                 q_reg_we <= 1;
                 q_req_ram <= 0;
+                q_fetch <= 0;
+                q_ce <= 1;
                 $display("PRCO_OP_MOVI\t%d, %d", q_imm8, q_seld);
                 end
                 
@@ -46,6 +52,8 @@ module prco_decoder (
                 q_sela <= i_instr[7:5];
                 q_reg_we <= 1;
                 q_req_ram <= 0;
+                q_fetch <= 0;
+                q_ce <= 1;
                 $display("PRCO_OP_MOV\t%d, %d", q_sela, q_seld);
                 end
                 
@@ -53,6 +61,8 @@ module prco_decoder (
                 q_sela <= i_instr[7:5];
                 q_reg_we <= 1;
                 q_req_ram <= 0;
+                q_fetch <= 0;
+                q_ce <= 1;
                 $display("PRCO_OP_ADD\t%d, %d", q_sela, q_seld);
                 end
 
@@ -60,6 +70,8 @@ module prco_decoder (
                 q_sela <= i_instr[7:5];
                 q_reg_we <= 1;
                 q_req_ram <= 1;
+                q_fetch <= 0;
+                q_ce <= 1;
                 $display("PRCO_OP_LW\t%d, %d(%d)", 
                     q_seld, q_simm5, q_sela);
                 end
@@ -68,6 +80,8 @@ module prco_decoder (
                 q_sela <= i_instr[7:5];
                 q_reg_we <= 0;
                 q_req_ram <= 0;
+                q_fetch <= 1;
+                q_ce <= 0;
                 $display("Unknown op: %h", ti_op);
                 end
         endcase
@@ -83,7 +97,14 @@ module prco_decoder (
             
             // Decode opcode and set outputs
             handle_opcode(i_instr[15:11]);
+
+        end else begin
+            q_fetch <= 0;
+            q_ce <= 0;
         end
+
+        if(q_ce) q_ce <= 0;
+        if(q_fetch) q_fetch <= 0;
     end
 
 endmodule

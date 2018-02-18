@@ -6,7 +6,10 @@ module prco_lmem (
     input           i_clk,
 
     // Pipeline signals
-    input           i_ce,
+    input           i_ce_fetch,
+    input           i_ce_alu,
+    output reg      q_ce_dec,
+    output reg      q_ce_reg,
 
     input           i_mem_we,
     input [15:0]    i_mem_addr,
@@ -43,14 +46,30 @@ module prco_lmem (
     end
 
     always @(posedge i_clk) begin
-        if(i_ce) begin
+        if(i_ce_fetch || i_ce_alu) begin
             if (i_mem_we == 1) begin
                 $display("Writing 0x%h to RAM[0x%h]", 
                     i_mem_dina, i_mem_addr);
                 r_lmem[i_mem_addr] <= i_mem_dina;
             end
 
+            if(i_ce_fetch) begin
+                q_ce_dec <= 1;
+                q_ce_reg <= 0;
+            end else if (i_ce_alu) begin
+                q_ce_dec <= 0;
+                q_ce_reg <= 1;
+            end else begin
+                q_ce_dec <= 0;
+                q_ce_reg <= 0;
+            end
+
             q_mem_douta <= r_lmem[i_mem_addr];
+        end
+
+        if(q_ce_dec || q_ce_reg) begin
+            q_ce_dec <= 0;
+            q_ce_reg <= 0;
         end
     end
     //assign q_mem_douta = r_lmem[i_mem_addr];

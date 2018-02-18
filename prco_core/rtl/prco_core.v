@@ -22,13 +22,12 @@ module prco_core(
     wire        r_dec_we;
     wire [15:0] r_dec_imm8;
     wire [4:0]  r_dec_simm5;
-    wire        r_dec_ram_req;
 
     wire [15:0] r_reg_doutd;
     wire [15:0] r_reg_douta;
     reg         r_reg_en = 1;
     reg [15:0]  r_reg_dina;
-    wire        r_reg_we = r_dec_we & r_state_fetch;
+    wire        r_reg_we = r_dec_we & (r_reg_q_ce_fetch || r_mem_q_ce_reg);
 
     wire [15:0] r_alu_result;
 
@@ -58,51 +57,23 @@ module prco_core(
     wire r_state_write = r_state[6];
     wire r_state_halt = r_state[7];
 
-    wire r_reg_ce = r_state_reset || r_state_read || r_state_fetch;
-    wire r_mem_ce = r_state_fetch | r_state_ram;
-
-    // state machine
-    always @(posedge(i_clk)) begin
-        case (r_state)
-        `STATE_RESET:
-            r_state <= `STATE_FETCH;
-
-        `STATE_FETCH:
-            r_state <= `STATE_DECODE;
-
-        `STATE_DECODE:
-            r_state <= `STATE_READ;
-
-        `STATE_READ:
-            r_state <= `STATE_EXEC;
-
-        `STATE_EXEC: begin
-            pc <= pc + 1;
-
-            if (r_dec_ram_req) begin
-                r_state <= `STATE_RAM;
-            end else begin
-                r_state <= `STATE_WRITE;
-            end
-            end
-        
-        `STATE_RAM:
-            r_state <= `STATE_WRITE;
-
-        `STATE_WRITE:
-            r_state <= `STATE_FETCH;
-
-        default:
-            r_state <= `STATE_RESET;
-        endcase
-    end
+    // Pipeline signals
+    wire          i_ce = r_reg_q_ce_fetch || r_dec_q_fetch;
+    reg           q_ce;
 
     always @(posedge i_clk, posedge i_reset) begin
         if (i_reset == 1) begin
             pc <= 0;
             states = 6'h1;
         end else begin
-            
+            if(q_ce) q_ce <= 0;
+
+            if(i_ce) begin
+                pc <= pc + 1;
+                q_ce <= 1;
+            end else begin
+                q_ce <= 0;
+            end
         end
     end    
 
@@ -110,7 +81,11 @@ module prco_core(
     prco_lmem inst_lmem (
         .i_clk(i_clk), 
 
-        .i_ce(r_mem_ce),
+        .i_ce_fetch(q_ce),
+        .i_ce_alu(r_alu_q_ce_ram),
+
+        .q_ce_dec(r_mem_q_ce_decode),
+        .q_ce_reg(r_mem_q_ce_reg),
         
         .i_mem_we(i_mem_we), 
         .i_mem_addr(r_mem_addr), 
@@ -123,7 +98,9 @@ module prco_core(
         .i_clk(i_clk), 
         .i_en(r_dec_en), 
 
-        .i_ce(r_state_decode),
+        .i_ce(r_mem_q_ce_decode),
+        .q_ce(r_dec_q_ce),
+        .q_fetch(r_dec_q_fetch),
 
         .i_instr(r_mem_douta), 
         .q_op(r_dec_op), 
@@ -134,14 +111,18 @@ module prco_core(
         .q_reg_we(r_dec_we),
 
         .q_req_ram(r_dec_ram_req)
-        );
+    );
 
     // Instantiate the module
     prco_regs inst_regs (
         .i_clk(i_clk), 
         .i_en(r_reg_en), 
 
-        .i_ce(r_reg_ce),
+        .i_ce_ram   (r_mem_q_ce_reg),
+        .i_ce_dec   (r_dec_q_ce),
+        .i_ce_alu   (r_alu_q_ce_reg),
+        .q_ce_alu   (r_reg_q_ce_alu),
+        .q_ce_fetch (r_reg_q_ce_fetch),
 
         .i_reset(i_reset), 
         .i_sela(r_dec_seld), 
@@ -151,13 +132,16 @@ module prco_core(
         .i_we(r_reg_we), 
         .i_seld(r_dec_seld), 
         .i_datd(r_reg_dina)
-        );
+    );
     
     // Instantiate the module
     prco_alu inst_alu (
         .i_clk(i_clk), 
 
-        .i_ce(r_state_exec),
+        .i_ce(r_reg_q_ce_alu),
+        .i_dec_req_ram(r_dec_ram_req),
+        .q_ce_ram(r_alu_q_ce_ram),
+        .q_ce_reg(r_alu_q_ce_reg),
 
         .i_op(r_dec_op), 
         .i_data(r_reg_douta), 

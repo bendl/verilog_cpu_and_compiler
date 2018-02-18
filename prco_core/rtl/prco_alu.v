@@ -8,6 +8,9 @@ module prco_alu (
 
     // Pipeline signals
     input           i_ce,
+    input           i_dec_req_ram,
+    output reg      q_ce_reg,
+    output reg      q_ce_ram,
 
     input [4:0]     i_op,
     input signed [15:0] i_data,
@@ -52,6 +55,19 @@ module prco_alu (
             q_result <= 16'h0000;
             end
         endcase
+
+        if(i_dec_req_ram) begin
+            q_ce_ram <= 1;
+            q_ce_reg <= 0;
+        end else begin
+            q_ce_ram <= 0;
+            q_ce_reg <= 1;
+        end
+      end
+
+      if(q_ce_ram || q_ce_reg) begin
+          q_ce_ram <= 0;
+          q_ce_reg <= 0;
       end
     end
 
