@@ -4,7 +4,8 @@
 
 module prco_lmem (
     input           i_clk,
-
+    input           i_reset,
+    
     // Pipeline signals
     input           i_ce_fetch,
     input           i_ce_alu,
@@ -72,6 +73,7 @@ module prco_lmem (
             q_ce_reg <= 0;
         end
     end
+    
     //assign q_mem_douta = r_lmem[i_mem_addr];
-
+    
 endmodule

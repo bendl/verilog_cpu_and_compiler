@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wave_config>
+   <wave_state>
+   </wave_state>
+   <db_ref_list>
+      <db_ref path="Z:/uni/prco304/prco_core/ise/tb_prco_core_isim_beh.wdb" id="1" type="auto">
+         <top_modules>
+            <top_module name="glbl" />
+            <top_module name="tb_prco_core" />
+         </top_modules>
+      </db_ref>
+   </db_ref_list>
+   <WVObjectSize size="48" />
+   <wvobject fp_name="divider28" type="divider">
+      <obj_property name="label">CORE TOP</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="BkColor">128 128 255</obj_property>
+      <obj_property name="TextColor">230 230 230</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_prco_core/q_debug" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">q_debug[7:0]</obj_property>
+      <obj_property name="ObjectShortName">q_debug[7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_prco_core/i_clk" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">i_clk</obj_property>
+      <obj_property name="ObjectShortName">i_clk</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_prco_core/i_en" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">i_en</obj_property>
+      <obj_property name="ObjectShortName">i_en</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_prco_core/i_reset" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">i_reset</obj_property>
+      <obj_property name="ObjectShortName">i_reset</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_prco_core/i_p_stalled" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">i_p_stalled</obj_property>
+      <obj_property name="ObjectShortName">i_p_stalled</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_prco_core/uut/r_cor_q_p_stalled" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">r_cor_q_p_stalled</obj_property>
+      <obj_property name="ObjectShortName">r_cor_q_p_stalled</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_prco_core/uut/r_cor_i_p_ce" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">r_cor_i_p_ce</obj_property>
+      <obj_property name="ObjectShortName">r_cor_i_p_ce</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_prco_core/uut/r_cor_q_p_ce" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">r_cor_q_p_ce</obj_property>
+      <obj_property name="ObjectShortName">r_cor_q_p_ce</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_prco_core/uut/pc" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">pc[15:0]</obj_property>
+      <obj_property name="ObjectShortName">pc[15:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_prco_core/uut/r_can_do_once" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">r_can_do_once</obj_property>
+      <obj_property name="ObjectShortName">r_can_do_once</obj_property>
+   </wvobject>
+   <wvobject fp_name="divider6" type="divider">
+      <obj_property name="label">MEM</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="BkColor">128 128 255</obj_property>
+      <obj_property name="TextColor">230 230 230</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_prco_core/uut/inst_lmem/i_p_cp" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">i_p_cp</obj_property>
+      <obj_property name="ObjectShortName">i_p_cp</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_prco_core/uut/inst_lmem/r_p_blocked" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">r_p_blocked</obj_property>
+      <obj_property name="ObjectShortName">r_p_blocked</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_prco_core/uut/inst_lmem/i_p_valid" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">i_p_valid</obj_property>
+      <obj_property name="ObjectShortName">i_p_valid</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_prco_core/uut/inst_lmem/q_p_valid" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">q_p_valid</obj_property>
+      <obj_property name="ObjectShortName">q_p_valid</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_prco_core/uut/inst_lmem/i_p_stalled" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">i_p_stalled</obj_property>
+      <obj_property name="ObjectShortName">i_p_stalled</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_prco_core/uut/inst_lmem/q_p_stalled" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">q_p_stalled</obj_property>
+      <obj_property name="ObjectShortName">q_p_stalled</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_prco_core/uut/inst_lmem/i_p_ce" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">i_p_ce</obj_property>
+      <obj_property name="ObjectShortName">i_p_ce</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_prco_core/uut/inst_lmem/q_p_ce" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">q_p_ce</obj_property>
+      <obj_property name="ObjectShortName">q_p_ce</obj_property>
+   </wvobject>
+   <wvobject fp_name="divider19" type="divider">
+      <obj_property name="label">DEC</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="BkColor">128 128 255</obj_property>
+      <obj_property name="TextColor">230 230 230</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_prco_core/uut/inst_decoder/i_p_cp" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">i_p_cp</obj_property>
+      <obj_property name="ObjectShortName">i_p_cp</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_prco_core/uut/inst_decoder/i_p_block" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">i_p_block</obj_property>
+      <obj_property name="ObjectShortName">i_p_block</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_prco_core/uut/inst_decoder/i_p_valid" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">i_p_valid</obj_property>
+      <obj_property name="ObjectShortName">i_p_valid</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_prco_core/uut/inst_decoder/q_p_valid" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">q_p_valid</obj_property>
+      <obj_property name="ObjectShortName">q_p_valid</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_prco_core/uut/inst_decoder/i_p_stalled" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">i_p_stalled</obj_property>
+      <obj_property name="ObjectShortName">i_p_stalled</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_prco_core/uut/inst_decoder/q_p_stalled" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">q_p_stalled</obj_property>
+      <obj_property name="ObjectShortName">q_p_stalled</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_prco_core/uut/inst_decoder/i_p_ce" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">i_p_ce</obj_property>
+      <obj_property name="ObjectShortName">i_p_ce</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_prco_core/uut/inst_decoder/q_p_ce" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">q_p_ce</obj_property>
+      <obj_property name="ObjectShortName">q_p_ce</obj_property>
+   </wvobject>
+   <wvobject fp_name="divider23" type="divider">
+      <obj_property name="label">REG</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="BkColor">128 128 255</obj_property>
+      <obj_property name="TextColor">230 230 230</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_prco_core/uut/inst_regs/i_p_cp" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">i_p_cp</obj_property>
+      <obj_property name="ObjectShortName">i_p_cp</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_prco_core/uut/inst_regs/q_p_cp" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">q_p_cp</obj_property>
+      <obj_property name="ObjectShortName">q_p_cp</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_prco_core/uut/inst_regs/i_p_stalled" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">i_p_stalled</obj_property>
+      <obj_property name="ObjectShortName">i_p_stalled</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_prco_core/uut/inst_regs/q_p_stalled" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">q_p_stalled</obj_property>
+      <obj_property name="ObjectShortName">q_p_stalled</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_prco_core/uut/inst_regs/q_p_ce" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">q_p_ce</obj_property>
+      <obj_property name="ObjectShortName">q_p_ce</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_prco_core/uut/inst_regs/i_p_ce" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">i_p_ce</obj_property>
+      <obj_property name="ObjectShortName">i_p_ce</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_prco_core/uut/inst_regs/q_p_valid" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">q_p_valid</obj_property>
+      <obj_property name="ObjectShortName">q_p_valid</obj_property>
+   </wvobject>
+   <wvobject fp_name="divider38" type="divider">
+      <obj_property name="label">Just ce</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="BkColor">128 128 255</obj_property>
+      <obj_property name="TextColor">230 230 230</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_prco_core/uut/r_cor_q_p_ce" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">r_cor_q_p_ce</obj_property>
+      <obj_property name="ObjectShortName">r_cor_q_p_ce</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_prco_core/uut/inst_lmem/q_p_ce" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">q_p_ce</obj_property>
+      <obj_property name="ObjectShortName">q_p_ce</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_prco_core/uut/inst_decoder/q_p_ce" type="logic" db_ref_id="1">
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="ElementShortName">q_p_ce</obj_property>
+      <obj_property name="ObjectShortName">q_p_ce</obj_property>
+      <obj_property name="label">q_p_ce</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_prco_core/uut/inst_regs/q_p_ce" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">q_p_ce</obj_property>
+      <obj_property name="ObjectShortName">q_p_ce</obj_property>
+   </wvobject>
+   <wvobject fp_name="divider49" type="divider">
+      <obj_property name="label">New Divider</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="BkColor">128 128 255</obj_property>
+      <obj_property name="TextColor">230 230 230</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_prco_core/uut/r_cor_q_p_valid" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">r_cor_q_p_valid</obj_property>
+      <obj_property name="ObjectShortName">r_cor_q_p_valid</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_prco_core/uut/inst_lmem/q_p_valid" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">q_p_valid</obj_property>
+      <obj_property name="ObjectShortName">q_p_valid</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_prco_core/uut/inst_decoder/q_p_valid" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">q_p_valid</obj_property>
+      <obj_property name="ObjectShortName">q_p_valid</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_prco_core/uut/inst_regs/q_p_valid" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">q_p_valid</obj_property>
+      <obj_property name="ObjectShortName">q_p_valid</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_prco_core/uut/r_cor_i_p_valid" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">r_cor_i_p_valid</obj_property>
+      <obj_property name="ObjectShortName">r_cor_i_p_valid</obj_property>
+   </wvobject>
+</wave_config>

@@ -5,12 +5,25 @@
 
 module prco_decoder (
     input i_clk,
+    input i_reset,
+    
     input i_en,
 
     // Pipeline signals
     input           i_ce,
     output reg      q_ce,
     output reg      q_fetch,
+    
+    // Pipeline control
+    input               i_p_cp,
+    input               i_p_stalled,
+    input               i_p_valid,
+    output              q_p_stalled,
+    output reg          q_p_valid,
+    input               i_p_ce,
+    output              q_p_ce,
+
+    input               i_p_block,
     
     input [15:0]                i_instr,
 
@@ -24,6 +37,7 @@ module prco_decoder (
     output reg                  q_req_alu,
     output reg                  q_req_ram
 );
+
     /// Task to set appropriate output signals for the
     /// incoming i_instr[15:0]
     task handle_opcode;
@@ -37,6 +51,7 @@ module prco_decoder (
                 q_fetch <= 1;
                 q_ce <= 0;
                 $display("PRCO_OP_NOP");
+                r_decode_stall = 1;
                 end
                 
             `PRCO_OP_MOVI: begin
@@ -97,7 +112,7 @@ module prco_decoder (
             
             // Decode opcode and set outputs
             handle_opcode(i_instr[15:11]);
-
+            
         end else begin
             q_fetch <= 0;
             q_ce <= 0;

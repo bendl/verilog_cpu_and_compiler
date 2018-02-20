@@ -6,7 +6,7 @@ module prco_core(
     input i_clk,
     input i_en,
     input i_reset,
-
+    
     output [7:0] q_debug
 );
 
@@ -129,8 +129,4 @@ module prco_core(
         .i_simm5(r_dec_simm5), 
         .q_result(r_alu_result)
     );
-
-
-
-
 endmodule

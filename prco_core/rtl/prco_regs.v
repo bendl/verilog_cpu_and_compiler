@@ -85,5 +85,5 @@ module prco_regs (
             q_ce_fetch <= 0;
         end
     end
-
+   
 endmodule
