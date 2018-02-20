@@ -33,6 +33,9 @@
 % https://en.wikibooks.org/wiki/LaTeX/List_Structures
 \usepackage{enumitem}
 
+%https://tex.stackexchange.com/questions/66896/ref-chapter-name-in-latex
+\usepackage{nameref}
+
 
 %% Report variables
 \newcommand{\scname}{PRCO}
@@ -266,12 +269,43 @@ Even though all registers can be used at the will of the programmer, it is recom
 
 \newpage
 \subsection{Control and Pipelining}
-The \scname{} processor employs primitive control and pipeline strategies to provide reliable instruction performance, optimisation, and delay and fault handling.
+The \scname{} processor employs a \textit{feed-forward} pipeline strategy. 
+This pipeline supports:
+\begin{itemize}
+\item{Time-varying processes: Multi-clock cycle decoding; Memory access; ALU ops.}
+\item{Module re-ordering: Instruction dependencies; Module skipping; Output redirection. }
+\item{Interruption (see section \ref{sect:interrupts}: \nameref{sect:interrupts}).}
+\end{itemize}
 
-Each module within the processor is connected to the previous and next module by control signals.
+As the pipeline is feed-forward, no information is sent back to previous modules to tell them of their status. This means that if a module is stalled (due to mutli-cycle processes or future modules are stalled), and the previous module is ready, the previous module will signal the next module that information is ready and it should take it, but the current module is unable to as it is busy. The pipeline resolves this issue by it's cyclic nature. This means that only 1 module at any time is processing data. Of-course, the downside to this approach is that instruction parallelism is reduced.
+
+\begin{figure}[ht]
+\centering
+     \includegraphics[width=1.0\textwidth]{prco_forward_pipe}
+      \caption{The feed-forward pipeline interconnect diagram used by the \scname{} processor.}
+       \label{fig:prco_forward_pipe}
+\end{figure}
+
+The pipeline structure is described in figure \ref{fig:prco_forward_pipe} (above). The general order of the modules is shown from left to right, but this can change due to the pipelines re-ordering functionality.
+
+The Decoder module will decode instruction words from memory and will output appropriate signals containing the requirements of the instruction, such as requiring register write access, any ALU operation, and whether the instructions requires access to internal/external memory.
+\newline\newline
+To improve instruction performance, the decoder can also choose what modules are required and when they are called. For example, for the MOVI (move immediate) instruction the Decoder will assign the following modules in the following order: ALU and Register write, resulting in a total of 5 stages (including PC, Fetch, and Decode). The last module in this pipeline, the Register write, will raise the \textit{q\_pipe\_end} signal indicating that the pipeline has finished and to start fetching the next instruction.
+
+For the NOP instruction, the decoder identifies that the instruction requires no dependencies and will hence signal the \textit{q\_pc\_inc} signal resulting in only 3 pipeline stages.
+
+For instructions that require RAM access, a typical pipeline order might look like: PC, Fetch, Decoder, Register Read, ALU, RAM, resulting in 6 stages being used.
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[scale=0.8]{td_instr}
+\end{center}
+\caption{\scname{} processor instruction cycle time diagram.}
+\label{fig:dft_algorithm}
+\end{figure}
 
 \newpage
-\subsection{Interrupts and Exceptions}
+\subsection{Interrupts and Exceptions}\label{sect:interrupts}
 
 \newpage
 \section{\scname{} Instruction Set Architecture}
@@ -286,13 +320,6 @@ For instructions that do not require a RAM read/write request, the RAM stage of 
 
 The fastest instruction in terms of CPU cycles is the NOP instruction. The greatest number of cycles for an instruction includes all RAM read/write request operations, such as the LW and SW instructions (see section \ref{sect:isa_general}).
 
-\begin{figure}[H]
-\begin{center}
-\includegraphics[scale=0.8]{td_instr}
-\end{center}
-\caption{The Discrete Fourier Transform definition \citep{wikipedia:dft}.}
-\label{fig:dft_algorithm}
-\end{figure}
 
 \subsection{General Instructions} \label{sect:isa_general}
 The term, general instruction, is given to instructions that are common to primitive operations such as arithmetic and comparison instructions.

@@ -14,17 +14,6 @@ module prco_decoder (
     output reg      q_ce,
     output reg      q_fetch,
     
-    // Pipeline control
-    input               i_p_cp,
-    input               i_p_stalled,
-    input               i_p_valid,
-    output              q_p_stalled,
-    output reg          q_p_valid,
-    input               i_p_ce,
-    output              q_p_ce,
-
-    input               i_p_block,
-    
     input [15:0]                i_instr,
 
     output reg [4:0]            q_op,
