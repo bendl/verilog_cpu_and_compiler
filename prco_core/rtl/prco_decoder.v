@@ -8,6 +8,11 @@ module prco_decoder (
     input i_reset,
     
     input i_en,
+
+    // Pipeline signals
+    input           i_ce,
+    output reg      q_ce,
+    output reg      q_fetch,
     
     // Pipeline control
     input               i_p_cp,
@@ -32,9 +37,6 @@ module prco_decoder (
     output reg                  q_req_alu,
     output reg                  q_req_ram
 );
-    reg [15:0] b_instr;
-
-    reg r_decode_stall = 0;
 
     /// Task to set appropriate output signals for the
     /// incoming i_instr[15:0]
@@ -45,6 +47,9 @@ module prco_decoder (
             `PRCO_OP_NOP: begin
                 q_sela <= i_instr[7:5];
                 q_reg_we <= 0;
+                q_req_ram <= 0;
+                q_fetch <= 1;
+                q_ce <= 0;
                 $display("PRCO_OP_NOP");
                 r_decode_stall = 1;
                 end
@@ -52,75 +57,69 @@ module prco_decoder (
             `PRCO_OP_MOVI: begin
                 q_sela <= i_instr[7:5];
                 q_reg_we <= 1;
+                q_req_ram <= 0;
+                q_fetch <= 0;
+                q_ce <= 1;
                 $display("PRCO_OP_MOVI\t%d, %d", q_imm8, q_seld);
                 end
                 
             `PRCO_OP_MOV: begin
                 q_sela <= i_instr[7:5];
                 q_reg_we <= 1;
+                q_req_ram <= 0;
+                q_fetch <= 0;
+                q_ce <= 1;
                 $display("PRCO_OP_MOV\t%d, %d", q_sela, q_seld);
                 end
                 
             `PRCO_OP_ADD: begin
                 q_sela <= i_instr[7:5];
                 q_reg_we <= 1;
+                q_req_ram <= 0;
+                q_fetch <= 0;
+                q_ce <= 1;
                 $display("PRCO_OP_ADD\t%d, %d", q_sela, q_seld);
+                end
+
+            `PRCO_OP_LW: begin
+                q_sela <= i_instr[7:5];
+                q_reg_we <= 1;
+                q_req_ram <= 1;
+                q_fetch <= 0;
+                q_ce <= 1;
+                $display("PRCO_OP_LW\t%d, %d(%d)", 
+                    q_seld, q_simm5, q_sela);
                 end
 
             default: begin
                 q_sela <= i_instr[7:5];
                 q_reg_we <= 0;
+                q_req_ram <= 0;
+                q_fetch <= 1;
+                q_ce <= 0;
                 $display("Unknown op: %h", ti_op);
                 end
         endcase
     endtask
 
     // TODO(ben): Should sensitivity list include i_instr?
-    always @(posedge i_clk, posedge i_en) begin
-        if(i_en == 1) begin
-            if(r_decode_stall) r_decode_stall = 0;
-        end
-    end
-
-    // Pipeline control
-    // We are stalled if we are ready but the next stage isn't ready (stalled)
-    assign q_p_stalled = q_p_valid && (i_p_stalled || i_p_block || r_decode_stall);
-
-    // Ready to progress if: previous stage is ready (valid)
-    // and next stage isn't stalled.
-    assign q_p_ce = i_p_valid && !q_p_stalled;
-
     always @(posedge i_clk) begin
-        if (q_p_stalled) begin
-            $display("DEC: Stalled because of mem!");
-        end
-
-        if (q_p_ce) begin
-            $display("DEC: doing...");
-        end
-    end
-
-    always @(posedge i_clk) begin
-        if (i_reset || i_p_cp) begin
-            q_p_valid <= 0;
-        end else if (q_p_ce) begin
-            q_p_valid <= i_p_valid;
-        end else if (i_p_ce) begin
-            q_p_valid <= 0;
-        end
-    end
-
-    always @(posedge i_clk) begin
-        if (q_p_ce) begin
-            b_instr <= i_instr;
-            q_op <= i_instr[15:11];
-            q_seld <= i_instr[10:8];
-            q_imm8 <= i_instr[7:0];
-            q_simm5 <= i_instr[4:0];
+        if(i_ce) begin
+            q_op = i_instr[15:11];
+            q_seld = i_instr[10:8];
+            q_imm8 = i_instr[7:0];
+            q_simm5 = i_instr[4:0];
             
             // Decode opcode and set outputs
             handle_opcode(i_instr[15:11]);
+            
+        end else begin
+            q_fetch <= 0;
+            q_ce <= 0;
         end
+
+        if(q_ce) q_ce <= 0;
+        if(q_fetch) q_fetch <= 0;
     end
 
 endmodule

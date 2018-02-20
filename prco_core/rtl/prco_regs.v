@@ -6,17 +6,13 @@ module prco_regs (
     input               i_clk,
     input               i_en,
     input               i_reset,
-    
-    // Pipeline control
-    input               i_p_cp,
-    output reg          q_p_cp,
 
-    input               i_p_stalled,
-    input               i_p_valid,
-    output              q_p_stalled,
-    output reg          q_p_valid,
-    input               i_p_ce,
-    output              q_p_ce,
+    // Pipeline signals
+    input           i_ce_ram,
+    input           i_ce_dec,
+    input           i_ce_alu,
+    output reg      q_ce_fetch,
+    output reg      q_ce_alu,
 
     // Dual port memory access
     input [2:0]         i_sela,
@@ -39,65 +35,55 @@ module prco_regs (
 
     always @(posedge i_clk, posedge i_reset, posedge i_en)
     begin
-        if(i_en == 1 && q_p_ce) begin
-            // Reset the register set
-            if(i_reset == 1) begin
-                $display("Resetting Registers");
-                for(i = 0; i < 6; i = i + 1) begin
-                    r_regs[i] <= 16'h0;
-                end
-                r_regs[`REG_SP] <= 16'h00FF;
-                r_regs[`REG_BP] <= 16'h00FF;
-
-                // Output something so we don't latch
-                q_data <= 16'h0;
-                q_datb <= 16'h0;
-            end 
-            // Return values
-            else begin
-                // Write to a register
-                if(i_we == 1) begin
-                    $display("Writing register %d value: %h",
-                        i_seld, i_datd);
-                    r_regs[i_seld] <= i_datd;
-                end
-
-                // Writeking output
-                q_data <= r_regs[i_sela];
-                q_datb <= r_regs[i_selb];
+        // Reset the register set
+        if(i_reset == 1) begin
+            $display("Resetting Registers");
+            for(i = 0; i < 6; i = i + 1) begin
+                r_regs[i] <= 16'h0;
             end
-        end
-    end
+            r_regs[`REG_SP] <= 16'h00FF;
+            r_regs[`REG_BP] <= 16'h00FF;
 
-    // Pipeline control
-    // We are stalled if we are ready but the next stage isn't ready (stalled)
-    assign q_p_stalled = q_p_valid && i_p_stalled;
+            // Output something so we don't latch
+            q_data <= 16'h0;
+            q_datb <= 16'h0;
 
-    // Ready to progress if: previous stage is ready (valid)
-    // and next stage isn't stalled.
-    assign q_p_ce       = i_p_valid && !q_p_stalled;
+            q_ce_alu <= 0;
+            q_ce_fetch <= 1;
+        end else if(i_ce_dec || i_ce_ram || i_ce_alu || i_we) begin
+            // Write to a register
+            if(i_we == 1) begin
+                $display("Writing register %d value: %h",
+                    i_seld, i_datd);
+                r_regs[i_seld] <= i_datd;
+            end
 
-    always @(posedge i_clk) begin
-        if (q_p_stalled) begin
-            $display("REG: Stalled because of dec!");
-        end
+            // Write output
+            q_data <= r_regs[i_sela];
+            q_datb <= r_regs[i_selb];
 
-        if (q_p_ce) begin
-            $display("REG: doing...");
-            q_p_cp <= 1;
+            if (i_ce_alu) begin
+                q_ce_alu <= 0;
+                q_ce_fetch <= 1;
+            end else if(i_ce_dec) begin
+                q_ce_alu <= 1;
+                q_ce_fetch <= 0;
+            end else if (i_ce_ram) begin
+                q_ce_alu <= 0;
+                q_ce_fetch <= 1;
+            end else begin
+                q_ce_alu <= 0;
+                q_ce_fetch <= 0;
+            end
         end else begin
-            q_p_cp <= 0;
+            q_ce_alu <= 0;
+            q_ce_fetch <= 0;
         end
-    end
-    
-    always @(posedge i_clk) begin
-        if (i_reset || i_p_cp) begin
-            q_p_valid <= 0;
-        end else if (q_p_ce) begin
-            q_p_valid <= i_p_valid;
-        end else if (i_p_ce) begin
-            q_p_valid <= 0;
-        end
-    end
 
+        if(q_ce_alu || q_ce_fetch) begin
+            q_ce_alu <= 0;
+            q_ce_fetch <= 0;
+        end
+    end
+   
 endmodule
