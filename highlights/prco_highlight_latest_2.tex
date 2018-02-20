@@ -1,0 +1,344 @@
+\documentclass[11pt,a4paper]{article}
+%DIF LATEXDIFF DIFFERENCE FILE
+%DIF DEL .\prco304_highlight_1.tex   Wed Feb  7 11:20:53 2018
+%DIF ADD .\prco304_highlight_2.tex   Wed Feb 14 14:10:23 2018
+
+% font
+\renewcommand{\familydefault}{\sfdefault}
+
+
+\usepackage[margin=0.8in]{geometry}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage[hidelinks]{hyperref}
+\usepackage{float}
+
+\usepackage{lipsum}% http://ctan.org/pkg/lipsum
+
+%% Bibliography/references packages
+\usepackage[comma]{natbib}
+%%\bibliographystyle{agsm}
+\bibliographystyle{dcu}
+
+%% https://en.wikibooks.org/wiki/LaTeX/List_Structures
+\usepackage{scrextend}
+
+% tables, row colour
+\usepackage{tabularx,colortbl}
+
+% https://tex.stackexchange.com/questions/22751/how-to-force-table-caption-on-top
+%\usepackage[tableposition=top]{caption}
+\usepackage{float}
+\floatstyle{plaintop}
+\restylefloat{table}
+
+% https://en.wikibooks.org/wiki/LaTeX/List_Structures
+\usepackage{enumitem}
+
+%DIF 37a37-38
+% https://jansoehlke.com/2010/06/strikethrough-in-latex/ %DIF > 
+\usepackage{ulem} %DIF > 
+%DIF -------
+
+%DIF 38a40
+ %DIF > 
+%DIF -------
+%% Report variables
+\newcommand{\scname}{BEN-1816}
+\newcommand{\dlatestv}{1.00}
+
+%DIF 42a45-48
+\definecolor{babyblueeyes}{rgb}{0.63, 0.79, 0.95} %DIF > 
+\definecolor{ballblue}{rgb}{0.13, 0.67, 0.8} %DIF > 
+\definecolor{beaublue}{rgb}{0.74, 0.83, 0.9} %DIF > 
+ %DIF > 
+%DIF -------
+\usepackage{array,booktabs,arydshln,xcolor}
+\usepackage{xcolor}% http://ctan.org/pkg/xcolor
+\usepackage{fancyhdr}% http://ctan.org/pkg/fancyhdr
+\fancypagestyle{main}{%
+	\renewcommand{\headrulewidth}{2pt}
+	\renewcommand{\headrule}{\hbox to\headwidth{%
+%DIF 48c55
+%DIF < 		\color{red}\leaders\hrule height \headrulewidth\hfill}}
+%DIF -------
+		\color{babyblueeyes}\leaders\hrule height \headrulewidth\hfill}} %DIF > 
+%DIF -------
+	\renewcommand{\footrulewidth}{2pt}
+	\renewcommand{\footrule}{\hbox to\headwidth{%
+%DIF 51c58
+%DIF < 		\color{red}\leaders\hrule height \headrulewidth\hfill}}
+%DIF -------
+		\color{babyblueeyes}\leaders\hrule height \headrulewidth\hfill}} %DIF > 
+%DIF -------
+	
+	%\fancyhf{}
+	%\fancyhead[LE]{\textbf{\leftmark}}
+	%\fancyhead[RE]{\textbf{\scname{}}}
+	%\fancyhead[LO]{\textbf{\scname{}}}
+	%\fancyhead[RO]{\textbf{\rightmark}}
+
+	%\fancyfoot[LE]{\textbf{\thepage}}
+	%\fancyfoot[RE]{\textbf{\scname{} Configuration Guide}}
+	%\fancyfoot[LO]{\textbf{\scname{} Configuration Guide}}
+	%\fancyfoot[RO]{\textbf{\thepage}}
+}
+
+
+%% Make bibliography show in table of contents
+%% https://tex.stackexchange.com/questions/8458/making-the-bibliography-appear-in-the-table-of-contents
+\usepackage[nottoc,numbib]{tocbibind}
+%% ^^^ overwrites \bibname, so set it back
+\renewcommand{\bibname}{References}
+
+\RequirePackage{filecontents}
+
+%s comments
+\usepackage{verbatim}
+
+%inline graphs
+\usepackage{wrapfig}
+% multiple figures on line
+\usepackage{subfig}
+
+\usepackage{graphicx}
+\graphicspath{ {img/} }
+
+% Caption font size
+% https://tex.stackexchange.com/questions/86120/font-size-of-figure-caption-header
+\usepackage[font=scriptsize,labelfont=bf]{caption}
+
+%\setlength{\belowcaptionskip}{-10pt}
+%\setlength{\abovecaptionskip}{-5pt} % Chosen fairly arbitrarily
+
+
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\lhead{\rightmark}
+\chead{}
+\rhead{FPGA-based Soft-Core CPU (Rev. \dlatestv{})}
+\lfoot{Page \thepage}
+\cfoot{}
+\rfoot{Ben Lancaster 10424877}
+
+\renewcommand{\subsectionmark}[1]{\markright{\thesubsection\ #1}}
+%DIF PREAMBLE EXTENSION ADDED BY LATEXDIFF
+%DIF CCHANGEBAR PREAMBLE %DIF PREAMBLE
+\RequirePackage[dvips]{changebar} %DIF PREAMBLE
+\RequirePackage{color}\definecolor{RED}{rgb}{1,0,0}\definecolor{BLUE}{rgb}{0,0,1} %DIF PREAMBLE
+\providecommand{\DIFaddtex}[1]{\protect\cbstart{\protect\color{blue}#1}\protect\cbend} %DIF PREAMBLE
+\providecommand{\DIFdeltex}[1]{\protect\cbdelete{\protect\color{red}#1}\protect\cbdelete} %DIF PREAMBLE
+%DIF SAFE PREAMBLE %DIF PREAMBLE
+\providecommand{\DIFaddbegin}{} %DIF PREAMBLE
+\providecommand{\DIFaddend}{} %DIF PREAMBLE
+\providecommand{\DIFdelbegin}{} %DIF PREAMBLE
+\providecommand{\DIFdelend}{} %DIF PREAMBLE
+%DIF FLOATSAFE PREAMBLE %DIF PREAMBLE
+\providecommand{\DIFaddFL}[1]{\DIFadd{#1}} %DIF PREAMBLE
+\providecommand{\DIFdelFL}[1]{\DIFdel{#1}} %DIF PREAMBLE
+\providecommand{\DIFaddbeginFL}{} %DIF PREAMBLE
+\providecommand{\DIFaddendFL}{} %DIF PREAMBLE
+\providecommand{\DIFdelbeginFL}{} %DIF PREAMBLE
+\providecommand{\DIFdelendFL}{} %DIF PREAMBLE
+%DIF HYPERREF PREAMBLE %DIF PREAMBLE
+\providecommand{\DIFadd}[1]{\texorpdfstring{\DIFaddtex{#1}}{#1}} %DIF PREAMBLE
+\providecommand{\DIFdel}[1]{\texorpdfstring{\DIFdeltex{#1}}{}} %DIF PREAMBLE
+\newcommand{\DIFscaledelfig}{0.5}
+%DIF HIGHLIGHTGRAPHICS PREAMBLE %DIF PREAMBLE
+\RequirePackage{settobox} %DIF PREAMBLE
+\RequirePackage{letltxmacro} %DIF PREAMBLE
+\newsavebox{\DIFdelgraphicsbox} %DIF PREAMBLE
+\newlength{\DIFdelgraphicswidth} %DIF PREAMBLE
+\newlength{\DIFdelgraphicsheight} %DIF PREAMBLE
+% store original definition of \includegraphics %DIF PREAMBLE
+\LetLtxMacro{\DIFOincludegraphics}{\includegraphics} %DIF PREAMBLE
+\newcommand{\DIFaddincludegraphics}[2][]{{\color{blue}\fbox{\DIFOincludegraphics[#1]{#2}}}} %DIF PREAMBLE
+\newcommand{\DIFdelincludegraphics}[2][]{% %DIF PREAMBLE
+\sbox{\DIFdelgraphicsbox}{\DIFOincludegraphics[#1]{#2}}% %DIF PREAMBLE
+\settoboxwidth{\DIFdelgraphicswidth}{\DIFdelgraphicsbox} %DIF PREAMBLE
+\settoboxtotalheight{\DIFdelgraphicsheight}{\DIFdelgraphicsbox} %DIF PREAMBLE
+\scalebox{\DIFscaledelfig}{% %DIF PREAMBLE
+\parbox[b]{\DIFdelgraphicswidth}{\usebox{\DIFdelgraphicsbox}\\[-\baselineskip] \rule{\DIFdelgraphicswidth}{0em}}\llap{\resizebox{\DIFdelgraphicswidth}{\DIFdelgraphicsheight}{% %DIF PREAMBLE
+\setlength{\unitlength}{\DIFdelgraphicswidth}% %DIF PREAMBLE
+\begin{picture}(1,1)% %DIF PREAMBLE
+\thicklines\linethickness{2pt} %DIF PREAMBLE
+{\color[rgb]{1,0,0}\put(0,0){\framebox(1,1){}}}% %DIF PREAMBLE
+{\color[rgb]{1,0,0}\put(0,0){\line( 1,1){1}}}% %DIF PREAMBLE
+{\color[rgb]{1,0,0}\put(0,1){\line(1,-1){1}}}% %DIF PREAMBLE
+\end{picture}% %DIF PREAMBLE
+}\hspace*{3pt}}} %DIF PREAMBLE
+} %DIF PREAMBLE
+\LetLtxMacro{\DIFOaddbegin}{\DIFaddbegin} %DIF PREAMBLE
+\LetLtxMacro{\DIFOaddend}{\DIFaddend} %DIF PREAMBLE
+\LetLtxMacro{\DIFOdelbegin}{\DIFdelbegin} %DIF PREAMBLE
+\LetLtxMacro{\DIFOdelend}{\DIFdelend} %DIF PREAMBLE
+\DeclareRobustCommand{\DIFaddbegin}{\DIFOaddbegin \let\includegraphics\DIFaddincludegraphics} %DIF PREAMBLE
+\DeclareRobustCommand{\DIFaddend}{\DIFOaddend \let\includegraphics\DIFOincludegraphics} %DIF PREAMBLE
+\DeclareRobustCommand{\DIFdelbegin}{\DIFOdelbegin \let\includegraphics\DIFdelincludegraphics} %DIF PREAMBLE
+\DeclareRobustCommand{\DIFdelend}{\DIFOaddend \let\includegraphics\DIFOincludegraphics} %DIF PREAMBLE
+\LetLtxMacro{\DIFOaddbeginFL}{\DIFaddbeginFL} %DIF PREAMBLE
+\LetLtxMacro{\DIFOaddendFL}{\DIFaddendFL} %DIF PREAMBLE
+\LetLtxMacro{\DIFOdelbeginFL}{\DIFdelbeginFL} %DIF PREAMBLE
+\LetLtxMacro{\DIFOdelendFL}{\DIFdelendFL} %DIF PREAMBLE
+\DeclareRobustCommand{\DIFaddbeginFL}{\DIFOaddbeginFL \let\includegraphics\DIFaddincludegraphics} %DIF PREAMBLE
+\DeclareRobustCommand{\DIFaddendFL}{\DIFOaddendFL \let\includegraphics\DIFOincludegraphics} %DIF PREAMBLE
+\DeclareRobustCommand{\DIFdelbeginFL}{\DIFOdelbeginFL \let\includegraphics\DIFdelincludegraphics} %DIF PREAMBLE
+\DeclareRobustCommand{\DIFdelendFL}{\DIFOaddendFL \let\includegraphics\DIFOincludegraphics} %DIF PREAMBLE
+%DIF END PREAMBLE EXTENSION ADDED BY LATEXDIFF
+
+\begin{document}
+
+\begin{titlepage}
+\begin{center}
+
+\vspace*{5cm}
+\Large
+\textbf{
+%%PRCO304 - Project Initiation Document
+Highlight Reports
+}
+
+\vspace{0.4cm}
+\large
+%%Space optimised FPGA-based side-microprocessor.
+PRCO304 - FPGA-based RISC microprocessor
+%%EMBEDDED CPU - FPGA-based RISC microprocessor
+
+\vspace{4cm}
+\textbf{Ben Lancaster}\\
+\today 
+
+
+\end{center}
+
+\end{titlepage}
+
+\pagestyle{main}
+
+\section*{Revision History}
+\begin{table}[h]
+\def\arraystretch{1.5}%  1 is the default, change whatever you need
+    \begin{tabularx}{\textwidth}{|l|l|X|}
+    \hline
+    Date & Highlight & Changes \\
+	\specialrule{2pt}{-2pt}{0pt}
+	\DIFaddbeginFL \DIFaddFL{15/02/2018 }& \DIFaddFL{2 }& \DIFaddFL{Highlight report 2. }\\ \hline
+	\DIFaddendFL 06/02/2018 & 1 & Highlight report 1. \\ \hline
+    \end{tabularx}
+    \caption{Document revisions.}
+\end{table}
+\newpage
+
+\renewcommand*\contentsname{Table of Contents}
+\tableofcontents
+\newpage
+
+\section{Highlight Reports}
+\subsection{Highlight Report 1}
+\begin{table}[H]
+\def\arraystretch{1.5}%  1 is the default, change whatever you need
+    \begin{tabularx}{\textwidth}{|X|}
+    \hline 
+	\multicolumn{1}{|c|}{\textbf{PRCO304: Highlight Report 1}}
+    \\
+	\specialrule{2pt}{-2pt}{0pt}
+    \textbf{Name:} Ben Lancaster
+    \\ \specialrule{2pt}{-2pt}{0pt}
+	\textbf{Date:} 06/02/2018
+	\\ \specialrule{2pt}{-2pt}{0pt}
+	\textbf{Active project stage:} Stage 1.1:  Research  and  Requirement Gathering
+	\\ \specialrule{2pt}{-2pt}{0pt}
+	\textbf{Review of work undertaken:}\newline
+	This week was assigned to work on stage 1.1:  Research  and  requirement
+gathering. \newline\newline
+	\textbf{Research and requirement gathering:}\newline
+	Research into existing soft-core processor designs has been started to identify their features, targets, and advantages and disadvantages. Key existing soft-core processors found are:\newline
+	-  Xilinx' MicroBlaze: a 32-bit Xilinx FPGA embeddable core capable of running operating systems, like Linux. Exposes a configurable GUI to customise the build of the processor to suit designers requirements (like number of GPIO, interrupts, timers, etc.).\newline
+	- ARM Cortex-A9: a 32-bit Xilinx and Altera FPGA core. Features out-of-order execution, compatible with existing ARM Thumb2 C compilers, and multi-core processing.\newline\newline
+	I have used this research to aim my soft-core processor's requirements and architecture. To document and finalize my processors design and requirements, I have started a processor specification and reference document. This document outlines the processors features, architecture, compatibility, and instructions.
+	\newline\newline
+	Additional progress:\newline
+	- Version control set up for documentation, highlight reports, and code bases.
+
+	\\ \hline
+	\textbf{Risks and Challenges:}\newline
+	{\color{red} Urgent risks:}\newline
+	{\color{orange} New risks:}\newline
+	{\color{purple} Existing risks:\newline
+	RC4: Schedule overrun. A gantt time chart has been created to better visualize task durations and requirements.}\newline
+	\\ \hline
+	\textbf{Plan of work for the next week:}\newline
+	Work will begin on Stage 1.2: Core high level design.\newline\newline
+	Finalised specifications and architecture of the soft-core processor will be put into a processor specification and reference document.
+	\newline
+	Architecture, control, pipelines, will be visualised in this document.
+
+	\\ \hline
+	\textbf{Date(s) of supervisory meeting(s) since last Highlight:}\newline
+	This is the 1st highlight report.\newline
+	30/01/18 - An introductory meeting was held to discuss the project initiation document (PID) and gain feedback on the project.
+	\\ \hline
+	\textbf{Notes from supervisory meeting(s) held since last Highlight:}\newline
+	Ensure risks are carefully explored and project core deliverables are realistic and achievable.
+	\\ \hline
+    \end{tabularx}
+    %\caption{Document revisions.}
+\end{table}
+
+
+\DIFaddbegin \subsection{\DIFadd{Highlight Report 2}}
+\begin{table}[H]
+\def\arraystretch{1.5}%DIF >   1 is the default, change whatever you need
+    \begin{tabularx}{\textwidth}{|X|}
+    \hline 
+	\multicolumn{1}{|c|}{\textbf{PRCO304: Highlight Report 2}}
+    \\
+	\specialrule{2pt}{-2pt}{0pt}
+    \textbf{\DIFaddFL{Name:}} \DIFaddFL{Ben Lancaster
+    }\\ \specialrule{2pt}{-2pt}{0pt}
+	\textbf{\DIFaddFL{Date:}} \DIFaddFL{15/02/2018
+	}\\ \specialrule{2pt}{-2pt}{0pt}
+	\textbf{\DIFaddFL{Active project stage:}} \DIFaddFL{Stage 1.2:  Core high level design
+	}\\ \specialrule{2pt}{-2pt}{0pt}
+	\textbf{\DIFaddFL{Review of work undertaken:}}\newline
+	\DIFaddFL{This week was assigned to work on stage 1.2:  Core high level design.
+gathering. }\newline\newline
+	\textbf{\DIFaddFL{Core high level design:}}\newline
+	\DIFaddFL{I have spent this week defining a processor specification and creating a processor specification/reference guide booklet (see attached). This booklet will contain both high-level and technical details regarding the design and implementation of the processor, including: register sets, control and pipelining strategies, the ISA and each instruction, and the compiler and how to use it.	
+	}\newline\newline
+	\DIFaddFL{This booklet will be developed over the life cycle of the project. Although the specification has been clearly defined, the booklet will be incrementally updated as processor features/requirements are added to the implementation (such as instructions, modules, and compiler features).
+	}\newline\newline
+	\DIFaddFL{Currently the reference booklet contains: register set definitions, several primitive instructions, and a brief introduction to instruction cycle timing.
+	}
+
+	\\ \hline
+	\textbf{\DIFaddFL{Risks and Challenges:}}\newline
+	{\color{red} \DIFaddFL{Urgent risks:}}\newline
+	{\color{orange} \DIFaddFL{New risks:}}\newline
+	{\color{purple} \DIFaddFL{Existing risks:}\newline
+	\sout{RC4: Schedule overrun. A gantt time chart has been created to better visualize task durations and requirements.}}\newline
+	{\color{gray} \DIFaddFL{Resolved risks:}\newline
+	\DIFaddFL{RC4: Schedule overrun. A gantt time chart has been created to better visualize task durations and requirements. (See attached time management chart.)}}\newline
+	\\ \hline
+	\textbf{\DIFaddFL{Plan of work for the next week:}}\newline
+	\DIFaddFL{Work will begin on Stage 2.0: Core dev. Register set implementation.}\newline\newline
+	\DIFaddFL{The register set module will be implemented in Verilog for the processor. Unit tests will be created to verify the timing/behaviour of the module.
+	}\newline
+	\DIFaddFL{The processor specification/reference booklet will be updated to describe how the register set has been implemented in the processor.
+	}
+
+	\\ \hline
+	\textbf{\DIFaddFL{Date(s) of supervisory meeting(s) since last Highlight:}}\newline
+	\DIFaddFL{This is the 1st highlight report.}\newline
+	\DIFaddFL{30/01/18 - An introductory meeting was held to discuss the project initiation document (PID) and gain feedback on the project.
+	}\\ \hline
+	\textbf{\DIFaddFL{Notes from supervisory meeting(s) held since last Highlight:}}\newline
+	\DIFaddFL{Ensure risks are carefully explored and project core deliverables are realistic and achievable.
+	}\\ \hline
+    \end{tabularx}
+    %DIF > \caption{Document revisions.}
+\end{table}
+
+ \DIFaddend\end{document}
