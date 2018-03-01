@@ -23,9 +23,6 @@ module tb_prco_core;
 		.i_en(i_en), 
 		.i_reset(i_reset), 
 
-		.i_p_stalled(i_p_stalled),
-		.i_p_dec_block(dec_block),
-
 		.q_debug(q_debug)
 	);
 
@@ -84,8 +81,6 @@ module tb_prco_core;
         @(posedge i_clk);
         @(posedge i_clk);
         @(posedge i_clk);
-        
-		$finish;
 	end
       
 endmodule

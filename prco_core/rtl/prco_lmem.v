@@ -37,12 +37,19 @@ module prco_lmem (
             P_LMEM_DEPTH, r_lmem[P_LMEM_DEPTH]);
         
         // Debug instructions
-        r_lmem[0] = 16'h20ab; // MOVI 0, ab
-        r_lmem[1] = 16'h21cd; // MOVI 1, cd
-        r_lmem[3] = 16'h0800; // LW 0, 00
-        r_lmem[4] = 16'h0000; // NOP
-        r_lmem[5] = 16'h22ef; // MOVI 2, ef
+        r_lmem[0] = 16'h20ab; // MOVI   0b000, ab
+        r_lmem[1] = 16'h21cd; // MOVI   0b001, cd
+        r_lmem[3] = 16'h0B00; // LW     0b011, DX +00(AX)
+        r_lmem[5] = 16'h22ef; // MOVI   0b010, ef
+        r_lmem[6] = 16'h24aa; // MOVI   0b100, aa
 
+        // Test LW instruction
+        r_lmem[16'h00aa] = 16'hCA;
+        r_lmem[16'h00ab] = 16'hFE;
+        r_lmem[16'h00ac] = 16'hBA;
+        r_lmem[16'h00ad] = 16'hBE;
+
+        // TODO: Move to microcode or to instruction data?
         r_lmem[P_LMEM_DEPTH] = 16'h00ff; // MOVI 2, ef
     end
 
@@ -65,6 +72,7 @@ module prco_lmem (
                 q_ce_reg <= 0;
             end
 
+            $display("MEM: Reading %h", i_mem_addr);
             q_mem_douta <= r_lmem[i_mem_addr];
         end
 

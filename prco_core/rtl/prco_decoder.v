@@ -40,7 +40,6 @@ module prco_decoder (
                 q_fetch <= 1;
                 q_ce <= 0;
                 $display("PRCO_OP_NOP");
-                r_decode_stall = 1;
                 end
                 
             `PRCO_OP_MOVI: begin
@@ -49,7 +48,7 @@ module prco_decoder (
                 q_req_ram <= 0;
                 q_fetch <= 0;
                 q_ce <= 1;
-                $display("PRCO_OP_MOVI\t%d, %d", q_imm8, q_seld);
+                $display("PRCO_OP_MOVI\t%h, %h", q_imm8, q_seld);
                 end
                 
             `PRCO_OP_MOV: begin
@@ -58,7 +57,7 @@ module prco_decoder (
                 q_req_ram <= 0;
                 q_fetch <= 0;
                 q_ce <= 1;
-                $display("PRCO_OP_MOV\t%d, %d", q_sela, q_seld);
+                $display("PRCO_OP_MOV\t%h, %h", q_sela, q_seld);
                 end
                 
             `PRCO_OP_ADD: begin
@@ -67,7 +66,7 @@ module prco_decoder (
                 q_req_ram <= 0;
                 q_fetch <= 0;
                 q_ce <= 1;
-                $display("PRCO_OP_ADD\t%d, %d", q_sela, q_seld);
+                $display("PRCO_OP_ADD\t%h, %h", q_sela, q_seld);
                 end
 
             `PRCO_OP_LW: begin
@@ -76,7 +75,7 @@ module prco_decoder (
                 q_req_ram <= 1;
                 q_fetch <= 0;
                 q_ce <= 1;
-                $display("PRCO_OP_LW\t%d, %d(%d)", 
+                $display("PRCO_OP_LW\t%h, %h(%h)", 
                     q_seld, q_simm5, q_sela);
                 end
 

@@ -26,20 +26,42 @@ module prco_core(
     reg [15:0]  r_reg_dina;
     
     reg         r_dec_en = 1;
-    wire        r_reg_we = r_dec_we & (r_reg_q_ce_fetch || r_mem_q_ce_reg);
+    wire        r_reg_we = r_dec_we & (r_reg_q_ce_fetch);
 
     wire [15:0] r_alu_result;
 
-    reg [15:0]  r_mem_addr;
-    always @(posedge i_clk) begin
-        r_mem_addr = pc;
-    end
+    reg [15:0] r_mem_addr;
     
     wire [15:0] r_mem_douta;
+
+    reg         r_mem_int_i_ce = 0;
+    reg         r_mem_i_ce = 0;
 
     // Pipeline signals
     wire          i_ce = r_reg_q_ce_fetch || r_dec_q_fetch;
     reg           q_ce;
+
+    always @(posedge i_clk) begin
+        if(r_alu_q_ce_ram) begin
+            r_mem_addr <= r_alu_result;
+            r_mem_int_i_ce <= 1;
+        end else if (r_mem_int_i_ce) begin
+            r_mem_i_ce <= 1;
+            r_mem_int_i_ce <= 0;
+        end else begin
+            r_mem_int_i_ce <= 0;
+            r_mem_i_ce <= 0;
+            r_mem_addr <= pc;
+        end
+    end
+
+    always @(posedge i_clk) begin
+        if(r_mem_q_ce_reg) begin
+            r_reg_dina <= r_mem_douta;
+        end else begin
+            r_reg_dina <= r_alu_result;
+        end
+    end
 
     always @(posedge i_clk, posedge i_reset) begin
         if (i_reset == 1) begin
@@ -61,7 +83,7 @@ module prco_core(
         .i_clk(i_clk), 
 
         .i_ce_fetch(q_ce),
-        .i_ce_alu(r_alu_q_ce_ram),
+        .i_ce_alu(r_mem_i_ce),
 
         .q_ce_dec(r_mem_q_ce_decode),
         .q_ce_reg(r_mem_q_ce_reg),
@@ -110,7 +132,7 @@ module prco_core(
         .q_datb(r_reg_douta), 
         .i_we(r_reg_we), 
         .i_seld(r_dec_seld), 
-        .i_datd(r_alu_result)
+        .i_datd(r_reg_dina)
     );
     
     // Instantiate the module
