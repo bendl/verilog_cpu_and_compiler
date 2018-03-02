@@ -125,16 +125,20 @@ parser_fopen(_in_ const char *fname,
                 if (parser == NULL)
                 {
                         GetCurrentDirectory(MAX_PATH, new_parser->lpstr_input_dir);
-                        PathCombine(new_parser->lpstr_input_fp, new_parser->lpstr_input_dir,
+                        PathCombine(new_parser->lpstr_input_fp, 
+                                    new_parser->lpstr_input_dir,
                                     fname);
-                        strcpy(new_parser->lpstr_input_dir, new_parser->lpstr_input_fp);
+                        strcpy(new_parser->lpstr_input_dir,
+                               new_parser->lpstr_input_fp);
                         PathRemoveFileSpec(new_parser->lpstr_input_dir);
                 }
                 else
                 {
                         // Copy old parser dir to new parser dir
-                        strcpy(new_parser->lpstr_input_dir, parser->lpstr_input_dir);
-                        PathCombine(new_parser->lpstr_input_fp, new_parser->lpstr_input_dir,
+                        strcpy(new_parser->lpstr_input_dir,
+                               parser->lpstr_input_dir);
+                        PathCombine(new_parser->lpstr_input_fp,
+                                    new_parser->lpstr_input_dir,
                                     fname);
                 }
         }
@@ -162,10 +166,14 @@ parser_fopen(_in_ const char *fname,
                         dprintf(
                             D_WARN,
                             "WARNING: " COMPILER_INCLUDE_ENV_VAR
-                            " environment variable is not set. Cannot search std include.");
+                            " environment variable is not set. Cannot search std include.\r\n");
 
                         // Else use previous parser's directory
-                        std_include = parser->lpstr_input_dir;
+                        if(parser == NULL) {
+                                std_include = new_parser->lpstr_input_dir;
+                        } else {
+                                std_include = parser->lpstr_input_dir;
+                        }
                 }
 
                 // Create new path from fname and std_include path

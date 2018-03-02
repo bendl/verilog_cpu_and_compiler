@@ -39,7 +39,8 @@ module prco_lmem (
         // Debug instructions
         r_lmem[0] = 16'h20ab; // MOVI   0b000, ab
         r_lmem[1] = 16'h21cd; // MOVI   0b001, cd
-        r_lmem[3] = 16'h0B00; // LW     0b011, DX +00(AX)
+        r_lmem[3] = 16'h0B00; // LW     0b011, DX +0(AX)
+        r_lmem[3] = 16'h0B00; // LW     0b100, DX -1(AX)
         r_lmem[5] = 16'h22ef; // MOVI   0b010, ef
         r_lmem[6] = 16'h24aa; // MOVI   0b100, aa
 

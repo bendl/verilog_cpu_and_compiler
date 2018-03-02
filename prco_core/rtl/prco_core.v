@@ -1,13 +1,15 @@
 // prco_core
 
 `include "inc/prco_constants.v"
+`include "inc/prco_misc.v"
 
 module prco_core(
-    input i_clk,
-    input i_en,
-    input i_reset,
+    input           i_clk,
+    input           i_en,
+    input           i_reset,
     
-    output [7:0] q_debug
+    output          q_debug_instr_clk,
+    output [7:0]    q_debug
 );
 
     // program counter
@@ -26,14 +28,15 @@ module prco_core(
     reg [15:0]  r_reg_dina;
     
     reg         r_dec_en = 1;
+
+    // Only write to a register when the decode instr requires it
+    // and: 
+    //   - We are at the write-back stage
     wire        r_reg_we = r_dec_we & (r_reg_q_ce_fetch);
 
-    wire [15:0] r_alu_result;
-
     reg [15:0] r_mem_addr;
-    
-    wire [15:0] r_mem_douta;
 
+    // Offset the ALU -> RAM request by 1 clock cycle
     reg         r_mem_int_i_ce = 0;
     reg         r_mem_i_ce = 0;
 
@@ -67,6 +70,7 @@ module prco_core(
         if (i_reset == 1) begin
             pc <= 0;
         end else begin
+            `PULSE_SIGNAL(q_ce);
             if(q_ce) q_ce <= 0;
 
             if(i_ce) begin

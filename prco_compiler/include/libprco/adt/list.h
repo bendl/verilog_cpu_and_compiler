@@ -22,6 +22,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+#ifndef LIBPRCO_LIST_H
+#define LIBPRCO_LIST_H
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -43,4 +46,6 @@ append_ll_item_head         (struct list_item *head, void *val);
 
 #ifdef __cplusplus
 }
+#endif
+
 #endif

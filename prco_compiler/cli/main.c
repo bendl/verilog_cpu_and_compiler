@@ -31,6 +31,7 @@ SOFTWARE.
 
 #include <libprco/dbug.h>
 #include <libprco/parser.h>
+#include <libprco/adt/ast.h>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -46,6 +47,8 @@ int main(int argc, char **argv)
     FILE *              file_output     = NULL;
     struct text_parser  *parser         = NULL;
     int                 module_dump     = 0;
+
+    printf("sizeof struct ast_item: %d\r\n", sizeof(struct ast_item));
 
     // Parse command line
     int opt;

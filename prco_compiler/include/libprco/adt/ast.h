@@ -25,6 +25,9 @@ SOFTWARE.
 #ifndef LIBPRCO_AST_H
 #define LIBPRCO_AST_H
 
+#include "../parser.h"
+#include "list.h"
+
 /// Identifier for nodes
 typedef enum ast_type {
     AST_NUM,
@@ -43,5 +46,88 @@ typedef enum ast_type {
     AST_FUNC_EXIT,
     AST_RET,
 } ast_type;
+
+
+struct ast_item;
+
+struct ast_num {
+    int                 val;
+};
+
+struct ast_bin {
+    enum token_type     op;
+    struct ast_item     *lhs;
+    struct ast_item     *rhs;
+};
+
+struct ast_func {
+    struct ast_proto    *proto;
+    struct ast_item     *body;
+    struct ast_item     *exit;
+
+    int                 num_local_vars;
+};
+
+struct ast_proto {
+    struct ast_func     *func;
+
+    char                *name;
+    int                 argc;
+};
+
+struct ast_param {
+    char                *name;
+    int                 index;
+
+    struct ast_param    *next;
+};
+
+struct ast_var {
+    char *name;
+    int   dt;
+    int   scope;
+};
+
+struct ast_lvar {
+    struct ast_var *var;
+    int             bp_offset;
+};
+
+struct ast_assign {
+    struct ast_lvar *var;
+    struct ast_item *val;
+};
+
+struct ast_if {
+    struct ast_item *cond;
+    struct ast_item *then;
+    struct ast_item *els;
+};
+
+struct ast_for {
+    struct ast_item *start;
+    struct ast_item *cond;
+    struct ast_item *step;
+    struct ast_item *body;
+};
+
+struct ast_item {
+    enum ast_type       type;
+    struct ast_item     *next;
+    unsigned int        id;
+
+    union {
+        struct ast_num      num;
+        struct ast_func     func;
+        struct ast_proto    proto;
+        struct ast_bin      bin;
+        struct ast_if       aif;
+        struct ast_for      afor;
+        struct ast_assign   assign;
+        struct ast_lvar     lvar;
+        struct ast_var      var;
+        struct ast_param    param;
+    };
+};
 
 #endif
