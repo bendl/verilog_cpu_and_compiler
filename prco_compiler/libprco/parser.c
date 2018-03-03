@@ -625,7 +625,7 @@ struct ast_item *parse_paren(void)
 
         // Parse inside the (...)
         result = parse_expr();
-        
+
         if(!lexer_match(TOK_RBRACE)) {
                 dprintf(D_ERR, "ERR: Missing closing ) paren in expr\r\n");
                 return NULL;
@@ -698,10 +698,12 @@ struct ast_item *parse_expr(void)
 
 struct ast_item *parse_block(void)
 {
-        struct ast_item *start, *last;
+        struct ast_item *start = NULL;
+        struct ast_item *last  = NULL;
+
         while(!lexer_match(TOK_RCBRACE)) {
                 struct ast_item *e = parse_expr();
-                if(e) return NULL;
+                if(!e) return NULL;
 
                 if(start == NULL) {
                         start = e;
