@@ -29,7 +29,7 @@ SOFTWARE.
 
 /// Supported backend targets
 /// \brief
-typedef enum target_archs {
+typedef enum target_arch {
     target_generic,  ///< A generic assembly target
     target_template, ///< A template assembly target, for starting with
     target_8086,     ///< 8086 intel syntax target
@@ -45,5 +45,56 @@ typedef enum target_datatype {
     dtPTR,  ///< Pointer
     dtCHAR, ///< 1 byte
 } target_datatype;
+
+
+typedef void (*cg_precode_d)    (void);
+typedef void (*cg_postcode_d)   (void);
+typedef void (*cg_expr_d)       (struct ast_item *t);
+typedef void (*cg_function_d)   (struct ast_func *f);   ///< Cg function
+typedef void (*cg_bin_d)        (struct ast_bin *b);    ///< Cg binary expression
+typedef void (*cg_number_d)     (struct ast_num *n);    ///< Cg number expression
+typedef void (*cg_var_d)        (struct ast_var *v);    ///< Cg variable/ident reference
+typedef void (*cg_call_d)       (struct ast_call *c);   ///< Cg function call
+typedef void (*cg_local_decl_d) (struct ast_lvar *v);   ///< Cg variable declaration
+
+/*
+typedef void (*cg_if_d)(ast_if_t *i);           ///< Cg if expression
+typedef void (*cg_for_d)(ast_for_t *f);         ///< Cg for loop expression
+typedef void (*cg_assignment_d)(ast_assign_t *a); ///< Cg variable assignment
+typedef void (*cg_var_ref_d)(ast_lvar_t *v); ///< Cg local variable reference
+typedef void (*cg_dir_extern_d)(ast_proto_t *p);  ///< Cg extern declaration
+typedef void (*cg_func_ret)(ast_ret_t *r);        ///< Cg extern declaration
+typedef int (*get_dt_size_d)(target_datatype dt); ///< Target datatype
+*/
+
+/// Structure containing function pointers to target specific codegen functions
+/// \brief
+struct target_delegate {
+        cg_precode_d    cg_precode;
+        cg_postcode_d   cg_postcode;
+        cg_expr_d       cg_expr;
+        cg_function_d   cg_function;
+        cg_bin_d        cg_bin;
+        cg_number_d     cg_number;
+        cg_var_d        cg_var;
+        cg_call_d       cg_call;
+        cg_local_decl_d cg_local_decl;
+
+        /*
+        cg_if_d         cg_if;
+        cg_for_d        cg_for;
+        cg_assignment_d cg_assignment;
+        cg_var_ref_d    cg_var_ref;
+        cg_dir_extern_d cg_dir_extern;
+        cg_func_ret     cg_func_ret;
+        get_dt_size_d   get_dt_size;
+        */
+};
+
+extern struct target_delegate   cg_target_delegate;
+extern enum target_arch         cg_target_arch;
+extern struct ast_func          *cg_cur_func;
+
+extern void init_target(enum target_arch arch);
 
 #endif

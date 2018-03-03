@@ -5,9 +5,11 @@
 #ifndef LIBPRCO_DBUG_H
 #define LIBPRCO_DBUG_H
 
-#define D_INFO  0x1
-#define D_ERR 0x2
-#define D_WARN  0x4
+#define D_INFO  0x01
+#define D_ERR   0x02
+#define D_WARN  0x04
+#define D_PARSE 0x08
+#define D_GEN   0x10
 #define D_ALL   0xFFFF
 
 extern unsigned int g_dbug_level;

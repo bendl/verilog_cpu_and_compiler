@@ -3,9 +3,11 @@
 //
 
 #include <stdlib.h>
+#include <assert.h>
+
 #include "dbug.h"
 #include "module.h"
-#include <assert.h>
+#include "gen.h"
 
 struct module *g_module;
 
@@ -27,4 +29,9 @@ struct module *get_g_module(void)
 {
         assert(g_module);
         return g_module;
+}
+
+void module_dump(struct module *m)
+{
+        cg_dump(m, target_template);
 }

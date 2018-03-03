@@ -48,7 +48,7 @@ int main(int argc, char **argv)
         int src_size;
         char *out_name = "out.s";
         int parse_result = 0;
-        int                module_dump = 0;
+        int module_dump_output = 0;
 
         printf("sizeof struct ast_item: %d\r\n", sizeof(struct ast_item));
 
@@ -63,7 +63,7 @@ int main(int argc, char **argv)
                         set_dbug_level(strtoul(optarg, &ptr, 16));
                 }
                         break;
-                case 'd': module_dump = 1;
+                case 'd': module_dump_output = 1;
                         break;
                 default:dprintf(D_ERR, "Unknown arguments.\r\n");
                         exit(1);
@@ -95,6 +95,10 @@ int main(int argc, char **argv)
                 dprintf(D_ERR, "parser_run error %d\r\n", parse_result);
                 return parse_result;
         }
+
+        // run_passes(module);
+
+        module_dump(module);
 
 
         return 0;
