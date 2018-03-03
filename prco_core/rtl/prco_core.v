@@ -8,7 +8,7 @@ module prco_core(
     input           i_en,
     input           i_reset,
     
-    output          q_debug_instr_clk,
+    output reg      q_debug_instr_clk,
     output [7:0]    q_debug
 );
 
@@ -33,6 +33,9 @@ module prco_core(
     // and: 
     //   - We are at the write-back stage
     wire        r_reg_we = r_dec_we & (r_reg_q_ce_fetch);
+    
+    wire [15:0] r_alu_result;
+    wire [15:0] r_mem_douta;
 
     reg [15:0] r_mem_addr;
 
@@ -74,6 +77,7 @@ module prco_core(
             if(q_ce) q_ce <= 0;
 
             if(i_ce) begin
+                q_debug_instr_clk <= 1;
                 pc <= pc + 1;
                 q_ce <= 1;
             end else begin
@@ -81,6 +85,12 @@ module prco_core(
             end
         end
     end    
+
+    always @(posedge i_clk) begin
+        if(q_debug_instr_clk) begin
+            q_debug_instr_clk <= 0;
+        end
+    end
 
     // Instantiate the module
     prco_lmem inst_lmem (

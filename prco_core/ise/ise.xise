@@ -416,6 +416,7 @@
     <file xil_pn:name="../rtl/inc/prco_constants.v" xil_pn:type="FILE_VERILOG"/>
     <file xil_pn:name="../rtl/inc/prco_isa.v" xil_pn:type="FILE_VERILOG"/>
     <file xil_pn:name="../rtl/inc/prco_test.v" xil_pn:type="FILE_VERILOG"/>
+    <file xil_pn:name="../rtl/inc/prco_misc.v" xil_pn:type="FILE_VERILOG"/>
   </autoManagedFiles>
 
 </project>
