@@ -10,10 +10,14 @@
          </top_modules>
       </db_ref>
    </db_ref_list>
-   <WVObjectSize size="43" />
+   <WVObjectSize size="44" />
    <wvobject fp_name="/tb_prco_core/q_debug" type="array" db_ref_id="1">
       <obj_property name="ElementShortName">q_debug[7:0]</obj_property>
       <obj_property name="ObjectShortName">q_debug[7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_prco_core/q_debug_instr_clk" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">q_debug_instr_clk</obj_property>
+      <obj_property name="ObjectShortName">q_debug_instr_clk</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_prco_core/i_clk" type="logic" db_ref_id="1">
       <obj_property name="ElementShortName">i_clk</obj_property>

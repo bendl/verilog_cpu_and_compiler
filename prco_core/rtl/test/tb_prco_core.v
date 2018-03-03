@@ -13,6 +13,7 @@ module tb_prco_core;
 
 	// Outputs
 	wire [7:0] q_debug;
+    wire       q_debug_instr_clk;
 
     // Create clock signal
     always #5 i_clk = ~i_clk;
@@ -23,6 +24,7 @@ module tb_prco_core;
 		.i_en(i_en), 
 		.i_reset(i_reset), 
 
+        .q_debug_instr_clk(q_debug_instr_clk),
 		.q_debug(q_debug)
 	);
 
