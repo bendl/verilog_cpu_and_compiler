@@ -1,5 +1,4 @@
-// binary_ops_1
 
-@main() {
+def main() {
 	1+2+3;
 }

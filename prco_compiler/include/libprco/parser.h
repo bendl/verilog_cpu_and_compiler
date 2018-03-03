@@ -134,6 +134,14 @@ extern int parser_run(_in_ struct text_parser *parser);
 
 void parser_test(struct text_parser *parser);
 
+
+// Text parser functions
+extern struct ast_item      *parse_expr(void);
+extern struct ast_item      *parse_block(void);
+extern struct ast_proto     *parse_proto(enum token_type t);
+extern struct ast_func      *parse_def(void);
+
+
 #ifdef __cplusplus
 }
 #endif

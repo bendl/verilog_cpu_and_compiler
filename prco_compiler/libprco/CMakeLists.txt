@@ -18,7 +18,7 @@ file(GLOB PRCO_HEADERS
     ../include/libprco/adt/*.h
     ../include/libprco/arch/*.h)
 
-add_library(${PROJECT_NAME} STATIC ${PRCO_SOURCES} ${PRCO_HEADERS})
+add_library(${PROJECT_NAME} STATIC ${PRCO_SOURCES} ${PRCO_HEADERS} module.c ../include/libprco/module.h)
 
 install(TARGETS libprco DESTINATION lib)
 install(DIRECTORY ../include/ DESTINATION include)

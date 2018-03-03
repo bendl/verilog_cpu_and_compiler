@@ -30,104 +30,124 @@ SOFTWARE.
 
 /// Identifier for nodes
 typedef enum ast_type {
-    AST_NUM,
-    AST_VAR,
-    AST_BIN,
-    AST_CALL,
-    AST_LOCAL_VAR,
-    AST_REF_VAR,
-    AST_IF,
-    AST_FOR,
-    AST_BOOL,
-    AST_ASSIGNMENT,
-    AST_VAR_REF,
+        AST_NUM,
+        AST_VAR,
+        AST_BIN,
+        AST_CALL,
+        AST_LOCAL_VAR,
+        AST_REF_VAR,
+        AST_IF,
+        AST_FOR,
+        AST_BOOL,
+        AST_ASSIGNMENT,
+        AST_VAR_REF,
 
-    AST_FUNC,
-    AST_FUNC_EXIT,
-    AST_RET,
+        AST_FUNC,
+        AST_FUNC_EXIT,
+        AST_RET,
 } ast_type;
 
 
 struct ast_item;
 
 struct ast_num {
-    int                 val;
+        int val;
 };
 
 struct ast_bin {
-    enum token_type     op;
-    struct ast_item     *lhs;
-    struct ast_item     *rhs;
+        enum token_type op;
+        struct ast_item *lhs;
+        struct ast_item *rhs;
 };
 
 struct ast_func {
-    struct ast_proto    *proto;
-    struct ast_item     *body;
-    struct ast_item     *exit;
+        struct ast_proto *proto;
+        struct ast_item  *body;
+        struct ast_item  *exit;
+        struct list_item *locals;
+        struct ast_func  *next;
 
-    int                 num_local_vars;
+        int num_local_vars;
 };
 
 struct ast_proto {
-    struct ast_func     *func;
-
-    char                *name;
-    int                 argc;
+        struct ast_func  *func;
+        struct ast_proto *next;
+        struct list_item *args;
+        int              argc;
+        char             *name;
 };
 
 struct ast_param {
-    char                *name;
-    int                 index;
+        char *name;
+        int  index;
 
-    struct ast_param    *next;
+        struct ast_param *next;
 };
 
 struct ast_var {
-    char *name;
-    int   dt;
-    int   scope;
+        char *name;
+        int  dt;
+        int  scope;
 };
 
 struct ast_lvar {
-    struct ast_var *var;
-    int             bp_offset;
+        struct ast_var *var;
+        int            bp_offset;
 };
 
 struct ast_assign {
-    struct ast_lvar *var;
-    struct ast_item *val;
+        struct ast_lvar *var;
+        struct ast_item *val;
 };
 
 struct ast_if {
-    struct ast_item *cond;
-    struct ast_item *then;
-    struct ast_item *els;
+        struct ast_item *cond;
+        struct ast_item *then;
+        struct ast_item *els;
 };
 
 struct ast_for {
-    struct ast_item *start;
-    struct ast_item *cond;
-    struct ast_item *step;
-    struct ast_item *body;
+        struct ast_item *start;
+        struct ast_item *cond;
+        struct ast_item *step;
+        struct ast_item *body;
 };
 
 struct ast_item {
-    enum ast_type       type;
-    struct ast_item     *next;
-    unsigned int        id;
-
-    union {
-        struct ast_num      num;
-        struct ast_func     func;
-        struct ast_proto    proto;
-        struct ast_bin      bin;
-        struct ast_if       aif;
-        struct ast_for      afor;
-        struct ast_assign   assign;
-        struct ast_lvar     lvar;
-        struct ast_var      var;
-        struct ast_param    param;
-    };
+        enum ast_type   type;
+        struct ast_item *next;
+        unsigned int    id;
+        void            *expr;
 };
+
+struct ast_item_union {
+        enum ast_type   type;
+        struct ast_item *next;
+        unsigned int    id;
+
+        union {
+                struct ast_num    num;
+                struct ast_func   func;
+                struct ast_proto  proto;
+                struct ast_bin    bin;
+                struct ast_if     aif;
+                struct ast_for    afor;
+                struct ast_assign assign;
+                struct ast_lvar   lvar;
+                struct ast_var    var;
+                struct ast_param  param;
+        };
+};
+
+
+// Instantiation functions
+extern struct ast_item  *new_expr  (void *expr, enum ast_type type);
+extern struct ast_num   *new_num   (int num_val);
+extern struct ast_func  *new_func  (struct ast_proto *proto, struct ast_item *body);
+extern struct ast_bin   *new_bin   (char op, struct ast_item *lhs, struct ast_item *rhs);
+extern struct ast_proto *new_proto (char *name, struct list_item* args, int argc);
+extern struct ast_var   *new_var   (char *name, int dt);
+extern struct ast_lvar  *new_lvar  (struct ast_var *var);
 
 #endif

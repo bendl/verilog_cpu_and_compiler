@@ -39,7 +39,7 @@ append_ll_item_head(struct list_item *head, void *val)
                 return head;
         }
 
-        // If the head is empty, return it
+        // If the head is empty, return id
         if (head->value == NULL) {
                 head->value = val;
                 return head;
