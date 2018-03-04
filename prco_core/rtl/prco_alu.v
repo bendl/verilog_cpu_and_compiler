@@ -31,6 +31,7 @@ module prco_alu (
                 // Sign extend the signed 5 bit immediate
                 sign_extended_imm = { {11{i_simm5[4]}}, i_simm5[4:0] };
                 q_result = i_data + sign_extended_imm;
+                // i_data
             end
 
         `PRCO_OP_MOVI: begin

@@ -33,11 +33,13 @@ module prco_core(
     // and: 
     //   - We are at the write-back stage
     wire        r_reg_we = r_dec_we & (r_reg_q_ce_fetch);
+    wire        r_lmem_we = r_dec_req_ram_we & (r_mem_i_ce);
     
     wire [15:0] r_alu_result;
     wire [15:0] r_mem_douta;
 
-    reg [15:0] r_mem_addr;
+    reg [15:0]  r_mem_addr;
+
 
     // Offset the ALU -> RAM request by 1 clock cycle
     reg         r_mem_int_i_ce = 0;
@@ -102,9 +104,9 @@ module prco_core(
         .q_ce_dec(r_mem_q_ce_decode),
         .q_ce_reg(r_mem_q_ce_reg),
         
-        .i_mem_we(i_mem_we), 
+        .i_mem_we(r_lmem_we), 
         .i_mem_addr(r_mem_addr), 
-        .i_mem_dina(i_mem_dina), 
+        .i_mem_dina(r_reg_doutd), 
         .q_mem_douta(r_mem_douta)
     );
 
@@ -125,7 +127,8 @@ module prco_core(
         .q_simm5(r_dec_simm5),
         .q_reg_we(r_dec_we),
 
-        .q_req_ram(r_dec_ram_req)
+        .q_req_ram(r_dec_ram_req),
+        .q_req_ram_we(r_dec_req_ram_we)
     );
 
     // Instantiate the module

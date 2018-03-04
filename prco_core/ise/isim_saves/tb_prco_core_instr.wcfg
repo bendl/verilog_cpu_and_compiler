@@ -10,7 +10,7 @@
          </top_modules>
       </db_ref>
    </db_ref_list>
-   <WVObjectSize size="44" />
+   <WVObjectSize size="40" />
    <wvobject fp_name="/tb_prco_core/q_debug" type="array" db_ref_id="1">
       <obj_property name="ElementShortName">q_debug[7:0]</obj_property>
       <obj_property name="ObjectShortName">q_debug[7:0]</obj_property>
@@ -61,17 +61,21 @@
       <obj_property name="ElementShortName">i_ce_alu</obj_property>
       <obj_property name="ObjectShortName">i_ce_alu</obj_property>
    </wvobject>
+   <wvobject fp_name="/tb_prco_core/uut/inst_lmem/i_mem_we" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">i_mem_we</obj_property>
+      <obj_property name="ObjectShortName">i_mem_we</obj_property>
+   </wvobject>
    <wvobject fp_name="/tb_prco_core/uut/inst_lmem/i_mem_addr" type="array" db_ref_id="1">
       <obj_property name="ElementShortName">i_mem_addr[15:0]</obj_property>
       <obj_property name="ObjectShortName">i_mem_addr[15:0]</obj_property>
    </wvobject>
+   <wvobject fp_name="/tb_prco_core/uut/inst_lmem/i_mem_dina" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">i_mem_dina[15:0]</obj_property>
+      <obj_property name="ObjectShortName">i_mem_dina[15:0]</obj_property>
+   </wvobject>
    <wvobject fp_name="/tb_prco_core/uut/inst_lmem/q_mem_douta" type="array" db_ref_id="1">
       <obj_property name="ElementShortName">q_mem_douta[15:0]</obj_property>
       <obj_property name="ObjectShortName">q_mem_douta[15:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_prco_core/uut/inst_lmem/q_ce_reg" type="logic" db_ref_id="1">
-      <obj_property name="ElementShortName">q_ce_reg</obj_property>
-      <obj_property name="ObjectShortName">q_ce_reg</obj_property>
    </wvobject>
    <wvobject fp_name="divider141" type="divider">
       <obj_property name="label">DEC</obj_property>
@@ -108,26 +112,6 @@
       <obj_property name="DisplayName">label</obj_property>
       <obj_property name="BkColor">128 128 255</obj_property>
       <obj_property name="TextColor">230 230 230</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_prco_core/uut/inst_regs/i_ce_ram" type="logic" db_ref_id="1">
-      <obj_property name="ElementShortName">i_ce_ram</obj_property>
-      <obj_property name="ObjectShortName">i_ce_ram</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_prco_core/uut/inst_regs/i_ce_dec" type="logic" db_ref_id="1">
-      <obj_property name="ElementShortName">i_ce_dec</obj_property>
-      <obj_property name="ObjectShortName">i_ce_dec</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_prco_core/uut/inst_regs/i_ce_alu" type="logic" db_ref_id="1">
-      <obj_property name="ElementShortName">i_ce_alu</obj_property>
-      <obj_property name="ObjectShortName">i_ce_alu</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_prco_core/uut/inst_regs/q_ce_fetch" type="logic" db_ref_id="1">
-      <obj_property name="ElementShortName">q_ce_fetch</obj_property>
-      <obj_property name="ObjectShortName">q_ce_fetch</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_prco_core/uut/inst_regs/q_ce_alu" type="logic" db_ref_id="1">
-      <obj_property name="ElementShortName">q_ce_alu</obj_property>
-      <obj_property name="ObjectShortName">q_ce_alu</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_prco_core/uut/inst_regs/i_we" type="logic" db_ref_id="1">
       <obj_property name="ElementShortName">i_we</obj_property>

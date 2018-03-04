@@ -24,7 +24,8 @@ module prco_decoder (
 
     output reg                  q_reg_we,
     output reg                  q_req_alu,
-    output reg                  q_req_ram
+    output reg                  q_req_ram,
+    output reg                  q_req_ram_we
 );
 
     /// Task to set appropriate output signals for the
@@ -39,6 +40,7 @@ module prco_decoder (
                 q_req_ram <= 0;
                 q_fetch <= 1;
                 q_ce <= 0;
+                q_req_ram_we <= 0;
                 $display("PRCO_OP_NOP");
                 end
                 
@@ -48,6 +50,7 @@ module prco_decoder (
                 q_req_ram <= 0;
                 q_fetch <= 0;
                 q_ce <= 1;
+                q_req_ram_we <= 0;
                 $display("PRCO_OP_MOVI\t%h, %h", q_imm8, q_seld);
                 end
                 
@@ -57,6 +60,7 @@ module prco_decoder (
                 q_req_ram <= 0;
                 q_fetch <= 0;
                 q_ce <= 1;
+                q_req_ram_we <= 0;
                 $display("PRCO_OP_MOV\t%h, %h", q_sela, q_seld);
                 end
                 
@@ -66,6 +70,7 @@ module prco_decoder (
                 q_req_ram <= 0;
                 q_fetch <= 0;
                 q_ce <= 1;
+                q_req_ram_we <= 0;
                 $display("PRCO_OP_ADD\t%h, %h", q_sela, q_seld);
                 end
 
@@ -75,8 +80,19 @@ module prco_decoder (
                 q_req_ram <= 1;
                 q_fetch <= 0;
                 q_ce <= 1;
+                q_req_ram_we <= 0;
                 $display("PRCO_OP_LW\t%h, %h(%h)", 
                     q_seld, q_simm5, q_sela);
+                end
+
+            `PRCO_OP_SW: begin
+                q_sela <= i_instr[7:5];
+                q_reg_we <= 0;
+                q_req_ram <= 1;
+                q_fetch <= 0;
+                q_ce <= 1;
+                q_req_ram_we <= 1;
+                $display("PRCO_OP_SW\t%h, %h", q_seld, q_sela);
                 end
 
             default: begin
@@ -85,6 +101,7 @@ module prco_decoder (
                 q_req_ram <= 0;
                 q_fetch <= 1;
                 q_ce <= 0;
+                q_req_ram_we <= 0;
                 $display("Unknown op: %h", ti_op);
                 end
         endcase
