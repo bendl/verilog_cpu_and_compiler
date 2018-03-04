@@ -46,10 +46,15 @@ module prco_lmem (
         r_lmem[6] = 16'h24aa; // MOVI   0b100, aa
         */
 
+        // Test SW
         r_lmem[0] = 16'h24ab; // MOVI   0b100, ab
         r_lmem[1] = 16'h23cd; // MOVI   0b011, cd
         r_lmem[2] = 16'h1460; // SW     0b100, +0(0b011)
         r_lmem[3] = 16'h1461; // SW     0b100, +1(0b011)
+
+        // Test LW
+        r_lmem[4] = 16'h24aa; // MOVI   0b100, aa
+        r_lmem[5] = 16'h0880; // LW     0b000, +0(b100)
 
         // Test LW instruction
         r_lmem[16'h00aa] = 16'hCA;
