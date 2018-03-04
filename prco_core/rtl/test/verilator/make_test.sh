@@ -16,4 +16,4 @@ function run_test {
     fi
 }
 
-run_test prco_core
+run_test prco_alu

@@ -74,6 +74,16 @@ module prco_decoder (
                 $display("PRCO_OP_ADD\t%h, %h", q_sela, q_seld);
                 end
 
+            `PRCO_OP_ADDI: begin
+                q_sela <= i_instr[7:5];
+                q_reg_we <= 1;
+                q_req_ram <= 0;
+                q_fetch <= 0;
+                q_ce <= 1;
+                q_req_ram_we <= 0;
+                $display("PRCO_OP_ADDI\t%h, %h", q_sela, q_imm8);
+                end
+
             `PRCO_OP_LW: begin
                 q_sela <= i_instr[7:5];
                 q_reg_we <= 1;
@@ -93,6 +103,27 @@ module prco_decoder (
                 q_ce <= 1;
                 q_req_ram_we <= 1;
                 $display("PRCO_OP_SW\t%h, %h", q_seld, q_sela);
+                end
+
+            `PRCO_OP_CMP: begin
+                $display("PRCO_OP_CMP\t%d", q_seld);
+                q_sela          <= `REG_SR;
+                q_reg_we        <= 1;
+                q_req_ram       <= 0;
+                q_ce            <= 1;
+                q_req_ram_we    <= 1;
+                end
+
+            `PRCO_OP_OR,
+            `PRCO_OP_XOR,
+            `PRCO_OP_AND: begin
+                q_sela <= i_instr[7:5];
+                q_reg_we <= 1;
+                q_req_ram <= 0;
+                q_fetch <= 0;
+                q_ce <= 1;
+                q_req_ram_we <= 0;
+                $display("PRCO_OP_BIT\t%h, %h", q_sela, q_imm8);
                 end
 
             default: begin

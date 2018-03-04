@@ -13,11 +13,7 @@
 `define REG_BP          6
 `define REG_SP          7
 
-`define STATE_RESET     8'h1
-`define STATE_FETCH     8'h2
-`define STATE_DECODE    8'h4
-`define STATE_READ      8'h8
-`define STATE_EXEC      8'h10
-`define STATE_RAM       8'h20
-`define STATE_WRITE     8'h40
-`define STATE_HALT      8'h80
+`define SR_Z            0
+`define SR_S            1
+`define SR_O            2
+`define SR__LAST        3
