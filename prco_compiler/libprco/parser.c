@@ -124,18 +124,20 @@ parser_fopen(_in_ const char *fname,
 
         if (PathIsRelative(fname))
         {
+                dprintf(D_INFO, "Path is relative\r\n");
                 // Get current dir from current parser
                 // If current parser is null, use executable pwd
                 // I.e. pwd + fname
-                if (parser == NULL)
-                {
+                if (parser == NULL) {
                         GetCurrentDirectory(MAX_PATH, new_parser->lpstr_input_dir);
-                        PathCombine(new_parser->lpstr_input_fp, 
-                                    new_parser->lpstr_input_dir,
-                                    fname);
-                        strcpy(new_parser->lpstr_input_dir,
-                               new_parser->lpstr_input_fp);
+                        dprintf(D_INFO, "dir: %s\r\n", new_parser->lpstr_input_dir);
+                        dprintf(D_INFO, "fname: %s\r\n", fname);
+                        PathCombine(new_parser->lpstr_input_fp,
+                                new_parser->lpstr_input_dir, fname);
+                        strcpy(new_parser->lpstr_input_dir, new_parser->lpstr_input_fp);
                         PathRemoveFileSpec(new_parser->lpstr_input_dir);
+                        dprintf(D_INFO, "fp: %s\r\n", new_parser->lpstr_input_fp);
+                        dprintf(D_INFO, "Parser null\r\n");
                 }
                 else
                 {
@@ -146,9 +148,10 @@ parser_fopen(_in_ const char *fname,
                                     new_parser->lpstr_input_dir,
                                     fname);
                 }
-        }
-        else
-        {
+
+                dprintf(D_INFO, "Origin path: %s\r\n", fname);
+                dprintf(D_INFO, "New path: %s\r\n", new_parser->lpstr_input_fp);
+        } else {
                 // Extract dir from fname
                 // TODO: Pass size to this function
                 int fname_size = strlen(fname) + 1;
@@ -163,6 +166,8 @@ parser_fopen(_in_ const char *fname,
                 // Check to see if id exists in the std include path
                 char *std_include = new_parser->lpstr_input_dir;
                 int ret;
+
+                dprintf(D_INFO, "File doesnt exist!\r\n");
 
                 ret = GetEnvironmentVariable(COMPILER_INCLUDE_ENV_VAR,
                                              new_parser->lpstr_input_dir, MAX_PATH);
@@ -189,6 +194,9 @@ parser_fopen(_in_ const char *fname,
                     new_parser->lpstr_input_dir,
                     fname);
         }
+
+
+        dprintf(D_INFO, "New path exists: %s\r\n", new_parser->lpstr_input_fp);
 
 // fname exists
 l_fname_exists:
@@ -320,9 +328,9 @@ parser_run_cleanup:
 token_type 
 lexer_next(void)
 {
+        struct list_item *resv_it;
         char buf[32];
         int i = 0;
-        struct list_item *resv_it;
 
         assert(g_cur_parser());
         assert(g_cur_parser()->file_input);

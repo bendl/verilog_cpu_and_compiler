@@ -17,6 +17,8 @@ struct module {
 
 extern struct module *g_module;
 
+extern FILE *g_file_out;
+
 extern struct module *get_g_module(void);
 
 extern struct module *new_module(void);

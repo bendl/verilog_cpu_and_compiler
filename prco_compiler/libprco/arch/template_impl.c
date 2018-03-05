@@ -15,13 +15,17 @@ void cg_target_template_init(struct target_delegate *dt)
         dt->cg_local_decl = cg_local_decl_template;
         dt->cg_number = cg_number_template;
         dt->cg_var = cg_var_template;
+
+        eprintf(".text\r\n");
+        eprintf(".globl _main\r\n");
+        eprintf("_main:\r\n");
 }
 
 inline void cg_sf_start(struct ast_func *f)
 {
-        dprintf(D_GEN, "PUSH EBP\r\n");
-        dprintf(D_GEN, "MOV EPB, ESP\r\n");
-        dprintf(D_GEN, "SUB ESP, 4\r\n");
+        eprintf("push %%bp\r\n");
+        eprintf("mov %%bp, %%sp\r\n");
+        eprintf("SUB $4, %%sp\r\n");
 }
 
 void cg_debug_bin(struct ast_bin* b)
@@ -56,7 +60,7 @@ void cg_function_template(struct ast_func *f)
         cg_cur_function = f;
 
         // Create stack frame
-        cg_sf_start(f);
+        //cg_sf_start(f);
 
         // cg the function body
         cg_expr_template(f->body);
@@ -75,23 +79,28 @@ void cg_bin_template(struct ast_bin *b)
         cg_expr_template(b->lhs);
 
         if(b->rhs) {
-                dprintf(D_GEN, "PUSH EAX\r\n");
+                eprintf("PUSH %%ax\r\n");
                 cg_expr_template(b->rhs);
         }
 
         switch(b->op) {
         case TOK_PLUS:
-                dprintf(D_GEN, "POP ECX\r\n");
-                dprintf(D_GEN, "ADD ECX, EAX\r\n"); break;
-        default: assert("Unimplemented cg_bin_template b->op!" && 0);
+                eprintf("POP %%cx\r\n");
+                eprintf("ADD %%cx, %%ax\r\n"); 
+                break;
+
+        case TOK_SUB: 
+                eprintf("POP %%cx\r\n");
+                eprintf("SUB %%cx, %%ax");
+                break;
+
+        default: assert("Unimplemented cg_bin_template b->op!" && 0); break;
         }
 }
 
 void cg_number_template(struct ast_num *n)
 {
-
-        dprintf(D_GEN, "Starting cg for number: %d\r\n", n->val);
-        dprintf(D_GEN, "MOVI %d, EAX\r\n", n->val);
+        eprintf("mov $%d, %%ax\r\n", n->val);
 }
 
 void cg_var_template(struct ast_var *v) {}

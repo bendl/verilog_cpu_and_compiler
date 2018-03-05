@@ -34,7 +34,7 @@ typedef enum target_arch {
     target_template, ///< A template assembly target, for starting with
     target_8086,     ///< 8086 intel syntax target
     target_x86,      ///< x86 at&t syntax target
-    target_uvm100,   ///< https://github.com/bendl/uvm target
+    target_prco100,   ///< https://github.com/bendl/prco target
 } target_archs;
 
 /// Target datatype sizes

@@ -25,11 +25,12 @@ rem call :build_std
 
 echo "Running Tests..."
 cd test
-call :run_test tests/binary_ops_1.ccl 6
+call :run_test tests/binary_ops_1.prco 6
+call :run_test tests/foo.prco 6
 
 echo %NUM_TESTS% ran.
 echo %RESULT%/%NUM_TESTS% tests failed.
-del out.s
+rem del out.s
 rem del a.exe
 goto :eof
 
@@ -42,12 +43,11 @@ EXIT /B %ERRORLEVEL%
 
 :run_test
 set /A NUM_TESTS=NUM_TESTS+1
-call "../wbuild/cli/cli.exe" -d -D0xff -i %~1
+call "../wbuild/cli/cli.exe" -i %~1 -d -D0xFF
 if !errorlevel! EQU 0 (
 	rem Compiler successfullly created assembly file
-	rem Compiler id with gcc as...
+	rem Compiler it with gcc as...
 	gcc -m32 -O0 out.s
-    rem ../libccl/std/stdio.o
 	a.exe
 	set ANSWER=!errorlevel!
 ) else (

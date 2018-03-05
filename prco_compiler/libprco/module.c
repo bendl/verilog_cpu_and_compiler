@@ -10,6 +10,7 @@
 #include "gen.h"
 
 struct module *g_module;
+FILE *         g_file_out;
 
 struct module *new_module(void)
 {

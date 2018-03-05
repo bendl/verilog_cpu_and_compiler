@@ -77,6 +77,7 @@ int main(int argc, char **argv)
 
         // Create output file for writing
         file_output = fopen(out_name, "w");
+        g_file_out  = file_output;
 
         // Create new IR module
         module = new_module();
@@ -99,6 +100,8 @@ int main(int argc, char **argv)
         // run_passes(module);
 
         module_dump(module);
+
+        fclose(g_file_out);
 
 
         return 0;
