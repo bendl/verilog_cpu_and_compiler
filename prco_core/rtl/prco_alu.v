@@ -119,7 +119,7 @@ module prco_alu (
                 // Sign extend the signed 5 bit immediate
                 sign_extended_imm = { {11{i_simm5[4]}}, i_simm5[4:0] };
                 q_result = i_data + sign_extended_imm;
-                // i_data
+                q_should_branch <= 0;
             end
 
         `PRCO_OP_CMP: begin
@@ -131,31 +131,36 @@ module prco_alu (
 
         `PRCO_OP_JMP: begin
             // ALU result is the PC in address
-            // data = CX register
-            // datb = SR register
-            q_result <= i_data;
-            q_should_branch <= func_alu_should_jmp(i_imm8, i_datb);
+            // datb = register to jump to
+            // data = SR register
+            q_result <= i_datb;
+            q_should_branch <= func_alu_should_jmp(i_imm8, i_data);
             end
 
         `PRCO_OP_MOVI: begin
             q_result[15:8] <= 0;
             q_result[7:0] <= i_imm8;
+            q_should_branch <= 0;
             end
 
         `PRCO_OP_MOV: begin
             q_result <= i_datb;
+            q_should_branch <= 0;
             end
 
         `PRCO_OP_ADD: begin
             q_result <= i_data + i_datb;
+            q_should_branch <= 0;
             end
 
         `PRCO_OP_ADDI: begin
             q_result <= i_datb + i_imm8;
+            q_should_branch <= 0;
             end
 
         `PRCO_OP_SUBI: begin
             q_result <= i_datb - i_imm8;
+            q_should_branch <= 0;
             end
 
         `PRCO_OP_OR: begin
@@ -178,6 +183,7 @@ module prco_alu (
         default: begin
             $display("ALU: Unknown op: %h", i_op);
             q_result <= 16'h0000;
+            q_should_branch <= 0;
             end
         endcase
 
@@ -190,9 +196,10 @@ module prco_alu (
         end
       end
 
-      if(q_ce_ram || q_ce_reg) begin
+      if(q_ce_ram || q_ce_reg || q_should_branch) begin
           q_ce_ram <= 0;
           q_ce_reg <= 0;
+          q_should_branch <= 0;
       end
     end
 

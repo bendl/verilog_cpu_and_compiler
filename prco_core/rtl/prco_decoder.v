@@ -111,8 +111,18 @@ module prco_decoder (
                 q_reg_we        <= 1;
                 q_req_ram       <= 0;
                 q_ce            <= 1;
-                q_req_ram_we    <= 1;
+                q_req_ram_we    <= 0;
                 end
+            
+            `PRCO_OP_JMP: begin
+                $display("PRCO_OP_JMP\t%d %d", q_seld, q_imm8);
+                q_sela          <= `REG_SR;
+                q_reg_we        <= 1;
+                q_req_ram       <= 0;
+                q_ce            <= 1;
+                q_req_ram_we    <= 0;
+                end
+            
 
             `PRCO_OP_OR,
             `PRCO_OP_XOR,

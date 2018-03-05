@@ -13,7 +13,8 @@ module prco_core(
 );
 
     // program counter
-    reg [15:0] pc = 0;
+    reg [15:0]  pc = 0;
+    reg         pc_branch = 0;
 
     wire [5:0]  r_dec_op;
     wire [2:0]  r_dec_seld;
@@ -71,6 +72,12 @@ module prco_core(
         end
     end
 
+    always @(posedge i_clk) begin
+        if(r_alu_q_should_branch) begin
+            pc_branch <= 1;
+        end
+    end
+
     always @(posedge i_clk, posedge i_reset) begin
         if (i_reset == 1) begin
             pc <= 0;
@@ -80,7 +87,15 @@ module prco_core(
 
             if(i_ce) begin
                 q_debug_instr_clk <= 1;
-                pc <= pc + 1;
+
+                if(pc_branch) begin
+                    $display("Jumping to %d", r_alu_result);
+                    pc <= r_alu_result;
+                    pc_branch <= 0;
+                end else begin
+                    pc <= pc + 1;
+                end
+
                 q_ce <= 1;
             end else begin
                 q_ce <= 0;
@@ -166,6 +181,7 @@ module prco_core(
         .i_datb(r_reg_doutd), 
         .i_imm8(r_dec_imm8), 
         .i_simm5(r_dec_simm5), 
-        .q_result(r_alu_result)
+        .q_result(r_alu_result),
+        .q_should_branch(r_alu_q_should_branch)
     );
 endmodule

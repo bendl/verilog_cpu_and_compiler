@@ -27,29 +27,6 @@ int main(int argc, char** argv) {
     uut->i_clk   = 1;
     uut->eval();
 
-    uut->i_clk   = 0;
-    uut->eval();
-
-    uut->i_clk   = 1;
-    uut->eval();
-
-    uut->i_clk   = 0;
-    uut->eval();
-
-    uut->i_clk   = 1;
-    uut->eval();
-
-    uut->i_clk   = 0;
-    uut->eval();
-
-    uut->i_clk   = 1;
-    uut->eval();
-
-    uut->i_clk   = 0;
-    uut->eval();
-
-    printf("instr: %x\r\n", uut->prco_core__DOT__inst_decoder__DOT__i_instr);
-
     delete uut;
 
     return 0;
