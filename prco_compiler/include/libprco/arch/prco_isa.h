@@ -56,11 +56,14 @@ struct prco_op_struct {
     regw_t          opcode;
     unsigned char   op;
     unsigned char   flags;  //< Depracated
+
     unsigned char   regD;
     unsigned char   regA;
-    unsigned char   regB;   //< Depracted
-    unsigned char imm8 : 8;
-    signed char simm5 : 5;
+    unsigned char   regB;
+
+    unsigned char imm8  : 8;
+    signed char   simm5 : 5;
+    
     void *ast;
     unsigned char asm_offset;
     unsigned int asm_flags;
@@ -80,9 +83,9 @@ struct prco_op_struct {
     REG(Ax) \
     REG(Bx) \
     REG(Cx) \
-    REG(X2) \
-    REG(X3) \
     REG(Dx) \
+    REG(Ex) \
+    REG(Sr) \
     REG(Bp) \
     REG(Sp) \
     REG(__prco_reg_MAX) \
@@ -144,7 +147,9 @@ struct prco_op_struct opcode_sub_rr(enum prco_reg regA, enum prco_reg regD);
 struct prco_op_struct opcode_sub_ri(enum prco_reg regD, signed char imm8);
 
 struct prco_op_struct opcode_jmp_r(enum prco_reg rd);
-struct prco_op_struct opcode_cmp_rr(enum prco_reg rd, enum prco_reg ra);
+struct prco_op_struct opcode_cmp_rr(enum prco_reg rd, 
+              enum prco_reg ra, 
+              enum prco_reg rb);
 struct prco_op_struct opcode_call_i(unsigned char imm8);
 struct prco_op_struct opcode_ret_i(unsigned char imm8);
 

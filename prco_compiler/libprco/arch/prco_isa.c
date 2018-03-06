@@ -255,16 +255,21 @@ struct prco_op_struct opcode_jmp_r(enum prco_reg rd)
     return op;
 }
 
-struct prco_op_struct opcode_cmp_rr(enum prco_reg rd, enum prco_reg ra)
+struct prco_op_struct 
+opcode_cmp_rr(enum prco_reg rd, 
+              enum prco_reg ra, 
+              enum prco_reg rb)
 {
     struct prco_op_struct op = { 0 };
     op.flags = 0;
     op.op = CMP;
     op.regD = rd;
     op.regA = ra;
+    op.regB = rb;
     op.opcode |= op.op << 11;
     op.opcode |= op.regD << 8;
     op.opcode |= op.regA << 5;
+    op.opcode |= op.regB << 2;
 
     assert_opcode(&op, 0);
     return op;

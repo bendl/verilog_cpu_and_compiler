@@ -17,6 +17,8 @@ extern void cg_bin_template(struct ast_bin *b);
 extern void cg_number_template(struct ast_num *n);
 extern void cg_var_template(struct ast_var *v);
 extern void cg_local_decl_template(struct ast_lvar *v);
+extern void cg_precode_template(void);
+extern void cg_postcode_template(void);
 /*
 extern void cg_call_template(struct ast_call *v);
 extern void cg_if_template(ast_if_t *i);
