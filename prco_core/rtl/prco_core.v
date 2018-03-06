@@ -27,6 +27,11 @@ module prco_core(
     wire [15:0] r_reg_douta;
     reg         r_reg_en = 1;
     reg [15:0]  r_reg_dina;
+
+    // Tempory registers for storing register select paths
+    // for switching between type 2 and 3 instructions.
+    reg [2:0]   r_reg_sela;
+    reg [2:0]   r_reg_selb;
     
     reg         r_dec_en = 1;
 
@@ -109,6 +114,19 @@ module prco_core(
         end
     end
 
+    // Swap the register select lines if type 3 instruction
+    // (3 reg selects)
+    always @(posedge i_clk) begin
+        if (r_dec_q_third_sel) begin
+            $display("Decoder CMP... Swapping register inputs...");
+            r_reg_sela <= r_dec_sela;
+            r_reg_selb <= r_dec_selb;
+        end else begin
+            r_reg_sela <= r_dec_seld;
+            r_reg_selb <= r_dec_sela;
+        end
+    end
+
     // Instantiate the module
     prco_lmem inst_lmem (
         .i_clk(i_clk), 
@@ -136,8 +154,12 @@ module prco_core(
 
         .i_instr(r_mem_douta), 
         .q_op(r_dec_op), 
+
         .q_seld(r_dec_seld), 
         .q_sela(r_dec_sela),
+        .q_selb(r_dec_selb),
+        .q_third_sel(r_dec_q_third_sel),
+
         .q_imm8(r_dec_imm8),
         .q_simm5(r_dec_simm5),
         .q_reg_we(r_dec_we),
@@ -158,10 +180,13 @@ module prco_core(
         .q_ce_fetch (r_reg_q_ce_fetch),
 
         .i_reset(i_reset), 
-        .i_sela(r_dec_seld), 
+
+        .i_sela(r_reg_sela), 
+        .i_selb(r_reg_selb), 
+
         .q_data(r_reg_doutd), 
-        .i_selb(r_dec_sela), 
         .q_datb(r_reg_douta), 
+
         .i_we(r_reg_we), 
         .i_seld(r_dec_seld), 
         .i_datd(r_reg_dina)
@@ -177,8 +202,10 @@ module prco_core(
         .q_ce_reg(r_alu_q_ce_reg),
 
         .i_op(r_dec_op), 
+
         .i_data(r_reg_douta), 
         .i_datb(r_reg_doutd), 
+
         .i_imm8(r_dec_imm8), 
         .i_simm5(r_dec_simm5), 
         .q_result(r_alu_result),

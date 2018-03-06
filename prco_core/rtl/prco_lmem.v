@@ -44,7 +44,7 @@ module prco_lmem (
         r_lmem[3] = 16'h0B00; // LW     0b100, DX -1(AX)
         r_lmem[5] = 16'h22ef; // MOVI   0b010, ef
         r_lmem[6] = 16'h24aa; // MOVI   0b100, aa
-        */
+        //
 
         // Test SW
         r_lmem[0] = 16'h24ab; // MOVI   0b100, ab
@@ -57,12 +57,19 @@ module prco_lmem (
         // Test LW
         r_lmem[5] = 16'h24aa; // MOVI   0b100, aa
         r_lmem[6] = 16'h0880; // LW     0b000, +0(b100)
+        */
 
         // Test LW instruction
         r_lmem[16'h00aa] = 16'hCA;
         r_lmem[16'h00ab] = 16'hFE;
         r_lmem[16'h00ac] = 16'hBA;
         r_lmem[16'h00ad] = 16'hBE;
+
+        // Test CMP
+        r_lmem[1] = 16'h2010;
+        r_lmem[2] = 16'h2110;
+        r_lmem[3] = 16'h6a04;
+        
 
         // TODO: Move to microcode or to instruction data?
         r_lmem[P_LMEM_DEPTH] = 16'h00ff; // MOVI 2, ef

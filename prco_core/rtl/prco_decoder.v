@@ -16,12 +16,21 @@ module prco_decoder (
     
     input [15:0]                i_instr,
 
+    // Output 5 bit opcode
     output reg [4:0]            q_op,
+    // Output Rd and Ra register selects
     output reg [2:0]            q_seld,
     output reg [2:0]            q_sela,
+
+    // Output identifying a type 3 instruction (3 reg selects)
+    output reg                  q_third_sel,
+    output reg [2:0]            q_selb,
+
+    // Output immediate values
     output reg unsigned [7:0]   q_imm8,
     output reg signed [4:0]     q_simm5,
 
+    // Output dependencies
     output reg                  q_reg_we,
     output reg                  q_req_alu,
     output reg                  q_req_ram,
@@ -36,6 +45,8 @@ module prco_decoder (
         case (ti_op)
             `PRCO_OP_NOP: begin
                 q_sela <= i_instr[7:5];
+                q_third_sel     <= 0;
+
                 q_reg_we <= 0;
                 q_req_ram <= 0;
                 q_fetch <= 1;
@@ -46,6 +57,8 @@ module prco_decoder (
                 
             `PRCO_OP_MOVI: begin
                 q_sela <= i_instr[7:5];
+                q_third_sel     <= 0;
+
                 q_reg_we <= 1;
                 q_req_ram <= 0;
                 q_fetch <= 0;
@@ -56,6 +69,8 @@ module prco_decoder (
                 
             `PRCO_OP_MOV: begin
                 q_sela <= i_instr[7:5];
+                q_third_sel     <= 0;
+                
                 q_reg_we <= 1;
                 q_req_ram <= 0;
                 q_fetch <= 0;
@@ -66,6 +81,8 @@ module prco_decoder (
                 
             `PRCO_OP_ADD: begin
                 q_sela <= i_instr[7:5];
+                q_third_sel     <= 0;
+
                 q_reg_we <= 1;
                 q_req_ram <= 0;
                 q_fetch <= 0;
@@ -76,6 +93,8 @@ module prco_decoder (
 
             `PRCO_OP_ADDI: begin
                 q_sela <= i_instr[7:5];
+                q_third_sel     <= 0;
+
                 q_reg_we <= 1;
                 q_req_ram <= 0;
                 q_fetch <= 0;
@@ -86,6 +105,8 @@ module prco_decoder (
 
             `PRCO_OP_LW: begin
                 q_sela <= i_instr[7:5];
+                q_third_sel     <= 0;
+
                 q_reg_we <= 1;
                 q_req_ram <= 1;
                 q_fetch <= 0;
@@ -97,6 +118,8 @@ module prco_decoder (
 
             `PRCO_OP_SW: begin
                 q_sela <= i_instr[7:5];
+                q_third_sel     <= 0;
+
                 q_reg_we <= 0;
                 q_req_ram <= 1;
                 q_fetch <= 0;
@@ -106,8 +129,12 @@ module prco_decoder (
                 end
 
             `PRCO_OP_CMP: begin
-                $display("PRCO_OP_CMP\t%d", q_seld);
-                q_sela          <= `REG_SR;
+                $display("PRCO_OP_CMP\t%d, %d, %d", q_seld, q_sela, q_selb);
+
+                q_sela          <= i_instr[7:5];
+                q_selb          <= i_instr[4:2];
+                q_third_sel     <= 1;
+                
                 q_reg_we        <= 1;
                 q_req_ram       <= 0;
                 q_ce            <= 1;
@@ -117,6 +144,8 @@ module prco_decoder (
             `PRCO_OP_JMP: begin
                 $display("PRCO_OP_JMP\t%d %d", q_seld, q_imm8);
                 q_sela          <= `REG_SR;
+                q_third_sel     <= 0;
+
                 q_reg_we        <= 1;
                 q_req_ram       <= 0;
                 q_ce            <= 1;
@@ -128,6 +157,8 @@ module prco_decoder (
             `PRCO_OP_XOR,
             `PRCO_OP_AND: begin
                 q_sela <= i_instr[7:5];
+                q_third_sel     <= 0;
+
                 q_reg_we <= 1;
                 q_req_ram <= 0;
                 q_fetch <= 0;
@@ -138,6 +169,8 @@ module prco_decoder (
 
             default: begin
                 q_sela <= i_instr[7:5];
+                q_third_sel     <= 0;
+                
                 q_reg_we <= 0;
                 q_req_ram <= 0;
                 q_fetch <= 1;

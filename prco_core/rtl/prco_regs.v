@@ -1,6 +1,7 @@
 // PRCO Register Set
 
 `include "inc/prco_constants.v"
+`include "inc/prco_isa.v"
 
 module prco_regs (
     input               i_clk,
