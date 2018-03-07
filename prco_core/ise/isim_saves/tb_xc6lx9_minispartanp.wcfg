@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wave_config>
+   <wave_state>
+   </wave_state>
+   <db_ref_list>
+      <db_ref path="Z:/uni/prco304/prco_core/ise/tb_xc6lx9_minispartanp_isim_beh.wdb" id="1" type="auto">
+         <top_modules>
+            <top_module name="glbl" />
+            <top_module name="tb_xc6lx9_minispartanp" />
+         </top_modules>
+      </db_ref>
+   </db_ref_list>
+   <WVObjectSize size="5" />
+   <wvobject fp_name="/tb_xc6lx9_minispartanp/clk50" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">clk50</obj_property>
+      <obj_property name="ObjectShortName">clk50</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_xc6lx9_minispartanp/LEDS" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">LEDS[7:0]</obj_property>
+      <obj_property name="ObjectShortName">LEDS[7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_xc6lx9_minispartanp/uut/inst_core/i_reset" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">i_reset</obj_property>
+      <obj_property name="ObjectShortName">i_reset</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_xc6lx9_minispartanp/uut/inst_core/inst_decoder/i_instr" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">i_instr[15:0]</obj_property>
+      <obj_property name="ObjectShortName">i_instr[15:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_xc6lx9_minispartanp/uut/inst_core/q_debug_instr_clk" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">q_debug_instr_clk</obj_property>
+      <obj_property name="ObjectShortName">q_debug_instr_clk</obj_property>
+   </wvobject>
+</wave_config>

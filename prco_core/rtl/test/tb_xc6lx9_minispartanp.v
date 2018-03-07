@@ -18,11 +18,12 @@ module tb_xc6lx9_minispartanp;
         // Initialize Inputs
         clk50 = 0;
         LEDS = 0;
-
-        // Wait 100 ns for global reset to finish
-        #100;
         
         // Add stimulus here
+        @(posedge clk50);
+        @(posedge clk50);
+        @(posedge clk50);
+        @(posedge clk50);
         @(posedge clk50);
         @(posedge clk50);
         @(posedge clk50);

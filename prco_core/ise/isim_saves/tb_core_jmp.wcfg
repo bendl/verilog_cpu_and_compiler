@@ -10,7 +10,7 @@
          </top_modules>
       </db_ref>
    </db_ref_list>
-   <WVObjectSize size="12" />
+   <WVObjectSize size="17" />
    <wvobject fp_name="/tb_prco_core/i_clk" type="logic" db_ref_id="1">
       <obj_property name="ElementShortName">i_clk</obj_property>
       <obj_property name="ObjectShortName">i_clk</obj_property>
@@ -19,6 +19,10 @@
       <obj_property name="ElementShortName">i_reset</obj_property>
       <obj_property name="ObjectShortName">i_reset</obj_property>
    </wvobject>
+   <wvobject fp_name="/tb_prco_core/uut/q_debug_instr_clk" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">q_debug_instr_clk</obj_property>
+      <obj_property name="ObjectShortName">q_debug_instr_clk</obj_property>
+   </wvobject>
    <wvobject fp_name="/tb_prco_core/uut/pc" type="array" db_ref_id="1">
       <obj_property name="ElementShortName">pc[15:0]</obj_property>
       <obj_property name="ObjectShortName">pc[15:0]</obj_property>
@@ -26,6 +30,10 @@
    <wvobject fp_name="/tb_prco_core/uut/inst_decoder/i_instr" type="array" db_ref_id="1">
       <obj_property name="ElementShortName">i_instr[15:0]</obj_property>
       <obj_property name="ObjectShortName">i_instr[15:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_prco_core/uut/inst_regs/i_seld" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">i_seld[2:0]</obj_property>
+      <obj_property name="ObjectShortName">i_seld[2:0]</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_prco_core/uut/inst_regs/i_sela" type="array" db_ref_id="1">
       <obj_property name="ElementShortName">i_sela[2:0]</obj_property>
@@ -58,5 +66,17 @@
    <wvobject fp_name="/tb_prco_core/uut/inst_alu/q_result" type="array" db_ref_id="1">
       <obj_property name="ElementShortName">q_result[15:0]</obj_property>
       <obj_property name="ObjectShortName">q_result[15:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_prco_core/uut/inst_decoder/q_reg_we" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">q_reg_we</obj_property>
+      <obj_property name="ObjectShortName">q_reg_we</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_prco_core/uut/inst_regs/i_ce_dec" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">i_ce_dec</obj_property>
+      <obj_property name="ObjectShortName">i_ce_dec</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_prco_core/uut/inst_regs/i_ce_alu" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">i_ce_alu</obj_property>
+      <obj_property name="ObjectShortName">i_ce_alu</obj_property>
    </wvobject>
 </wave_config>

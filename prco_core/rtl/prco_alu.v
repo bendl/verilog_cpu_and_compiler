@@ -118,7 +118,7 @@ module prco_alu (
                 $display("ALU_PRCO_OP_S/LW");
                 // Sign extend the signed 5 bit immediate
                 sign_extended_imm = { {11{i_simm5[4]}}, i_simm5[4:0] };
-                q_result = i_data + sign_extended_imm;
+                q_result <= i_data + sign_extended_imm;
                 q_should_branch <= 0;
             end
 

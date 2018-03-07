@@ -52,7 +52,9 @@ module prco_core(
     reg         r_mem_i_ce = 0;
 
     // Pipeline signals
-    wire          i_ce = r_reg_q_ce_fetch || r_dec_q_fetch;
+    // Jump-start the CPU into running
+    reg           r_cpu_init;
+    wire          i_ce = r_cpu_init || (r_reg_q_ce_fetch || r_dec_q_fetch);
     reg           q_ce;
 
     always @(posedge i_clk) begin
@@ -77,18 +79,21 @@ module prco_core(
         end
     end
 
-    always @(posedge i_clk) begin
-        if(r_alu_q_should_branch) begin
-            pc_branch <= 1;
-        end
-    end
-
     always @(posedge i_clk, posedge i_reset) begin
         if (i_reset == 1) begin
             pc <= 0;
+            q_ce <= 0;
+            r_cpu_init <= 1;
         end else begin
             `PULSE_SIGNAL(q_ce);
-            if(q_ce) q_ce <= 0;
+            r_cpu_init <= 0;
+            
+            if(r_alu_q_should_branch) begin
+                pc_branch <= 1;
+            end
+            if(q_debug_instr_clk) begin
+                q_debug_instr_clk <= 0;
+            end
 
             if(i_ce) begin
                 q_debug_instr_clk <= 1;
@@ -109,9 +114,7 @@ module prco_core(
     end    
 
     always @(posedge i_clk) begin
-        if(q_debug_instr_clk) begin
-            q_debug_instr_clk <= 0;
-        end
+        
     end
 
     // Swap the register select lines if type 3 instruction

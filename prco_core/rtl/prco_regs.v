@@ -34,7 +34,7 @@ module prco_regs (
     // Reset interator
     integer i;
 
-    always @(posedge i_clk, posedge i_reset, posedge i_en)
+    always @(posedge i_clk)
     begin
         // Reset the register set
         if(i_reset == 1) begin
