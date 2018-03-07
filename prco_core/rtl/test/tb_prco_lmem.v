@@ -14,7 +14,7 @@ module tb_prco_lmem;
     // Outputs
     wire [15:0] q_mem_douta;
 
-    always #5 i_clk = ~i_clk;
+    always #10 i_clk = ~i_clk;
 
     // Instantiate the Unit Under Test (UUT)
     prco_lmem #(32) 

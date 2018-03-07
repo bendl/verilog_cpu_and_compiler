@@ -18,7 +18,7 @@ module tb_prco_regs;
     wire [15:0] q_data;
     wire [15:0] q_datb;
 
-    always #5 i_clk = ~i_clk;
+    always #10 i_clk = ~i_clk;
 
     // Instantiate the Unit Under Test (UUT)
     prco_regs uut (

@@ -16,7 +16,7 @@ module tb_prco_core;
     wire       q_debug_instr_clk;
 
     // Create clock signal
-    always #5 i_clk = ~i_clk;
+    always #10 i_clk = ~i_clk;
 
 	// Instantiate the Unit Under Test (UUT)
 	prco_core uut (

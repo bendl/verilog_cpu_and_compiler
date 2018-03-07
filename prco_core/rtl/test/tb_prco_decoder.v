@@ -18,7 +18,7 @@ module tb_prco_decoder;
     wire       q_reg_we;
 
     // Create clock signal
-    always #5 i_clk = ~i_clk;
+    always #10 i_clk = ~i_clk;
 
     // Instantiate the Unit Under Test (UUT)
     prco_decoder uut (

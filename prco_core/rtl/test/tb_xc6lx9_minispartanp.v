@@ -6,7 +6,7 @@ module tb_xc6lx9_minispartanp;
     reg clk50;
     reg [7:0] LEDS;
 
-    always #5 clk50 = ~clk50;
+    always #10 clk50 = ~clk50;
 
     // Instantiate the Unit Under Test (UUT)
     xc6lx9_msp uut (
