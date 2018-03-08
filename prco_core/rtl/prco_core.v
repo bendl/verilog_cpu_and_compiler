@@ -8,6 +8,10 @@ module prco_core(
     input           i_en,
     input           i_reset,
     
+    input           i_rx,
+    output          q_tx,
+    output [7:0]    q_tx_byte,
+    
     output reg      q_debug_instr_clk,
     output [7:0]    q_debug
 );
@@ -46,6 +50,25 @@ module prco_core(
 
     reg [15:0]  r_mem_addr;
 
+    // UART logic
+    wire        uart_tx;
+    wire        uart_reset = i_reset;
+    
+    assign      q_tx =      uart_tx;
+    assign      q_tx_byte = uart_tx_byte;
+
+    reg         uart_can_tx = 0;
+    reg [7:0]   uart_tx_byte = 8'h00;
+    reg         uart_transmit = 1;
+    reg         uart_rx_fifo_pop = 0;
+    // TODO: convert input to 50mhz
+    wire        uart_clk50 = i_clk;
+    wire [7:0]  uart_rx_byte;
+    wire        uart_irq;
+    wire        uart_busy;
+    wire        uart_tx_fifo_full;
+    wire        uart_rx_fifo_empty;
+    wire        uart_is_transmitting;
 
     // Offset the ALU -> RAM request by 1 clock cycle
     reg         r_mem_int_i_ce = 0;
@@ -103,7 +126,11 @@ module prco_core(
                     pc <= r_alu_result;
                     pc_branch <= 0;
                 end else begin
-                    pc <= pc + 1;
+                    if (pc > 6) begin
+                        pc <= 0;
+                    end else begin
+                        pc <= pc + 1;
+                    end
                 end
 
                 q_ce <= 1;
@@ -214,4 +241,34 @@ module prco_core(
         .q_result(r_alu_result),
         .q_should_branch(r_alu_q_should_branch)
     );
+    
+    
+   uart_fifo uart_fifo(
+       // Outputs
+       .rx_byte         (uart_rx_byte[7:0]),
+       .tx              (uart_tx),
+       .irq             (uart_irq),
+       .busy            (uart_busy),
+       .tx_fifo_full    (uart_tx_fifo_full),
+       .rx_fifo_empty   (uart_rx_fifo_empty),
+       //.is_transmitting (is_transmitting),
+       // Inputs
+       .tx_byte         (uart_tx_byte[7:0]),
+       .clk             (uart_clk50),
+       .rst             (uart_reset),
+       .rx              (uart_rx),
+       .transmit        (uart_transmit),
+       .rx_fifo_pop     (uart_rx_fifo_pop)
+   );
+
+    always @(posedge i_clk) begin
+        if(!uart_tx_fifo_full) begin
+            uart_transmit <= 1;
+            uart_tx_byte <= 16'h41;
+        end else begin
+            $display("uart fifo full. waiting...");
+            uart_transmit <= 0;
+        end
+    end
+
 endmodule
