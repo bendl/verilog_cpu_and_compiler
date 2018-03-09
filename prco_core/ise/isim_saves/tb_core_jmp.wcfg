@@ -10,7 +10,7 @@
          </top_modules>
       </db_ref>
    </db_ref_list>
-   <WVObjectSize size="17" />
+   <WVObjectSize size="18" />
    <wvobject fp_name="/tb_prco_core/i_clk" type="logic" db_ref_id="1">
       <obj_property name="ElementShortName">i_clk</obj_property>
       <obj_property name="ObjectShortName">i_clk</obj_property>
@@ -78,5 +78,9 @@
    <wvobject fp_name="/tb_prco_core/uut/inst_regs/i_ce_alu" type="logic" db_ref_id="1">
       <obj_property name="ElementShortName">i_ce_alu</obj_property>
       <obj_property name="ObjectShortName">i_ce_alu</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_prco_core/uut/inst_alu/r_sr" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">r_sr[7:0]</obj_property>
+      <obj_property name="ObjectShortName">r_sr[7:0]</obj_property>
    </wvobject>
 </wave_config>

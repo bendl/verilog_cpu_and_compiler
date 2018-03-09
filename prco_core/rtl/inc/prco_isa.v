@@ -35,10 +35,11 @@
 `define PRCO_OP_RET         5'b10000
 `define PRCO_OP_SPC         5'b10001
 `define PRCO_OP_HALT        5'b10010
-`define PRCO_OP_INT         5'b10011
-`define PRCO_OP_OR          5'b10100
-`define PRCO_OP_XOR         5'b10101
-`define PRCO_OP_AND         5'b10110
+`define PRCO_OP_WRITE       5'b10011
+`define PRCO_OP_READ        5'b10100
+
+`define PRCO_PORT_UART1     8'b00000
+`define PRCO_PORT_GPIO1     8'b00001
 
 `define PRCO_OP_BITS        15:11
 `define PRCO_SELD_BITS      10:8

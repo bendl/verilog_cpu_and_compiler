@@ -24,6 +24,9 @@ module prco_alu (
 );
     reg [15:0] sign_extended_imm;
 
+    reg [7:0] r_sr;
+    initial r_sr = 8'h0;
+
     // Set the CMP bits
     function [15:0] func_alu_cmp;
         input [15:0] data;
@@ -125,7 +128,8 @@ module prco_alu (
         `PRCO_OP_CMP: begin
             $display("ALU_PRCO_OP_CMP: Comparing %d to %d",
                 i_data, i_datb);
-            q_result <= func_alu_cmp(i_data, i_datb);
+            r_sr <= func_alu_cmp(i_data, i_datb);
+            q_result <= 16'h0;
             q_should_branch <= 0;
             end
 
@@ -133,8 +137,8 @@ module prco_alu (
             // ALU result is the PC in address
             // datb = register to jump to
             // data = SR register
-            q_result <= i_datb;
-            q_should_branch <= func_alu_should_jmp(i_imm8, i_data);
+            q_result <= 16'h0;
+            q_should_branch <= func_alu_should_jmp(i_imm8, r_sr);
             end
 
         `PRCO_OP_MOVI: begin
@@ -157,24 +161,19 @@ module prco_alu (
             q_result <= i_datb + i_imm8;
             q_should_branch <= 0;
             end
+            
+        `PRCO_OP_WRITE,
+        `PRCO_OP_READ: begin
+            $display("ALU_OP_WRITE/READ %h", i_datb);
+            q_result <= i_datb;
+            q_should_branch <= 0;
+            end
 
         `PRCO_OP_SUBI: begin
             q_result <= i_datb - i_imm8;
             q_should_branch <= 0;
             end
 
-        `PRCO_OP_OR: begin
-            q_result <= i_data | i_datb;
-            q_should_branch <= 0;
-            end
-        `PRCO_OP_XOR: begin
-            q_result <= i_data ^ i_datb;
-            q_should_branch <= 0;
-            end
-        `PRCO_OP_AND: begin
-            q_result <= i_data & i_datb;
-            q_should_branch <= 0;
-            end
 
         `PRCO_OP_NOP: begin
             q_result <= 16'h0000;

@@ -10,7 +10,7 @@
          </top_modules>
       </db_ref>
    </db_ref_list>
-   <WVObjectSize size="5" />
+   <WVObjectSize size="7" />
    <wvobject fp_name="/tb_xc6lx9_minispartanp/clk50" type="logic" db_ref_id="1">
       <obj_property name="ElementShortName">clk50</obj_property>
       <obj_property name="ObjectShortName">clk50</obj_property>
@@ -30,5 +30,13 @@
    <wvobject fp_name="/tb_xc6lx9_minispartanp/uut/inst_core/q_debug_instr_clk" type="logic" db_ref_id="1">
       <obj_property name="ElementShortName">q_debug_instr_clk</obj_property>
       <obj_property name="ObjectShortName">q_debug_instr_clk</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_xc6lx9_minispartanp/uut/r_uart_q_tx" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">r_uart_q_tx</obj_property>
+      <obj_property name="ObjectShortName">r_uart_q_tx</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_xc6lx9_minispartanp/uut/r_uart_tx_byte" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">r_uart_tx_byte[7:0]</obj_property>
+      <obj_property name="ObjectShortName">r_uart_tx_byte[7:0]</obj_property>
    </wvobject>
 </wave_config>

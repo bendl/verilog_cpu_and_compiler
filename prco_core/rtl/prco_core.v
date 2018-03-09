@@ -44,6 +44,7 @@ module prco_core(
     //   - We are at the write-back stage
     wire        r_reg_we = r_dec_we & (r_reg_q_ce_fetch);
     wire        r_lmem_we = r_dec_req_ram_we & (r_mem_i_ce);
+    wire        r_io_i_new_data_uart = r_dec_q_new_uart1_data & (r_reg_q_ce_fetch);
     
     wire [15:0] r_alu_result;
     wire [15:0] r_mem_douta;
@@ -55,11 +56,10 @@ module prco_core(
     wire        uart_reset = i_reset;
     
     assign      q_tx =      uart_tx;
-    assign      q_tx_byte = uart_tx_byte;
+    assign      q_tx_byte = 8'h0;
 
     reg         uart_can_tx = 0;
-    reg [7:0]   uart_tx_byte = 8'h00;
-    reg         uart_transmit = 1;
+    wire        uart_transmit = r_dec_q_new_uart1_data & r_reg_q_ce_fetch & !uart_tx_fifo_full;
     reg         uart_rx_fifo_pop = 0;
     // TODO: convert input to 50mhz
     wire        uart_clk50 = i_clk;
@@ -140,22 +140,6 @@ module prco_core(
         end
     end    
 
-    always @(posedge i_clk) begin
-        
-    end
-
-    // Swap the register select lines if type 3 instruction
-    // (3 reg selects)
-    always @(posedge i_clk) begin
-        if (r_dec_q_third_sel) begin
-            $display("Decoder CMP... Swapping register inputs...");
-            r_reg_sela <= r_dec_sela;
-            r_reg_selb <= r_dec_selb;
-        end else begin
-            r_reg_sela <= r_dec_seld;
-            r_reg_selb <= r_dec_sela;
-        end
-    end
 
     // Instantiate the module
     prco_lmem inst_lmem (
@@ -195,7 +179,8 @@ module prco_core(
         .q_reg_we(r_dec_we),
 
         .q_req_ram(r_dec_ram_req),
-        .q_req_ram_we(r_dec_req_ram_we)
+        .q_req_ram_we(r_dec_req_ram_we),
+        .q_new_uart1_data(r_dec_q_new_uart1_data)
     );
 
     // Instantiate the module
@@ -211,8 +196,8 @@ module prco_core(
 
         .i_reset(i_reset), 
 
-        .i_sela(r_reg_sela), 
-        .i_selb(r_reg_selb), 
+        .i_sela(r_dec_seld), 
+        .i_selb(r_dec_sela), 
 
         .q_data(r_reg_doutd), 
         .q_datb(r_reg_douta), 
@@ -242,33 +227,31 @@ module prco_core(
         .q_should_branch(r_alu_q_should_branch)
     );
     
-    
-   uart_fifo uart_fifo(
-       // Outputs
-       .rx_byte         (uart_rx_byte[7:0]),
-       .tx              (uart_tx),
-       .irq             (uart_irq),
-       .busy            (uart_busy),
-       .tx_fifo_full    (uart_tx_fifo_full),
-       .rx_fifo_empty   (uart_rx_fifo_empty),
-       //.is_transmitting (is_transmitting),
-       // Inputs
-       .tx_byte         (uart_tx_byte[7:0]),
-       .clk             (uart_clk50),
-       .rst             (uart_reset),
-       .rx              (uart_rx),
-       .transmit        (uart_transmit),
-       .rx_fifo_pop     (uart_rx_fifo_pop)
-   );
+    prco_io inst_io (
+        .i_clk(i_clk),
+        .i_new_data_uart1(r_io_i_new_data_uart),
+        .i_8bit_data(r_alu_result[7:0]),
+        .q_UART1_tx_data(r_io_q_UART1_tx_data),
+        .q_GPIO1(r_io_q_GPIO1)
+    );
 
-    always @(posedge i_clk) begin
-        if(!uart_tx_fifo_full) begin
-            uart_transmit <= 1;
-            uart_tx_byte <= 16'h41;
-        end else begin
-            $display("uart fifo full. waiting...");
-            uart_transmit <= 0;
-        end
-    end
+    reg [7:0] r_io_test = 8'hEE;
+    uart_fifo uart_fifo(
+        // Outputs
+        .rx_byte         (uart_rx_byte[7:0]),
+        .tx              (uart_tx),
+        .irq             (uart_irq),
+        .busy            (uart_busy),
+        .tx_fifo_full    (uart_tx_fifo_full),
+        .rx_fifo_empty   (uart_rx_fifo_empty),
+        //.is_transmitting (is_transmitting),
+        // Inputs
+        .tx_byte         (r_alu_result[7:0]),
+        .clk             (uart_clk50),
+        .rst             (uart_reset),
+        .rx              (uart_rx),
+        .transmit        (uart_transmit),
+        .rx_fifo_pop     (uart_rx_fifo_pop)
+    );
 
 endmodule
