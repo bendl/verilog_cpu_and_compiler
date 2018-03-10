@@ -94,7 +94,20 @@ void assert_opcode(struct prco_op_struct *op, char print)
                 op->opcode,
                 op->comment);
             break;
-        default: printf("UNKNOWN\r\n"); break;
+
+    case READ:
+    case WRITE:
+        assert((op->opcode >> 11) == op->op);
+        assert(((op->opcode >> 8) & PRCO_OP_BITS_REG) == op->regD);
+        assert(((op->opcode >> 0) & PRCO_OP_BITS_PORT) == op->port);
+        printf("%s\t%s,\t%s\t%04x\t%s\r\n",
+               OP_STR[op->op],
+               REG_STR[op->regD],
+               PORT_STR[op->port],
+               op->opcode,
+               op->comment);
+        break;
+        default: printf("UNKNOWN\r\n"); assert("UNKNOWN OP!" && 0); break;
     }
     
 }
@@ -255,21 +268,17 @@ struct prco_op_struct opcode_jmp_r(enum prco_reg rd)
     return op;
 }
 
-struct prco_op_struct 
-opcode_cmp_rr(enum prco_reg rd, 
-              enum prco_reg ra, 
-              enum prco_reg rb)
+struct prco_op_struct opcode_cmp_rr(enum prco_reg rd, 
+              enum prco_reg ra)
 {
     struct prco_op_struct op = { 0 };
     op.flags = 0;
     op.op = CMP;
     op.regD = rd;
     op.regA = ra;
-    op.regB = rb;
     op.opcode |= op.op << 11;
     op.opcode |= op.regD << 8;
     op.opcode |= op.regA << 5;
-    op.opcode |= op.regB << 2;
 
     assert_opcode(&op, 0);
     return op;
@@ -335,11 +344,40 @@ struct prco_op_struct opcode_sw(enum prco_reg rd, enum prco_reg ra, signed char 
     op.op = SW;
     op.regD = rd;
     op.regA = ra;
-    op.simm5 = (imm5 & 0b11111);
     op.opcode |= op.op << 11;
     op.opcode |= op.regD << 8;
     op.opcode |= op.regA << 5;
     op.opcode |= (op.simm5 & 0b11111) << 0;
+
+    assert_opcode(&op, 0);
+    return op;
+}
+
+struct prco_op_struct opcode_read(enum prco_reg rd, enum prco_port port)
+{
+    struct prco_op_struct op = { 0 };
+    op.flags = 0;
+    op.op = READ;
+    op.regD = rd;
+    op.port = port;
+    op.opcode |= op.op << 11;
+    op.opcode |= op.regD << 8;
+    op.opcode |= op.port << 0;
+
+    assert_opcode(&op, 0);
+    return op;
+}
+
+struct prco_op_struct opcode_write(enum prco_reg rd, enum prco_port port)
+{
+    struct prco_op_struct op = { 0 };
+    op.flags = 0;
+    op.op = WRITE;
+    op.regD = rd;
+    op.port = port;
+    op.opcode |= op.op << 11;
+    op.opcode |= op.regD << 8;
+    op.opcode |= op.port << 0;
 
     assert_opcode(&op, 0);
     return op;

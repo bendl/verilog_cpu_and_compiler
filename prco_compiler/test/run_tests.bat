@@ -25,7 +25,7 @@ rem call :build_std
 
 echo "Running Tests..."
 cd test
-call :run_test tests/binary_ops_1.prco 6
+rem call :run_test tests/binary_ops_1.prco 6
 call :run_test tests/foo.prco 6
 
 echo %NUM_TESTS% ran.

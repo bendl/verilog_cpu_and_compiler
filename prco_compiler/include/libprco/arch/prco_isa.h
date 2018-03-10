@@ -51,18 +51,21 @@ struct prco_simm6 {
 #define PRCO_OP_BITS_OP   0b11111
 #define PRCO_OP_BITS_REG  0b111
 #define PRCO_OP_BITS_IMM8 0b11111111
+#define PRCO_OP_BITS_PORT 0b11111111
 
 struct prco_op_struct {
-    regw_t          opcode;
-    unsigned char   op;
-    unsigned char   flags;  //< Depracated
+    regw_t              opcode;
+    unsigned char       op;
+    unsigned char       flags;  //< Depracated
 
-    unsigned char   regD;
-    unsigned char   regA;
-    unsigned char   regB;
+    unsigned char       regD;
+    unsigned char       regA;
+    unsigned char       regB;
 
     unsigned char imm8  : 8;
     signed char   simm5 : 5;
+
+    unsigned char       port;
     
     void *ast;
     unsigned char asm_offset;
@@ -90,6 +93,11 @@ struct prco_op_struct {
     REG(Sp) \
     REG(__prco_reg_MAX) \
 
+#define FOREACH_PORT(PORT) \
+        PORT(UART1) \
+        PORT(GPIO1) \
+        PORT(__prco_port_MAX)
+
 #define FOREACH_OP(OP) \
     OP(NOP) \
     OP(LW) \
@@ -110,6 +118,8 @@ struct prco_op_struct {
     OP(RET) \
     OP(SPC) \
     OP(HALT) \
+    OP(WRITE) \
+    OP(READ) \
     OP(__prco_op_MAX) \
 
 #define GENERATE_ENUM(ENUM) ENUM,
@@ -120,14 +130,20 @@ enum prco_reg {
 };
 
 enum prco_op {
-    FOREACH_OP(GENERATE_ENUM)
+        FOREACH_OP(GENERATE_ENUM)
 };
+
+enum prco_port {
+        FOREACH_PORT(GENERATE_ENUM)
+};
+
 STATIC_ASSERT(__prco_op_MAX <= PRCO_OP_BITS_OP+1, opcode_bit_length_exceeded); 
 STATIC_ASSERT(__prco_reg_MAX <= PRCO_OP_BITS_REG+1, 3_bit_opcode_exceeded); 
 
 
 static const char *REG_STR[] = { FOREACH_REG(GENERATE_STR) };
 static const char *OP_STR[] = { FOREACH_OP(GENERATE_STR) };
+static const char *PORT_STR[] = { FOREACH_PORT(GENERATE_STR) };
 
 void print_opcode(struct prco_op_struct *prco_op);
 
@@ -148,8 +164,7 @@ struct prco_op_struct opcode_sub_ri(enum prco_reg regD, signed char imm8);
 
 struct prco_op_struct opcode_jmp_r(enum prco_reg rd);
 struct prco_op_struct opcode_cmp_rr(enum prco_reg rd, 
-              enum prco_reg ra, 
-              enum prco_reg rb);
+              enum prco_reg ra);
 struct prco_op_struct opcode_call_i(unsigned char imm8);
 struct prco_op_struct opcode_ret_i(unsigned char imm8);
 
@@ -157,6 +172,10 @@ struct prco_op_struct opcode_neg_r(enum prco_reg regD);
 
 struct prco_op_struct opcode_lw(enum prco_reg rd, enum prco_reg ra, signed char imm5);
 struct prco_op_struct opcode_sw(enum prco_reg rd, enum prco_reg ra, signed char imm5);
+
+// TODO: Combine these instructions?
+struct prco_op_struct opcode_read(enum prco_reg rd, enum prco_port port);
+struct prco_op_struct opcode_write(enum prco_reg rd, enum prco_port port);
 
 #ifdef __cplusplus
 }

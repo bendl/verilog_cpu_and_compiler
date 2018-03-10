@@ -5,6 +5,28 @@
 #include <assert.h>
 #include "dbug.h"
 #include "arch/template_impl.h"
+#include "arch/prco_isa.h"
+
+#define ASM_OFFSET_BYTES 1
+
+struct prco_op_struct asm_list[64] = {0};
+int asm_list_it   = 0;
+
+#define asm_push(instr)                                                        \
+    asm_list[asm_list_it] = instr;                                             \
+    asm_list[asm_list_it].asm_offset = asm_list_it * ASM_OFFSET_BYTES;         \
+    asm_list_it++;
+
+#define asm_comment(s)                                                         \
+    asm_list[(asm_list_it - 1) < 0 ? 0 : (asm_list_it-1)].comment = s;
+
+#define asm_flags(i, f)                                                        \
+    asm_list[(asm_list_it - i) < 0 ? 0 : (asm_list_it - 1)].flags f;
+
+#define for_each_asm(it, asm_p)                                                \
+        for (it = 0, asm_p = &asm_list[it];                                    \
+             it < asm_list_it;                                                 \
+             it++, asm_p = &asm_list[it])
 
 void cg_target_template_init(struct target_delegate *dt)
 {
@@ -15,17 +37,74 @@ void cg_target_template_init(struct target_delegate *dt)
         dt->cg_local_decl = cg_local_decl_template;
         dt->cg_number = cg_number_template;
         dt->cg_var = cg_var_template;
+        dt->cg_postcode = cg_postcode_template;
+        dt->cg_precode = cg_precode_template;
 
         eprintf(".text\r\n");
         eprintf(".globl _main\r\n");
         eprintf("_main:\r\n");
 }
 
+void cg_precode_template(void)
+{
+        int it;
+        struct prco_op_struct op;
+
+        dprintf(D_GEN, ".precode\r\n");
+        for (it = NOP; it < __prco_op_MAX; it++) {
+                //printf("%02x %s\r\n", it, OP_STR[it]);
+                printf("`define PRCO_OP_%s\t5'b"BINP5"\n",
+                OP_STR[it], BIN5(it));
+        }
+
+        for (it = UART1; it < __prco_port_MAX; it++) {
+                //printf("%02x %s\r\n", it, OP_STR[it]);
+                printf("`define PRCO_PORT_%s\t\t8'b"BINP5"\n",
+                       PORT_STR[it], BIN5(it));
+        }
+
+        opcode_mov_ri(Ax, 0x10);
+        opcode_mov_ri(Bx, 0x10);
+        opcode_cmp_rr(Ax, Bx);
+        opcode_mov_ri(Cx, 0x00);
+        opcode_jmp_r(Cx);
+
+        opcode_mov_ri(Ax, 0x42);
+        opcode_write(Ax, UART1);
+        opcode_mov_ri(Ax, 0x45);
+        opcode_write(Ax, UART1);
+        opcode_mov_ri(Ax, 0x4E);
+        opcode_write(Ax, UART1);
+        opcode_mov_ri(Ax, 0x32);
+        opcode_write(Ax, UART1);
+        opcode_mov_ri(Bx, 0x00);
+        opcode_jmp_r(Bx);
+}
+
+void cg_postcode_template(void)
+{
+
+}
+
+inline void cg_push_prco(enum prco_reg rd)
+{
+        asm_push(opcode_add_ri(Sp, -1));
+        asm_push(opcode_sw(rd, Sp, 0));
+        asm_comment("PUSH");
+}
+
+inline void cg_pop_prco(enum prco_reg rd)
+{
+        asm_push(opcode_lw(rd, Sp, 0));
+        asm_comment("POP");
+        asm_push(opcode_add_ri(Sp, 1));
+}
+
 inline void cg_sf_start(struct ast_func *f)
 {
         eprintf("push %%bp\r\n");
         eprintf("mov %%bp, %%sp\r\n");
-        eprintf("SUB $4, %%sp\r\n");
+        eprintf("sub $4, %%sp\r\n");
 }
 
 void cg_debug_bin(struct ast_bin* b)

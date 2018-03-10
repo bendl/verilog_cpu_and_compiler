@@ -9,16 +9,19 @@
 void cg_dump(struct module *m,
              enum target_arch arch)
 {
+        struct ast_proto *p = m->prototypes;
+        struct ast_func  *f = m->functions;
+
         // Initialise the target code generator
         init_target(arch);
 
-
-        struct ast_proto *p = m->prototypes;
-        struct ast_func  *f = m->functions;
+        cg_target_delegate.cg_precode();
 
         list_for_each(f) {
                 cg_target_delegate.cg_function(f);
         }
+
+        cg_target_delegate.cg_postcode();
 }
 
 void eprintf(char *fmt, ...)
