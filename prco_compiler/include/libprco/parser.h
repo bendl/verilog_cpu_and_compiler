@@ -62,7 +62,9 @@ extern "C" {
     TOK(TOK_PREP_DIRECTIVE) \
     TOK(TOK_CC_STDCALL) \
     TOK(TOK_CC_CDECL) \
-    TOK(TOK_CC_FASTCALL)
+    TOK(TOK_CC_FASTCALL) \
+    TOK(TOK_PORT_PORT1) \
+    TOK(TOK_PORT_UART1)
 
 /// lexer token types
 typedef enum token_type {
@@ -81,7 +83,7 @@ struct text_parser {
     FILE *file_input;       //< FILE handle
     int   i_file_line;      //< Lexer line number
     int   i_file_col;       //< Lexer line column
-    void *i_parse_result;   //< Integer parse result, 1 = ok
+    int   parse_result;   //< Integer parse result, 1 = ok
 };
 
 /// Reserved word structure
@@ -140,6 +142,7 @@ extern struct ast_item      *parse_expr(void);
 extern struct ast_item      *parse_block(void);
 extern struct ast_proto     *parse_proto(enum token_type t);
 extern struct ast_func      *parse_def(void);
+extern struct ast_item      *parse_call(char *ident);
 
 
 #ifdef __cplusplus

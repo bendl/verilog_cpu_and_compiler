@@ -78,6 +78,14 @@ struct ast_proto {
         char             *name;
 };
 
+struct ast_call {
+        char                    *callee;
+        struct list_item        *args;
+        int                     argc;
+        struct ast_func         *func;
+        struct ast_proto        *proto;
+};
+
 struct ast_param {
         char *name;
         int  index;
@@ -149,5 +157,6 @@ extern struct ast_bin   *new_bin   (char op, struct ast_item *lhs, struct ast_it
 extern struct ast_proto *new_proto (char *name, struct list_item* args, int argc);
 extern struct ast_var   *new_var   (char *name, int dt);
 extern struct ast_lvar  *new_lvar  (struct ast_var *var);
+extern struct ast_call  *new_call(char *callee, struct list_item *args, int argc);
 
 #endif

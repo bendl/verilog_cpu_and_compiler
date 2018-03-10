@@ -3,6 +3,7 @@
 //
 
 #include <assert.h>
+#include <mem.h>
 #include "dbug.h"
 #include "arch/template_impl.h"
 #include "arch/prco_isa.h"
@@ -27,6 +28,64 @@ int asm_list_it   = 0;
         for (it = 0, asm_p = &asm_list[it];                                    \
              it < asm_list_it;                                                 \
              it++, asm_p = &asm_list[it])
+
+void asm_calc_labels(void)
+{
+        int it, find;
+        int offset_check = 0x00;
+        struct prco_op_struct *op, *findop;
+
+        dprintf(D_ALL, "asm_calc_labels:\r\n");
+
+        for_each_asm(it, op) {
+                assert(op->asm_offset == offset_check);
+                offset_check += ASM_OFFSET_BYTES;
+
+                // If we need to work out the return address of
+                // a function
+                if(op->asm_flags & ASM_CALL_NEXT) {
+                        assert(op->op == MOVI);
+                        // 5 is the number of instructions to Create and push
+                        //  the return pointer for the call
+                        op->imm8 = op->asm_offset + (5 * ASM_OFFSET_BYTES);
+                        // encode the new value in the opcode
+                        op->opcode |= (op->imm8 & 0xff);
+                        assert((op->opcode & 0xff) == op->imm8);
+
+                        // Remove the flag
+                        op->asm_flags &= ~ASM_CALL_NEXT;
+                        continue;
+                }
+
+                // If we need to work out where to jump
+                if(op->asm_flags & ASM_FUNC_CALL) {
+                        struct ast_call *caller = (struct ast_call*)op->ast;
+
+                        // Find offset of function entry
+                        for_each_asm(find, findop) {
+                                if(it == find) continue;
+
+                                if ((findop->asm_flags & ASM_FUNC_START) && findop->ast) {
+                                        struct ast_func *callee = (struct ast_func*)findop->ast;
+                                        if(strcmp(caller->callee, callee->proto->name) == 0) {
+                                                op->imm8 = findop->asm_offset;
+                                                op->opcode |= op->imm8 & 0xFF;
+
+                                                // Remove the flag
+                                                op->asm_flags &= ~ASM_FUNC_CALL;
+                                        }
+                                }
+                        }
+
+                        continue;
+                }
+        }
+}
+
+int is_entry_func(struct ast_proto *p)
+{
+        return strcmp(p->name, "main") == 0;
+}
 
 void cg_target_template_init(struct target_delegate *dt)
 {
@@ -63,6 +122,7 @@ void cg_precode_template(void)
                        PORT_STR[it], BIN5(it));
         }
 
+        /*
         opcode_mov_ri(Ax, 0x10);
         opcode_mov_ri(Bx, 0x10);
         opcode_cmp_rr(Ax, Bx);
@@ -79,33 +139,58 @@ void cg_precode_template(void)
         opcode_write(Ax, UART1);
         opcode_mov_ri(Bx, 0x00);
         opcode_jmp_r(Bx);
+        */
+
+        printf("\r\n\r\n");
 }
 
 void cg_postcode_template(void)
 {
+        int it;
+        struct prco_op_struct *op;
 
+        dprintf(D_INFO, "Postcode:\r\n");
+
+        for_each_asm(it, op) {
+                //dprintf(D_INFO, "asm_list: %s\r\n", OP_STR[asm_list[asm_list_it].op]);
+                //fwrite(&asm_list[asm_list_it].opcode, 2, 1, g_file_out);
+                printf("0x%02X\t", op->asm_offset);
+                assert_opcode(op, 1);
+        }
+
+        printf("\r\n\r\n");
+        asm_calc_labels();
+
+        for_each_asm(it, op) {
+                //dprintf(D_INFO, "asm_list: %s\r\n", OP_STR[asm_list[asm_list_it].op]);
+                //fwrite(&asm_list[asm_list_it].opcode, 2, 1, g_file_out);
+                printf("0x%02X\t", op->asm_offset);
+                assert_opcode(op, 1);
+        }
+
+        //create_coe_file();
+        //create_verilog_memh_file();
+        //create_verilog_instr();
+
+        for_each_asm(it, op) {
+                printf("X\"%04x\",\n", op->opcode);
+        }
 }
 
-inline void cg_push_prco(enum prco_reg rd)
+void cg_push_prco(enum prco_reg rd)
 {
         asm_push(opcode_add_ri(Sp, -1));
         asm_push(opcode_sw(rd, Sp, 0));
         asm_comment("PUSH");
 }
 
-inline void cg_pop_prco(enum prco_reg rd)
+void cg_pop_prco(enum prco_reg rd)
 {
         asm_push(opcode_lw(rd, Sp, 0));
         asm_comment("POP");
         asm_push(opcode_add_ri(Sp, 1));
 }
 
-inline void cg_sf_start(struct ast_func *f)
-{
-        eprintf("push %%bp\r\n");
-        eprintf("mov %%bp, %%sp\r\n");
-        eprintf("sub $4, %%sp\r\n");
-}
 
 void cg_debug_bin(struct ast_bin* b)
 {
@@ -121,11 +206,62 @@ void cg_expr_template(struct ast_item *e)
                 switch(e->type) {
                 case AST_NUM: cg_number_template((struct ast_num*)e->expr); break;
                 case AST_BIN: cg_bin_template((struct ast_bin*)e->expr); break;
+                case AST_CALL: cg_call_template((struct ast_call*)e->expr); break;
                 default: dprintf(D_ERR, "Unknown cg routine for %d\r\n",
                                  e->type);
                 }
         }
 }
+
+inline void cg_sf_start(struct ast_func *f)
+{
+        struct prco_op_struct op;
+        op = opcode_add_ri(Sp, -1);
+        printf("SF START for %s\r\n", f->proto->name);
+        op.ast = f;
+        op.asm_flags |= ASM_FUNC_START;
+        op.comment = "Function/sf entry";
+        asm_push(op);
+        asm_push(opcode_sw(Bp, Sp, 0));
+        // Mov Sp -> Bp
+        asm_push(opcode_mov_rr(Bp, Sp));
+        asm_comment(f->proto->name);
+
+        eprintf("push %%bp\r\n");
+        eprintf("mov %%bp, %%sp\r\n");
+}
+
+void cg_sf_exit(void)
+{
+        // Mov Bp -> Sp
+        asm_push(opcode_mov_rr(Sp, Bp));
+        asm_comment("Function/sf exit");
+        // Pop Bp
+        cg_pop_prco(Bp);
+}
+
+void cg_call_template(struct ast_call *c)
+{
+        struct prco_op_struct op_next, op_call;
+        op_next = opcode_mov_ri(Cx, 0x00);
+        op_next.asm_flags = ASM_CALL_NEXT;
+        op_next.comment = "Create return address";
+
+        op_call = opcode_mov_ri(Cx, 0x00);
+        op_call.asm_flags = ASM_FUNC_CALL;
+        op_call.ast = c;
+        op_call.comment = "call";
+
+        // Set address of next function (current + 2)
+        asm_push(op_next);
+        cg_push_prco(Cx);
+
+        // Set address of jmp
+        asm_push(op_call);
+        asm_push(opcode_jmp_r(Cx));
+        asm_comment("JMP");
+}
+
 
 void cg_function_template(struct ast_func *f)
 {
@@ -139,16 +275,29 @@ void cg_function_template(struct ast_func *f)
         cg_cur_function = f;
 
         // Create stack frame
-        //cg_sf_start(f);
+        cg_sf_start(f);
 
         // cg the function body
         cg_expr_template(f->body);
 
         // Create the stack exit
         // if required
+        cg_sf_exit();
 
         // clean up
         cg_cur_function = NULL;
+
+        printf("End function");
+
+        if(is_entry_func(f->proto)) {
+                asm_push(opcode_t1(HALT, 0, 0, 0));
+                asm_comment("MAIN HALT\r\n------------------------------------");
+        } else {
+                cg_pop_prco(Cx);
+                asm_push(opcode_jmp_r(Cx));
+                asm_comment("FUNC RETURN to CALL\r\n---------------------------------------");
+        }
+        printf("\r\n");
 }
 
 void cg_bin_template(struct ast_bin *b)
@@ -159,18 +308,25 @@ void cg_bin_template(struct ast_bin *b)
 
         if(b->rhs) {
                 eprintf("PUSH %%ax\r\n");
+                cg_push_prco(Ax);
                 cg_expr_template(b->rhs);
         }
 
         switch(b->op) {
         case TOK_PLUS:
                 eprintf("POP %%cx\r\n");
-                eprintf("ADD %%cx, %%ax\r\n"); 
+                cg_pop_prco(Cx);
+                eprintf("ADD %%cx, %%ax\r\n");
+                asm_push(opcode_add_rr(Cx, Ax));
+                asm_comment("BIN ADD");
                 break;
 
         case TOK_SUB: 
                 eprintf("POP %%cx\r\n");
+                cg_pop_prco(Cx);
                 eprintf("SUB %%cx, %%ax");
+                asm_push(opcode_sub_rr(Cx, Ax));
+                asm_comment("BIN SUB");
                 break;
 
         default: assert("Unimplemented cg_bin_template b->op!" && 0); break;
@@ -180,6 +336,8 @@ void cg_bin_template(struct ast_bin *b)
 void cg_number_template(struct ast_num *n)
 {
         eprintf("mov $%d, %%ax\r\n", n->val);
+        asm_push(opcode_mov_ri(Ax, n->val));
+        asm_comment("NUMBER");
 }
 
 void cg_var_template(struct ast_var *v) {}
