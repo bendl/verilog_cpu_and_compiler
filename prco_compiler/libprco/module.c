@@ -36,3 +36,4 @@ void module_dump(struct module *m)
 {
         cg_dump(m, target_template);
 }
+

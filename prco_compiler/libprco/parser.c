@@ -279,6 +279,11 @@ int parser_run(_in_ struct text_parser *parser)
         parser_add_resv("__cdecl",      0,      TOK_CC_CDECL);
         parser_add_resv("__fastcall",   0,      TOK_CC_FASTCALL);
 
+        // PORT words
+        parser_add_resv("PORT1",        0,      TOK_PORT_PORT1);
+        parser_add_resv("UART1",        0,      TOK_PORT_UART1);
+
+
         // Push new parser to stack
         parse_result = parser_pushp(parser);
         if (parse_result != R_OK) {
@@ -295,19 +300,20 @@ int parser_run(_in_ struct text_parser *parser)
         while (1) {
                 switch (g_cur_token) {
                 case TOK_EOF:
-                        g_cur_parser()->i_parse_result = (void *)0;
-                        parse_result = g_cur_parser()->i_parse_result;
+                        g_cur_parser()->parse_result = 0;
+                        parse_result = g_cur_parser()->parse_result;
                         goto parser_run_cleanup;
+                        break;
 
                 case TOK_DEF:
                 case TOK_CC_CDECL:
                 case TOK_CC_STDCALL:
                 case TOK_CC_FASTCALL:
-                        g_cur_parser()->i_parse_result = !(void *)parse_def();
+                        g_cur_parser()->parse_result = !parse_def();
                         break;
 
                 default:
-                        g_cur_parser()->i_parse_result = (void *)parse_top_level();
+                        g_cur_parser()->parse_result = parse_top_level();
                         break;
                 } // end switch
 
@@ -315,8 +321,8 @@ int parser_run(_in_ struct text_parser *parser)
                         // TODO: Fix ^^^^ this!
                         return 0;
                 }
-                if (g_cur_parser()->i_parse_result != 0) {
-                        return g_cur_parser()->i_parse_result;
+                if (g_cur_parser()->parse_result != 0) {
+                        return g_cur_parser()->parse_result;
                 }
         }
 
@@ -511,7 +517,7 @@ struct ast_proto *parse_proto(enum token_type t)
                         } else {
                                 dprintf(D_ERR, "Duplication of prototype: %s\r\n",
                                         fn_name);
-                                return R_ERROR;
+                                return NULL;
                         }
                 }
         }
@@ -590,7 +596,65 @@ struct ast_lvar *get_var(char *ident)
         return check_str_in_scope(g_locals, ident);
 }
 
+int check_call(struct ast_call *call)
+{
+        // Check call to prototypes
+        struct ast_proto *p = get_g_module()->prototypes;
 
+        list_for_each(p) {
+                if (strcmp(call->callee, p->name) == 0) {
+                        // number of args must match
+                        // Ignore data types as we dont really have any
+                        if ((call->argc == p->argc)) {
+                                call->proto = p;
+                                return true;
+                        }
+                        // bad number of args
+                        break;
+                }
+        }
+
+        return false;
+}
+
+
+struct ast_item *parse_call(char *ident)
+{
+        struct list_item *args;
+        int argc = 0;
+        struct ast_call *call;
+        struct ast_item *arg_expr;
+
+        args = calloc(1, sizeof(*args));
+
+        lexer_match_next(TOK_LBRACE);
+        if(!lexer_match(TOK_RBRACE)) {
+                while(1) {
+                        arg_expr = parse_expr();
+                        if(!arg_expr) {
+                                args = NULL;
+                                break;
+                        }
+
+                        append_ll_item(args, arg_expr);
+                        argc++;
+
+                        if(lexer_match(TOK_RBRACE)) break;
+
+                        lexer_match_next(TOK_COMMA);
+                }
+        }
+
+        lexer_match_next(TOK_RBRACE);
+
+        // Create the call ast item
+        call = new_call(ident, args, argc);
+        if(check_call(call)) {
+                return new_expr(call, AST_CALL);
+        } else {
+                dprintf(D_ERR, "ERR: Undefined reference to: %s\r\n", ident);
+        }
+}
 
 struct ast_item *parse_ident(void)
 {
@@ -600,8 +664,9 @@ struct ast_item *parse_ident(void)
 
         lexer_match_next(TOK_ID);
 
+        // call expr: <ident>(...)
         if(lexer_match(TOK_LBRACE)) {
-                //return parse_call(ident);
+                return parse_call(ident);
         }
 
         // else its a variable reference
@@ -787,5 +852,15 @@ struct ast_num *new_num(int num_val)
 {
         struct ast_num *ret = calloc(1, sizeof(*ret));
         ret->val = num_val;
+        return ret;
+}
+
+struct ast_call *
+new_call(char *callee, struct list_item *args, int argc)
+{
+        struct ast_call *ret = calloc(1, sizeof(*ret));
+        ret->callee = callee;
+        ret->args = args;
+        ret->argc = argc;
         return ret;
 }
