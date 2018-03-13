@@ -7,6 +7,10 @@ module prco_core(
     input           i_clk,
     input           i_en,
     input           i_reset,
+
+    // Debug control
+    input           i_mode,
+    input           i_step,
     
     input           i_rx,
     output          q_tx,
@@ -19,6 +23,12 @@ module prco_core(
     // program counter
     reg [15:0]  pc = 0;
     reg         pc_branch = 0;
+
+    // Debug out port
+    assign q_debug[7:0] = {
+        {1{1'b0}},      // 4
+        pc[6:0]         // 4
+    };
 
     wire [5:0]  r_dec_op;
     wire [2:0]  r_dec_seld;
@@ -77,8 +87,15 @@ module prco_core(
     // Pipeline signals
     // Jump-start the CPU into running
     reg           r_cpu_init;
+    reg           i_ce_reg;
     wire          i_ce = r_cpu_init || (r_reg_q_ce_fetch || r_dec_q_fetch);
     reg           q_ce;
+    
+    always @(posedge i_clk) begin
+        if(i_ce) begin
+        end
+    end
+    
 
     always @(posedge i_clk) begin
         if(r_alu_q_ce_ram) begin
@@ -117,23 +134,40 @@ module prco_core(
             if(q_debug_instr_clk) begin
                 q_debug_instr_clk <= 0;
             end
-
+            
             if(i_ce) begin
-                q_debug_instr_clk <= 1;
+                i_ce_reg <= 1;
+            end
+            
+            // Pipeline telling us that we can start
+            // next instruction
+            if(i_ce_reg) begin
+                // If we are in debug mode, don't
+                // automatically increment pc, etc.
+                // 
+                // We must wait for the i_step signal
+                if((i_mode == 0) ||
+                   (i_mode == 1 && i_step)) 
+                begin                    
+                    q_debug_instr_clk <= 1;
 
-                if(pc_branch) begin
-                    $display("Jumping to %d", r_alu_result);
-                    pc <= r_alu_result;
-                    pc_branch <= 0;
-                end else begin
-                    if (pc > 6) begin
-                        pc <= 0;
+                    if(pc_branch) begin
+                        $display("Jumping to %d", r_alu_result);
+                        pc <= r_alu_result;
+                        pc_branch <= 0;
                     end else begin
-                        pc <= pc + 1;
+                        if (pc > 6) begin
+                            pc <= 0;
+                        end else begin
+                            pc <= pc + 1;
+                        end
                     end
+                    
+                    // We have acted upon the data and
+                    // are ready to pass to next module
+                    q_ce <= 1;
+                    i_ce_reg <= 0;
                 end
-
-                q_ce <= 1;
             end else begin
                 q_ce <= 0;
             end

@@ -66,7 +66,7 @@ module prco_lmem (
         r_lmem[16'h00ad] = 16'hBE;
 
         // Test CMP
-        //*
+        /*
         r_lmem[1] = 16'h2011;
         r_lmem[2] = 16'h2110;
         r_lmem[3] = 16'h6820;
@@ -75,7 +75,7 @@ module prco_lmem (
         //*/
 
         // Test UART
-        /*
+        //*
         r_lmem[0] = 16'h2042;
         r_lmem[1] = 16'h9800;
         r_lmem[2] = 16'h2045;
@@ -86,7 +86,7 @@ module prco_lmem (
         r_lmem[7] = 16'h9800;
         r_lmem[8] = 16'h2100;
         r_lmem[9] = 16'h6100;
-        */
+        //*/
         
 
         // TODO: Move to microcode or to instruction data?

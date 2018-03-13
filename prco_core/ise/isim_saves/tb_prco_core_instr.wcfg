@@ -3,22 +3,14 @@
    <wave_state>
    </wave_state>
    <db_ref_list>
-      <db_ref path="Z:/uni/prco304/prco_core/ise/tb_prco_core_isim_beh.wdb" id="1" type="auto">
+      <db_ref path="/home/ise/XilinxVM/prco304/prco_core/ise/tb_prco_core_isim_beh.wdb" id="1" type="auto">
          <top_modules>
             <top_module name="glbl" />
             <top_module name="tb_prco_core" />
          </top_modules>
       </db_ref>
    </db_ref_list>
-   <WVObjectSize size="46" />
-   <wvobject fp_name="/tb_prco_core/q_debug" type="array" db_ref_id="1">
-      <obj_property name="ElementShortName">q_debug[7:0]</obj_property>
-      <obj_property name="ObjectShortName">q_debug[7:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_prco_core/q_debug_instr_clk" type="logic" db_ref_id="1">
-      <obj_property name="ElementShortName">q_debug_instr_clk</obj_property>
-      <obj_property name="ObjectShortName">q_debug_instr_clk</obj_property>
-   </wvobject>
+   <WVObjectSize size="50" />
    <wvobject fp_name="/tb_prco_core/i_clk" type="logic" db_ref_id="1">
       <obj_property name="ElementShortName">i_clk</obj_property>
       <obj_property name="ObjectShortName">i_clk</obj_property>
@@ -31,9 +23,33 @@
       <obj_property name="ElementShortName">i_reset</obj_property>
       <obj_property name="ObjectShortName">i_reset</obj_property>
    </wvobject>
+   <wvobject fp_name="/tb_prco_core/uut/i_mode" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">i_mode</obj_property>
+      <obj_property name="ObjectShortName">i_mode</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_prco_core/uut/i_step" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">i_step</obj_property>
+      <obj_property name="ObjectShortName">i_step</obj_property>
+   </wvobject>
+   <wvobject fp_name="divider74" type="divider">
+      <obj_property name="label">New Divider</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="BkColor">128 128 255</obj_property>
+      <obj_property name="TextColor">230 230 230</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_prco_core/q_debug" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">q_debug[7:0]</obj_property>
+      <obj_property name="ObjectShortName">q_debug[7:0]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_prco_core/q_debug_instr_clk" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">q_debug_instr_clk</obj_property>
+      <obj_property name="ObjectShortName">q_debug_instr_clk</obj_property>
+   </wvobject>
    <wvobject fp_name="/tb_prco_core/uut/pc" type="array" db_ref_id="1">
       <obj_property name="ElementShortName">pc[15:0]</obj_property>
       <obj_property name="ObjectShortName">pc[15:0]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_prco_core/uut/r_alu_q_ce_ram" type="logic" db_ref_id="1">
       <obj_property name="ElementShortName">r_alu_q_ce_ram</obj_property>
@@ -55,6 +71,10 @@
       <obj_property name="ElementShortName">i_ce</obj_property>
       <obj_property name="ObjectShortName">i_ce</obj_property>
    </wvobject>
+   <wvobject fp_name="/tb_prco_core/uut/i_ce_reg" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">i_ce_reg</obj_property>
+      <obj_property name="ObjectShortName">i_ce_reg</obj_property>
+   </wvobject>
    <wvobject fp_name="/tb_prco_core/uut/q_ce" type="logic" db_ref_id="1">
       <obj_property name="ElementShortName">q_ce</obj_property>
       <obj_property name="ObjectShortName">q_ce</obj_property>
@@ -64,6 +84,7 @@
       <obj_property name="DisplayName">label</obj_property>
       <obj_property name="BkColor">128 128 255</obj_property>
       <obj_property name="TextColor">230 230 230</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_prco_core/uut/inst_lmem/i_reset" type="logic" db_ref_id="1">
       <obj_property name="ElementShortName">i_reset</obj_property>
@@ -84,36 +105,44 @@
    <wvobject fp_name="/tb_prco_core/uut/inst_lmem/i_mem_addr" type="array" db_ref_id="1">
       <obj_property name="ElementShortName">i_mem_addr[15:0]</obj_property>
       <obj_property name="ObjectShortName">i_mem_addr[15:0]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_prco_core/uut/inst_lmem/i_mem_dina" type="array" db_ref_id="1">
       <obj_property name="ElementShortName">i_mem_dina[15:0]</obj_property>
       <obj_property name="ObjectShortName">i_mem_dina[15:0]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_prco_core/uut/inst_lmem/q_mem_douta" type="array" db_ref_id="1">
       <obj_property name="ElementShortName">q_mem_douta[15:0]</obj_property>
       <obj_property name="ObjectShortName">q_mem_douta[15:0]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
    </wvobject>
    <wvobject fp_name="divider141" type="divider">
       <obj_property name="label">DEC</obj_property>
       <obj_property name="DisplayName">label</obj_property>
       <obj_property name="BkColor">128 128 255</obj_property>
       <obj_property name="TextColor">230 230 230</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_prco_core/uut/inst_decoder/i_instr" type="array" db_ref_id="1">
       <obj_property name="ElementShortName">i_instr[15:0]</obj_property>
       <obj_property name="ObjectShortName">i_instr[15:0]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_prco_core/uut/inst_decoder/q_op" type="array" db_ref_id="1">
       <obj_property name="ElementShortName">q_op[4:0]</obj_property>
       <obj_property name="ObjectShortName">q_op[4:0]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_prco_core/uut/inst_decoder/q_imm8" type="array" db_ref_id="1">
       <obj_property name="ElementShortName">q_imm8[7:0]</obj_property>
       <obj_property name="ObjectShortName">q_imm8[7:0]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_prco_core/uut/inst_decoder/q_simm5" type="array" db_ref_id="1">
       <obj_property name="ElementShortName">q_simm5[4:0]</obj_property>
       <obj_property name="ObjectShortName">q_simm5[4:0]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_prco_core/uut/inst_decoder/q_reg_we" type="logic" db_ref_id="1">
       <obj_property name="ElementShortName">q_reg_we</obj_property>
@@ -128,6 +157,7 @@
       <obj_property name="DisplayName">label</obj_property>
       <obj_property name="BkColor">128 128 255</obj_property>
       <obj_property name="TextColor">230 230 230</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_prco_core/uut/inst_regs/i_reset" type="logic" db_ref_id="1">
       <obj_property name="ElementShortName">i_reset</obj_property>
@@ -140,32 +170,39 @@
    <wvobject fp_name="/tb_prco_core/uut/inst_regs/i_seld" type="array" db_ref_id="1">
       <obj_property name="ElementShortName">i_seld[2:0]</obj_property>
       <obj_property name="ObjectShortName">i_seld[2:0]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_prco_core/uut/inst_regs/i_datd" type="array" db_ref_id="1">
       <obj_property name="ElementShortName">i_datd[15:0]</obj_property>
       <obj_property name="ObjectShortName">i_datd[15:0]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_prco_core/uut/inst_regs/i_sela" type="array" db_ref_id="1">
       <obj_property name="ElementShortName">i_sela[2:0]</obj_property>
       <obj_property name="ObjectShortName">i_sela[2:0]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_prco_core/uut/inst_regs/q_data" type="array" db_ref_id="1">
       <obj_property name="ElementShortName">q_data[15:0]</obj_property>
       <obj_property name="ObjectShortName">q_data[15:0]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_prco_core/uut/inst_regs/i_selb" type="array" db_ref_id="1">
       <obj_property name="ElementShortName">i_selb[2:0]</obj_property>
       <obj_property name="ObjectShortName">i_selb[2:0]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_prco_core/uut/inst_regs/q_datb" type="array" db_ref_id="1">
       <obj_property name="ElementShortName">q_datb[15:0]</obj_property>
       <obj_property name="ObjectShortName">q_datb[15:0]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
    </wvobject>
    <wvobject fp_name="divider34" type="divider">
       <obj_property name="label">ALU</obj_property>
       <obj_property name="DisplayName">label</obj_property>
       <obj_property name="BkColor">128 128 255</obj_property>
       <obj_property name="TextColor">230 230 230</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_prco_core/uut/inst_alu/q_ce_reg" type="logic" db_ref_id="1">
       <obj_property name="ElementShortName">q_ce_reg</obj_property>
@@ -178,22 +215,27 @@
    <wvobject fp_name="/tb_prco_core/uut/inst_alu/i_op" type="array" db_ref_id="1">
       <obj_property name="ElementShortName">i_op[4:0]</obj_property>
       <obj_property name="ObjectShortName">i_op[4:0]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_prco_core/uut/inst_alu/i_data" type="array" db_ref_id="1">
       <obj_property name="ElementShortName">i_data[15:0]</obj_property>
       <obj_property name="ObjectShortName">i_data[15:0]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_prco_core/uut/inst_alu/i_datb" type="array" db_ref_id="1">
       <obj_property name="ElementShortName">i_datb[15:0]</obj_property>
       <obj_property name="ObjectShortName">i_datb[15:0]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_prco_core/uut/inst_alu/q_result" type="array" db_ref_id="1">
       <obj_property name="ElementShortName">q_result[15:0]</obj_property>
       <obj_property name="ObjectShortName">q_result[15:0]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_prco_core/uut/inst_alu/i_simm5" type="array" db_ref_id="1">
       <obj_property name="ElementShortName">i_simm5[4:0]</obj_property>
       <obj_property name="ObjectShortName">i_simm5[4:0]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_prco_core/uut/inst_alu/q_should_branch" type="logic" db_ref_id="1">
       <obj_property name="ElementShortName">q_should_branch</obj_property>
@@ -204,5 +246,6 @@
       <obj_property name="DisplayName">label</obj_property>
       <obj_property name="BkColor">128 128 255</obj_property>
       <obj_property name="TextColor">230 230 230</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
    </wvobject>
 </wave_config>

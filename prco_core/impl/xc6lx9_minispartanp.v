@@ -8,6 +8,9 @@ module xc6lx9_msp(
     
 	// Button, Active HIGH
 	input PORTC3,
+	
+	output PORTA7,
+	output PORTA9,
 	 
     // uart tx 
     output PORTC10,
@@ -28,12 +31,21 @@ module xc6lx9_msp(
     
     // uart logic
     wire [7:0] r_uart_tx_byte;
+	
+	wire r_core_mode 	= DIPSW[0];
+	wire r_core_step 	= r_button_event;
+	
+	assign PORTA7 		= r_top_debug_instr_clk;
+	assign PORTA9 		= r_core_step;
 
     // Instantiate the module
     prco_core inst_core (
         .i_clk(clk50), 
         .i_en(inst_core_enable), 
         .i_reset(r_top_reset),
+		
+		.i_mode(r_core_mode),
+		.i_step(r_core_step),
     
         .i_rx(r_uart_i_rx),
         .q_tx(r_uart_q_tx),
@@ -48,13 +60,10 @@ module xc6lx9_msp(
         end
     end
     
-    assign LEDS = { 
-		//{4{1'b0}}, 
-		test_bin,
-		test_state, 
-		r_uart_q_tx, 
-		clk50, 
-		r_top_debug_instr_clk
+    assign LEDS = {
+		r_top_q_debug[5:0],		//6
+		r_core_mode,			//1
+		r_top_debug_instr_clk	//1
 	};
 	
     assign PORTC11 = r_uart_q_tx;

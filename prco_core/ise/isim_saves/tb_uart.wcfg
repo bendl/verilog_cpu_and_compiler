@@ -3,14 +3,14 @@
    <wave_state>
    </wave_state>
    <db_ref_list>
-      <db_ref path="Z:/uni/prco304/prco_core/ise/tb_prco_core_isim_beh.wdb" id="1" type="auto">
+      <db_ref path="/home/ise/XilinxVM/prco304/prco_core/ise/tb_prco_core_isim_beh.wdb" id="1" type="auto">
          <top_modules>
             <top_module name="glbl" />
             <top_module name="tb_prco_core" />
          </top_modules>
       </db_ref>
    </db_ref_list>
-   <WVObjectSize size="19" />
+   <WVObjectSize size="20" />
    <wvobject fp_name="/tb_prco_core/q_debug_instr_clk" type="logic" db_ref_id="1">
       <obj_property name="ElementShortName">q_debug_instr_clk</obj_property>
       <obj_property name="ObjectShortName">q_debug_instr_clk</obj_property>
@@ -19,15 +19,19 @@
       <obj_property name="ElementShortName">i_clk</obj_property>
       <obj_property name="ObjectShortName">i_clk</obj_property>
    </wvobject>
+   <wvobject fp_name="/tb_prco_core/uut/i_mode" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">i_mode</obj_property>
+      <obj_property name="ObjectShortName">i_mode</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_prco_core/uut/i_step" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">i_step</obj_property>
+      <obj_property name="ObjectShortName">i_step</obj_property>
+   </wvobject>
    <wvobject fp_name="divider9" type="divider">
       <obj_property name="label">New Divider</obj_property>
       <obj_property name="DisplayName">label</obj_property>
       <obj_property name="BkColor">128 128 255</obj_property>
       <obj_property name="TextColor">230 230 230</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_prco_core/uut/uart_tx_byte" type="array" db_ref_id="1">
-      <obj_property name="ElementShortName">uart_tx_byte[7:0]</obj_property>
-      <obj_property name="ObjectShortName">uart_tx_byte[7:0]</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_prco_core/uut/uart_transmit" type="logic" db_ref_id="1">
       <obj_property name="ElementShortName">uart_transmit</obj_property>
