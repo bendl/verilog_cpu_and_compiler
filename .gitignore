@@ -230,3 +230,4 @@ TSWLatexianTemp*
 /prco_core/rtl/test/verilator/obj_dir
 /prco_compiler/build
 /prco_compiler/wbuild
+/prco_compiler/cmake-build-debug

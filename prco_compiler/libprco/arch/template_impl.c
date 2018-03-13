@@ -3,7 +3,6 @@
 //
 
 #include <assert.h>
-#include <mem.h>
 #include "dbug.h"
 #include "arch/template_impl.h"
 #include "arch/prco_isa.h"
