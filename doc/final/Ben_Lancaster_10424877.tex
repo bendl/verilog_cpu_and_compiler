@@ -1,8 +1,12 @@
 \documentclass[11pt,a4paper]{report}
 
 % font
-\renewcommand{\familydefault}{\sfdefault}
+%\usepackage{fontspec}
+%\setmainfont{Times New Roman}
+%\usepackage{tgschola}
 
+\usepackage{helvet}
+\renewcommand{\familydefault}{\sfdefault}
 
 \usepackage[margin=0.8in]{geometry}
 \usepackage[utf8]{inputenc}
@@ -47,6 +51,9 @@
 \definecolor{babyblueeyes}{rgb}{0.63, 0.79, 0.95}
 \definecolor{ballblue}{rgb}{0.13, 0.67, 0.8}
 \definecolor{beaublue}{rgb}{0.74, 0.83, 0.9}
+\definecolor{blue8}{rgb}{0.09, 0.39, 0.67}
+\definecolor{blue9}{rgb}{0.00, 0.30, 0.51}
+\definecolor{blue9d}{rgb}{0.00, 0.21, 0.36}
 
 
 %\usepackage{etoolbox}
@@ -54,8 +61,9 @@
 
 %https://tex.stackexchange.com/questions/75667/change-colour-on-chapter-section-headings-lyx
 \usepackage{sectsty}
-\chapterfont{\color{blue}}
-\sectionfont{\color{blue}}
+\chapterfont{\color{blue9d}}
+\sectionfont{\color{blue9d}}
+\subsectionfont{\color{blue9d}}
 %\allchapterfont{\itshape}
 
 \usepackage{titlesec}
@@ -66,10 +74,10 @@
 \fancypagestyle{plain}{%
 	\renewcommand{\headrulewidth}{3pt}
 	\renewcommand{\headrule}{\hbox to\headwidth{%
-		\color{babyblueeyes}\leaders\hrule height \headrulewidth\hfill}}
+		\color{blue9}\leaders\hrule height \headrulewidth\hfill}}
 	\renewcommand{\footrulewidth}{3pt}
 	\renewcommand{\footrule}{\hbox to\headwidth{%
-		\color{babyblueeyes}\leaders\hrule height \headrulewidth\hfill}}
+		\color{blue9}\leaders\hrule height \headrulewidth\hfill}}
 	
 	%\fancyhf{}
 	%\fancyhead[LE]{\textbf{\leftmark}}
@@ -256,6 +264,9 @@ ben
 \newpage
 
 \chapter{Introduction}
+Soft-microprocessors 
+
+\lipsum[0-5]
 
 \section{Background}
 \subsection{Current Implementations}
@@ -271,7 +282,7 @@ The \scname{} processor will be able to read and write to all data passing throu
 The \scname{} processor is not designed to run general purpose operating systems, such as Linux or embedded RTOS systems. All memory devices attached to the FPGA are fully accessible to the processor core and instructions/programs running through it, meaning that operating systems or secure applications storing private and sensitive information is not protected by modern processor features such as privilege modes and virtual memory sections. The processor lacks common components required to run modern operating systems, such as a memory management unit (MMU) and privilege modes, and so should not be run on the processor.
 
 The \scname{} processor is not designed to run in high-reliability or safety-critical environments that require established safety standards, such as the UK Defence Standard 00-56 \citep{defstan_0056_2} and IEC 61508 \citep{iec61508}.
-
+\newline\newline
 The \scname{} processor, by design, should be used as a replacement for a simple micro-controller accompanying a main processing module.
 
 \subsection{Third-party Libraries}
