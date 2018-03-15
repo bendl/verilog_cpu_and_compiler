@@ -501,6 +501,69 @@ gathering. \newline\newline
     %\caption{Document revisions.}
 \end{table}
 
+
+\newpage
+\subsection{Highlight Report 6}
+\begin{table}[H]
+\def\arraystretch{1.5}%  1 is the default, change whatever you need
+    \begin{tabularx}{\textwidth}{|X|}
+    \hline 
+	\multicolumn{1}{|c|}{\textbf{PRCO304: Highlight Report 6}}
+    \\
+	\specialrule{2pt}{-2pt}{0pt}
+    \textbf{Name:} Ben Lancaster
+    \\ \specialrule{2pt}{-2pt}{0pt}
+	\textbf{Date:} 15/03/2018
+	\\ \specialrule{2pt}{-2pt}{0pt}
+	\textbf{Active project stage:}\newline
+	(ON-TIME) Stage 2.3:  Core: GPIO, Communication .\newline
+	(EARLY) Stage 3.2: Compiler: Assembler.\newline
+	\\ \specialrule{2pt}{-2pt}{0pt}
+	\textbf{Review of work undertaken:}\newline
+	Single-instruction stepping has been implementing allowing an external button to step and instruction (A key demo requirement!).
+	\newline\newline
+	\textbf{(ON-TIME) Stage 2.3:  Core: GPIO, Communication  Implementation:}\newline
+	A UART module library has been included in the core along with a FIFO buffer. The UART works well with single-instruction stepping, but free running the buffer immediately fills up and output is in random order.
+	\newline\newline
+	\textbf{(EARLY) Stage 3.2: Compiler: Assembler.}\newline
+	The assembler identifies instructions that require offsets and immediate to be calculated. The assembler can now modify instructions to fill in missing data.
+	\\ \hline
+	
+	
+	
+	\textbf{Risks and Challenges:\newline
+	RC6: UART FIFO fills up too quickly, resulting in bad output.}\newline
+	{\color{red} Urgent risks:}\newline
+	{\color{orange} New risks:\newline
+	RC6: UART FIFO fills up too quickly, resulting in bad output.}\newline
+	{\color{purple} Existing risks:}\newline
+	{\color{gray} Resolved risks:\newline
+	RC5: Complex memory operations (PUSH, POP) may require multiple instructions. Core will not support PUSH/POP as they are too complex. Compiler will output 2 instructions to emulate a PUSH/POP.}
+	\\ \hline
+	
+	
+	
+	\textbf{Plan of work for the next week:}\newline
+	Work will continue on parsing expressions in the compiler (if, for, while, etc.) and their codegen.
+	\newline\newline
+	The processor specification/reference booklet will continued to be updated with implementation specific details of the processor.
+	\newline\newline
+	The final report document content will be started (structure already laid out).
+	\\ \hline
+	
+	
+	\textbf{Date(s) of supervisory meeting(s) since last Highlight:}\newline
+	12/03/18 (bi-weekly highlight meeting)
+	\\ \hline
+	
+	
+	\textbf{Notes from supervisory meeting(s) held since last Highlight:}\newline
+	RC6: Confirmation that PUSH/POP concepts will be split into 2 instructions due to limited complexity of the processor core.
+	\\ \hline
+    \end{tabularx}
+    %\caption{Document revisions.}
+\end{table}
+
 \newpage
 \section{Highlight Attachments}
 \subsection*{Highlight 5}
@@ -529,6 +592,9 @@ gathering. \newline\newline
 \subsection{CPU Core}
 \begin{itemize}
 \item{{\color{purple} RC5: Complex memory operations (PUSH, POP) may require multiple instructions. PUSH/POP might be split into: (1) Inc/dec stack pointer; (2) Read RAM[stack pointer]. The compiler will be able to resolve this issue.}}
+\item{
+{\color{orange} RC6: UART FIFO fills up too quickly, resulting in bad output.}
+}
 \end{itemize}
 
 
