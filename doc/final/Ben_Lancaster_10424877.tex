@@ -14,6 +14,7 @@
 \usepackage{amsfonts}
 \usepackage{amssymb}
 
+
 % https://www.sharelatex.com/learn/Hyperlinks
 \usepackage{hyperref}
 \hypersetup{
@@ -34,6 +35,18 @@
 \usepackage[comma]{natbib}
 %%\bibliographystyle{agsm}
 \bibliographystyle{dcu}
+
+% CODE
+%\usepackage{listings}
+%\usepackage{xparse}
+%\usepackage{verbatim}
+%\NewDocumentCommand{\codeword}{v}{%
+%\texttt{\textcolor{blue}{#1}}%
+%}
+%s\lstset{language=C,keywordstyle={\bfseries \color{blue}}}
+
+\usepackage{minted}
+\usemintedstyle{vs}
 
 %% https://en.wikibooks.org/wiki/LaTeX/List_Structures
 \usepackage{scrextend}
@@ -372,10 +385,12 @@ The project will require a computer or laptop to develop the core and compiler o
 
 \chapter{\scname{} Processor Design}
 \section{High Level Design}
+The \scname{} processor is a modularised processor with modular logic blocks for the ALU, Registers, RAM, and it's peripherals. 
+
 
 \begin{figure}[H]
 \begin{center}
-\includegraphics[scale=0.39]{hld}
+\includegraphics[scale=0.5]{hld}
 \end{center}
 \caption{test}
 \label{fig:hld}
@@ -387,8 +402,77 @@ The project will require a computer or laptop to develop the core and compiler o
 
 \chapter{\scname{} Compiler}
 \section{Introduction}
+The \scname{} compiler is a command line based software tool used to convert a high-level text grammar (a programming language) into executable machine for the \scname{} processor.
+
+The compiler is invoked with parameters for the input code file and optional parameters defining optimisation level, target architecture, verbosity, output file name, and include directory paths. The full command line parameter list can be found in {\nameref{sect:compiler_cli}}.
+
+\subsection{Text Grammar}
+The input to the compiler is a generic programming language similar to C.
+
+\begin{verbatim}
+def main() {
+    int a = 0;
+}
+\end{verbatim}
+
+The grammar is defined below in Backus-Naur Form:
+\begin{verbatim}
+<word>      ::= [a-zA-Z]+[0-9]*
+<string>    ::= """ <word> """
+<number>    ::= [0-9]+
+
+<top> ::= <func_def>|<decl>|<extern>
+
+<func_def>  ::= <proto><body>
+<proto>     ::= "def" <word> "(" <args> ")" 
+<body>      ::= "{" <primary> "}"
+
+<primary>   ::= <decl>|<control>|<assign>
+<decl>      ::= <word> "=" <expr>
+
+<control>   ::= <if>|<for>|<while>
+<if>        ::= "if" "(" <expr> ")" <body>
+<for>       ::= "for" "(" <expr> <expr> <expr> ")" <body>
+
+<expr>      ::= <assign>|<binop>|<number>|<string>|"("|")"
+
+<assign>    ::= <word> "=" <expr>
+<binop>     ::= "+"|"-"|"*"|"/" <expr>
+\end{verbatim}
+
+It should be noted that the grammar and compiler do not have any terminals for defining datatypes, such as "short" and "int". This is because there is only one datatype supported by both compiler and processor. This is due to the complexity required to support different sized datatypes, for example, calculating how many 16-bit words to allocate on the stack for local parameters and accessing them through offsets is difficult and out of scope.
+
 \section{Architecture}
 \section{Implementation}
+
+\subsection{Text Parser}
+
+\subsection{AST Generation}
+
+\subsection{Optimisation}
+The \scname{} compiler can optionally perform simple optimisations, such as unreachable code elimination and constant folding. The optimisations can be controlled by specifying the \verb|-On| parameter to the CLI, where \verb|n| is the level of optimisation.
+
+The techniques used by the optimiser to perform these optimisations is primitive; the optimiser is not given AST information in SSA form. Because of these limitations, only basic optimisations can be identified.
+
+Constant folding is performed by the optimiser to reduce (reduce) expressions that can be identified as constant. For example, the following expression in Figure \ref{fig:constant_fold} can be identified as constant and can be reduced.
+\begin{figure}[H]
+\begin{center}
+\begin{verbatim}
+int a = 1 + (2 + 3) * 4;
+\end{verbatim}
+\end{center}
+\caption{An expression suitable for constant folding.}
+\label{fig:constant_fold}
+\end{figure}
+
+\subsection{Code Generation}
+The compiler Code Generation stage converts the optimised AST into an intermediatary list of \verb|struct prco_op_struct|. It does this by iterating over each \verb|struct ast_item| in the AST and checks whether the item requires code generation. For example, an \verb|struct ast_item| with type \verb|AST_FUNC| is one which requires code generation. The AST is then passed to the \verb|cg_func_prco| function where the code generation takes please. For this type, the stack frame header is generated first, before the body of the body. At the end of the function's body, the stack frame end code generation routing is run.
+
+This code generation stage is named intermediatary because absolute addresses of \verb|JMP| instructions have not been calculated. The calculation of these addresses is performed in the following stage, Assembling. In addition, the location (and offset's) of functions may need to be rearranged.
+
+\subsection{Assembling}
+The final stage of the compiler is the assembling stage. This stage takes the list of \verb|struct prco_op_struct| and outputs a list of machine code instructions. The assembler accomplishes this by calculating offsets and addresses of functions, branching instructions, and global variable addresses. It may also rearrange function locations so that the main function is the first instruction to be outputted.
+
 \section{Testing and Verification}
 
 \chapter{Conclusion}
@@ -397,6 +481,16 @@ The project will require a computer or laptop to develop the core and compiler o
 \chapter{Appendices}
 \section{Appendix A. \scname{} Core Reference Guide}
 \section{Appendix B. \scname{} Compiler Reference Guide}
+\subsection{CLI Arguments}\label{sect:compiler_cli}
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[scale=0.4]{fig_compiler_uml_seq}
+\end{center}
+\caption{UML sequence diagram for the \scname{} compiler.}
+\label{fig:hld}
+\end{figure}
+
 \section{Appendix C. Project Initiation Document}
 
 \newpage
