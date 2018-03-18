@@ -39,40 +39,16 @@ module tb_prco_core;
         i_clk = 0;
         i_en = 0;
         i_reset = 1;
-        i_mode = 1;
+        i_mode = 0;
         i_step = 0;
-        
-        // Add stimulus here
-        @(posedge i_clk);
-        i_en = 1;
-        i_reset = 1;
-        
-        @(posedge i_clk);
-        i_reset = 0;
-        
-        #1000
-        @(posedge i_clk);
-        i_step = 1;
-        @(posedge i_clk);
-        i_step = 0;
-        
-        #1000
-        @(posedge i_clk);
-        i_step = 1;
-        @(posedge i_clk);
-        i_step = 0;    
-        
-        #1000
-        @(posedge i_clk);
-        i_step = 1;
-        @(posedge i_clk);
-        i_step = 0;    
-        
-        #1000
-        @(posedge i_clk);
-        i_step = 1;
-        @(posedge i_clk);
-        i_step = 0;        
+		
+		@(posedge i_clk);
+		@(posedge i_clk);
+		@(posedge i_clk);
+		i_reset = 0;
+		@(posedge i_clk);
+		@(posedge i_clk);
+		@(posedge i_clk);
     end
 endmodule
 

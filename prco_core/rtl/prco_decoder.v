@@ -67,7 +67,7 @@ module prco_decoder (
                 q_ce <= 1;
                 q_req_ram_we <= 0;
                 q_new_uart1_data <= 0;
-                $display("PRCO_OP_MOVI\t%h, %h", q_imm8, q_seld);
+                $display("PRCO_OP_MOVI\ti%h, d%h", i_instr[7:0], i_instr[10:8]);
                 end
                 
             `PRCO_OP_MOV: begin
@@ -80,7 +80,7 @@ module prco_decoder (
                 q_ce <= 1;
                 q_req_ram_we <= 0;
                 q_new_uart1_data <= 0;
-                $display("PRCO_OP_MOV\t%h, %h", q_sela, q_seld);
+                $display("PRCO_OP_MOV\ta%h, d%h", i_instr[7:5], i_instr[10:8]);
                 end
                 
             `PRCO_OP_ADD: begin
@@ -93,7 +93,7 @@ module prco_decoder (
                 q_ce <= 1;
                 q_req_ram_we <= 0;
                 q_new_uart1_data <= 0;
-                $display("PRCO_OP_ADD\t%h, %h", q_sela, q_seld);
+                $display("PRCO_OP_ADD\ta%h, d%h", i_instr[7:5], i_instr[10:8]);
                 end
 
             `PRCO_OP_ADDI: begin
@@ -106,7 +106,7 @@ module prco_decoder (
                 q_ce <= 1;
                 q_req_ram_we <= 0;
                 q_new_uart1_data <= 0;
-                $display("PRCO_OP_ADDI\t%h, %h", q_sela, q_imm8);
+                $display("PRCO_OP_ADDI\t%h, %h", q_imm8, i_instr[10:8]);
                 end
 
             `PRCO_OP_LW: begin
@@ -133,11 +133,11 @@ module prco_decoder (
                 q_ce <= 1;
                 q_req_ram_we <= 1;
                 q_new_uart1_data <= 0;
-                $display("PRCO_OP_SW\t%h, %h", q_seld, q_sela);
+                $display("PRCO_OP_SW\t%h, %h", i_instr[10:8], q_sela);
                 end
 
             `PRCO_OP_CMP: begin
-                $display("PRCO_OP_CMP\t%d, %d, %d", q_seld, q_sela, q_selb);
+                $display("PRCO_OP_CMP\t%d, %d, %d", i_instr[10:8], q_sela, q_selb);
 
                 q_sela          <= i_instr[7:5];
                 q_third_sel     <= 0;
@@ -150,7 +150,7 @@ module prco_decoder (
                 end
             
             `PRCO_OP_JMP: begin
-                $display("PRCO_OP_JMP\t%d %d", q_seld, q_imm8);
+                $display("PRCO_OP_JMP\t%d %d", i_instr[10:8], q_imm8);
                 q_sela          <= i_instr[7:5];
                 q_third_sel     <= 0;
 

@@ -148,7 +148,7 @@ module prco_alu (
             end
 
         `PRCO_OP_MOV: begin
-            q_result <= i_datb;
+            q_result <= i_data;
             q_should_branch <= 0;
             end
 

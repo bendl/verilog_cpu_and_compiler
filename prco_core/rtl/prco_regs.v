@@ -42,8 +42,8 @@ module prco_regs (
             for(i = 0; i < 6; i = i + 1) begin
                 r_regs[i] <= 16'h0;
             end
+            r_regs[`REG_BP] <= 16'h0000;
             r_regs[`REG_SP] <= 16'h00FF;
-            r_regs[`REG_BP] <= 16'h00FF;
 
             // Output something so we don't latch
             q_data <= 16'h0;
