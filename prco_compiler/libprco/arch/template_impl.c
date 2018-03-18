@@ -172,7 +172,11 @@ void cg_postcode_template(void)
         //create_verilog_instr();
 
         for_each_asm(it, op) {
-                printf("X\"%04x\",\n", op->opcode);
+                //printf("X\"%04x\",\n", op->opcode);
+        }
+
+        for_each_asm(it, op) {
+                printf("r_lmem[%d] = 16'h%04x;\n", it, op->opcode);
         }
 }
 
@@ -326,6 +330,10 @@ void cg_bin_template(struct ast_bin *b)
                 eprintf("SUB %%cx, %%ax");
                 asm_push(opcode_sub_rr(Cx, Ax));
                 asm_comment("BIN SUB");
+                break;
+
+        case TOK_STAR:
+                eprintf("POP %%cx\r\n");
                 break;
 
         default: assert("Unimplemented cg_bin_template b->op!" && 0); break;
