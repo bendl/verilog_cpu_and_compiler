@@ -90,7 +90,7 @@ module prco_lmem (
 		
 		// Test Compiler
 		//*
-		r_lmem[0] = 16'h4fff;
+r_lmem[0] = 16'h4fff;
 r_lmem[1] = 16'h16e0;
 r_lmem[2] = 16'h1ee0;
 r_lmem[3] = 16'h2001;
@@ -99,13 +99,13 @@ r_lmem[5] = 16'h10e0;
 r_lmem[6] = 16'h2002;
 r_lmem[7] = 16'h0ae0;
 r_lmem[8] = 16'h4f01;
-r_lmem[9] = 16'h4200;
+r_lmem[9] = 16'h4040;
 r_lmem[10] = 16'h4fff;
 r_lmem[11] = 16'h10e0;
 r_lmem[12] = 16'h2003;
 r_lmem[13] = 16'h0ae0;
 r_lmem[14] = 16'h4f01;
-r_lmem[15] = 16'h4200;
+r_lmem[15] = 16'h4040;
 r_lmem[16] = 16'h1fc0;
 r_lmem[17] = 16'h0ee0;
 r_lmem[18] = 16'h4f01;

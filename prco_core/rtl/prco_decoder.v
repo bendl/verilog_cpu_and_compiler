@@ -119,8 +119,8 @@ module prco_decoder (
                 q_ce <= 1;
                 q_req_ram_we <= 0;
                 q_new_uart1_data <= 0;
-                $display("PRCO_OP_LW\t%h, %h(%h)", 
-                    q_seld, q_simm5, q_sela);
+                $display("PRCO_OP_LW\td%h, o%h(a%h)", 
+                    i_instr[10:8], i_instr[4:0], i_instr[7:5]);
                 end
 
             `PRCO_OP_SW: begin

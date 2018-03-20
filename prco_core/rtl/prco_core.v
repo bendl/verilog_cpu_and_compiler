@@ -146,8 +146,7 @@ module prco_core(
                 // automatically increment pc, etc.
                 // 
                 // We must wait for the i_step signal
-                if((i_mode == 0) ||
-                   (i_mode == 1 && i_step)) 
+                if((i_mode == 0) || (i_mode == 1 && i_step)) 
                 begin                    
                     q_debug_instr_clk <= 1;
 
@@ -156,11 +155,7 @@ module prco_core(
                         pc <= r_alu_result;
                         pc_branch <= 0;
                     end else begin
-                        if (pc > 6) begin
-                            pc <= 0;
-                        end else begin
-                            pc <= pc + 1;
-                        end
+						pc <= pc + 1;
                     end
                     
                     // We have acted upon the data and

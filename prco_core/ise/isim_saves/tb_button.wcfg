@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wave_config>
+   <wave_state>
+   </wave_state>
+   <db_ref_list>
+      <db_ref path="/home/ise/XilinxVM/prco304/prco_core/ise/tb_xc6lx9_minispartanp_isim_beh.wdb" id="1" type="auto">
+         <top_modules>
+            <top_module name="glbl" />
+            <top_module name="tb_xc6lx9_minispartanp" />
+         </top_modules>
+      </db_ref>
+   </db_ref_list>
+   <WVObjectSize size="9" />
+   <wvobject fp_name="/tb_xc6lx9_minispartanp/clk50" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">clk50</obj_property>
+      <obj_property name="ObjectShortName">clk50</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_xc6lx9_minispartanp/uut/PORTC3" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">PORTC3</obj_property>
+      <obj_property name="ObjectShortName">PORTC3</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_xc6lx9_minispartanp/uut/o_debounced" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">o_debounced</obj_property>
+      <obj_property name="ObjectShortName">o_debounced</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_xc6lx9_minispartanp/uut/timer" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">timer[7:0]</obj_property>
+      <obj_property name="ObjectShortName">timer[7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_xc6lx9_minispartanp/uut/sync_pipe" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">sync_pipe</obj_property>
+      <obj_property name="ObjectShortName">sync_pipe</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_xc6lx9_minispartanp/uut/r_button_state" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">r_button_state</obj_property>
+      <obj_property name="ObjectShortName">r_button_state</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_xc6lx9_minispartanp/uut/r_last" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">r_last</obj_property>
+      <obj_property name="ObjectShortName">r_last</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_xc6lx9_minispartanp/uut/r_button_event" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">r_button_event</obj_property>
+      <obj_property name="ObjectShortName">r_button_event</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_xc6lx9_minispartanp/uut/test_state" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">test_state</obj_property>
+      <obj_property name="ObjectShortName">test_state</obj_property>
+   </wvobject>
+</wave_config>
