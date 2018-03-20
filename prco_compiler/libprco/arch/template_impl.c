@@ -320,7 +320,7 @@ void cg_bin_template(struct ast_bin *b)
                 eprintf("POP %%cx\r\n");
                 cg_pop_prco(Cx);
                 eprintf("ADD %%cx, %%ax\r\n");
-                asm_push(opcode_add_rr(Cx, Ax));
+                asm_push(opcode_add_rr(Ax, Cx));
                 asm_comment("BIN ADD");
                 break;
 
@@ -328,7 +328,7 @@ void cg_bin_template(struct ast_bin *b)
                 eprintf("POP %%cx\r\n");
                 cg_pop_prco(Cx);
                 eprintf("SUB %%cx, %%ax");
-                asm_push(opcode_sub_rr(Cx, Ax));
+                asm_push(opcode_sub_rr(Ax, Cx));
                 asm_comment("BIN SUB");
                 break;
 

@@ -77,8 +77,8 @@ void assert_opcode(struct prco_op_struct *op, char print)
             assert(((op->opcode >> 5) & PRCO_OP_BITS_REG) == op->regA);
             printf("%s\t%s,\t%s\t%04x\t%s\r\n", 
                 OP_STR[op->op],
-                REG_STR[op->regA], 
                 REG_STR[op->regD],
+                REG_STR[op->regA],
                 op->opcode,
                 op->comment);
             break;
@@ -87,12 +87,12 @@ void assert_opcode(struct prco_op_struct *op, char print)
             assert((op->opcode >> 11) == op->op);
             assert(((op->opcode >> 8) & PRCO_OP_BITS_REG) == op->regD);
             assert(((op->opcode >> 0) & PRCO_OP_BITS_IMM8) == op->imm8);
-            printf("%s\t$%x,\t%s\t%04x\t%s\r\n", 
-                OP_STR[op->op],
-                op->imm8, 
-                REG_STR[op->regD], 
-                op->opcode,
-                op->comment);
+            printf("%s\t$%x,\t%s\t%04x\t%s\r\n",
+                                    OP_STR[op->op],
+                                    op->imm8,
+                                    REG_STR[op->regD],
+                                    op->opcode,
+                                    op->comment);
             break;
 
     case READ:
