@@ -137,7 +137,7 @@ module prco_alu (
             // ALU result is the PC in address
             // datb = register to jump to
             // data = SR register
-            q_result <= 16'h0;
+            q_result <= i_datb;
             q_should_branch <= func_alu_should_jmp(i_imm8, r_sr);
             end
 
