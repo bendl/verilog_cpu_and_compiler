@@ -23,6 +23,8 @@ module prco_core(
     // program counter
     reg [15:0]  pc = 0;
     reg         pc_branch = 0;
+    
+    reg [3:0] core_state = 4'b0;
 
     // Debug out port
     assign q_debug[7:0] = {
@@ -129,7 +131,7 @@ module prco_core(
             r_cpu_init <= 0;
             
             if(r_alu_q_should_branch) begin
-                pc_branch <= 1;
+                core_state <= 1;
             end
             if(q_debug_instr_clk) begin
                 q_debug_instr_clk <= 0;
@@ -139,32 +141,46 @@ module prco_core(
                 i_ce_reg <= 1;
             end
             
-            // Pipeline telling us that we can start
-            // next instruction
-            if(i_ce_reg) begin
-                // If we are in debug mode, don't
-                // automatically increment pc, etc.
-                // 
-                // We must wait for the i_step signal
-                if((i_mode == 0) || (i_mode == 1 && i_step)) 
-                begin                    
-                    q_debug_instr_clk <= 1;
-
-                    if(pc_branch) begin
-                        $display("Jumping to %d", r_alu_result);
-                        pc <= r_alu_result;
-                        pc_branch <= 0;
-                    end else begin
-						pc <= pc + 1;
-                    end
-                    
-                    // We have acted upon the data and
-                    // are ready to pass to next module
-                    q_ce <= 1;
-                    i_ce_reg <= 0;
-                end
-            end else begin
+            if(r_dec_q_halt) begin
+                // Halt, do nothing...
                 q_ce <= 0;
+            end 
+            // Normal PC increment
+            else if (core_state == 0) begin
+                // Pipeline telling us that we can start
+                // next instruction
+                if(i_ce_reg) begin
+                    // If we are in debug mode, don't
+                    // automatically increment pc, etc.
+                    // 
+                    // We must wait for the i_step signal
+                    if((i_mode == 0) || (i_mode == 1 && i_step)) 
+                    begin                    
+                        q_debug_instr_clk <= 1;
+                        pc <= pc + 1;
+                        
+                        // We have acted upon the data and
+                        // are ready to pass to next module
+                        q_ce <= 1;
+                        i_ce_reg <= 0;
+                    end
+                end else begin
+                    q_ce <= 0;
+                end
+            end
+            // If jump required
+            // TODO: core_state is a disgusting fix, fix it...
+            else if (core_state == 1) begin
+                $display("core state == 1");
+                pc <= r_alu_result;
+                core_state <= core_state + 1;
+            end else if(core_state == 4'b0010) begin
+                core_state <= core_state + 1;
+            end else if(core_state == 4'b0011) begin
+                core_state <= core_state + 1;
+            end else if(core_state == 4'b100) begin
+                q_ce <= 1;
+                core_state <= 0;
             end
         end
     end    
@@ -209,7 +225,8 @@ module prco_core(
 
         .q_req_ram(r_dec_ram_req),
         .q_req_ram_we(r_dec_req_ram_we),
-        .q_new_uart1_data(r_dec_q_new_uart1_data)
+        .q_new_uart1_data(r_dec_q_new_uart1_data),
+        .q_halt(r_dec_q_halt)
     );
 
     // Instantiate the module

@@ -127,7 +127,11 @@ r_lmem[28] = 16'h6200;
     end
 
     always @(posedge i_clk) begin
-        if(i_ce_fetch || i_ce_alu) begin
+		if(i_reset) begin
+			// Do nothing
+			q_ce_dec <= 0;
+			q_ce_reg <= 0;
+		end else if(i_ce_fetch || i_ce_alu) begin
             if (i_mem_we == 1) begin
                 $display("Writing 0x%h to RAM[0x%h]", 
                     i_mem_dina, i_mem_addr);

@@ -35,7 +35,8 @@ module prco_decoder (
     output reg                  q_req_alu,
     output reg                  q_req_ram,
     output reg                  q_req_ram_we,
-    output reg                  q_new_uart1_data
+    output reg                  q_new_uart1_data,
+    output reg                  q_halt
 );
 
     /// Task to set appropriate output signals for the
@@ -54,6 +55,7 @@ module prco_decoder (
                 q_ce <= 0;
                 q_req_ram_we <= 0;
                 q_new_uart1_data <= 0;
+                q_halt <= 0;
                 $display("PRCO_OP_NOP");
                 end
                 
@@ -67,6 +69,7 @@ module prco_decoder (
                 q_ce <= 1;
                 q_req_ram_we <= 0;
                 q_new_uart1_data <= 0;
+                q_halt <= 0;
                 $display("PRCO_OP_MOVI\ti%h, d%h", i_instr[7:0], i_instr[10:8]);
                 end
                 
@@ -80,6 +83,7 @@ module prco_decoder (
                 q_ce <= 1;
                 q_req_ram_we <= 0;
                 q_new_uart1_data <= 0;
+                q_halt <= 0;
                 $display("PRCO_OP_MOV\ta%h, d%h", i_instr[7:5], i_instr[10:8]);
                 end
                 
@@ -93,6 +97,7 @@ module prco_decoder (
                 q_ce <= 1;
                 q_req_ram_we <= 0;
                 q_new_uart1_data <= 0;
+                q_halt <= 0;
                 $display("PRCO_OP_ADD\ta%h, d%h", i_instr[7:5], i_instr[10:8]);
                 end
 
@@ -106,6 +111,7 @@ module prco_decoder (
                 q_ce <= 1;
                 q_req_ram_we <= 0;
                 q_new_uart1_data <= 0;
+                q_halt <= 0;
                 $display("PRCO_OP_ADDI\t%h, %h", q_imm8, i_instr[10:8]);
                 end
 
@@ -119,6 +125,7 @@ module prco_decoder (
                 q_ce <= 1;
                 q_req_ram_we <= 0;
                 q_new_uart1_data <= 0;
+                q_halt <= 0;
                 $display("PRCO_OP_LW\td%h, o%h(a%h)", 
                     i_instr[10:8], i_instr[4:0], i_instr[7:5]);
                 end
@@ -133,6 +140,7 @@ module prco_decoder (
                 q_ce <= 1;
                 q_req_ram_we <= 1;
                 q_new_uart1_data <= 0;
+                q_halt <= 0;
                 $display("PRCO_OP_SW\t%h, %h", i_instr[10:8], q_sela);
                 end
 
@@ -147,6 +155,7 @@ module prco_decoder (
                 q_ce            <= 1;
                 q_req_ram_we    <= 0;
                 q_new_uart1_data <= 0;
+                q_halt <= 0;
                 end
             
             `PRCO_OP_JMP: begin
@@ -159,6 +168,7 @@ module prco_decoder (
                 q_ce            <= 1;
                 q_req_ram_we    <= 0;
                 q_new_uart1_data <= 0;
+                q_halt <= 0;
                 end
             
             `PRCO_OP_WRITE: begin
@@ -171,6 +181,7 @@ module prco_decoder (
                 q_ce            <= 1;
                 q_req_ram_we    <= 0;
                 q_new_uart1_data <= 1;
+                q_halt <= 0;
                 end
 
             default: begin
@@ -183,7 +194,9 @@ module prco_decoder (
                 q_ce <= 0;
                 q_req_ram_we <= 0;
                 q_new_uart1_data <= 0;
+                q_halt <= 1;
                 $display("Unknown op: %h", ti_op);
+                $display("HALTING!!!");
                 end
         endcase
     endtask

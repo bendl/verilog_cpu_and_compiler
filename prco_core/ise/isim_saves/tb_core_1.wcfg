@@ -3,7 +3,7 @@
    <wave_state>
    </wave_state>
    <db_ref_list>
-      <db_ref path="Z:/uni/prco304/prco_core/ise/tb_prco_core_isim_beh.wdb" id="1" type="auto">
+      <db_ref path="/home/ise/XilinxVM/prco304/prco_core/ise/tb_prco_core_isim_beh.wdb" id="1" type="auto">
          <top_modules>
             <top_module name="glbl" />
             <top_module name="tb_prco_core" />
@@ -38,6 +38,14 @@
    <wvobject fp_name="/tb_prco_core/uut/i_ce_reg" type="logic" db_ref_id="1">
       <obj_property name="ElementShortName">i_ce_reg</obj_property>
       <obj_property name="ObjectShortName">i_ce_reg</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_prco_core/uut/pc_branch" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">pc_branch</obj_property>
+      <obj_property name="ObjectShortName">pc_branch</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_prco_core/uut/core_state" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">core_state</obj_property>
+      <obj_property name="ObjectShortName">core_state</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_prco_core/uut/q_ce" type="logic" db_ref_id="1">
       <obj_property name="ElementShortName">q_ce</obj_property>
@@ -134,13 +142,5 @@
    <wvobject fp_name="/tb_prco_core/uut/inst_alu/q_should_branch" type="logic" db_ref_id="1">
       <obj_property name="ElementShortName">q_should_branch</obj_property>
       <obj_property name="ObjectShortName">q_should_branch</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_prco_core/uut/pc_branch" type="logic" db_ref_id="1">
-      <obj_property name="ElementShortName">pc_branch</obj_property>
-      <obj_property name="ObjectShortName">pc_branch</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_prco_core/uut/pc_branch_ack" type="logic" db_ref_id="1">
-      <obj_property name="ElementShortName">pc_branch_ack</obj_property>
-      <obj_property name="ObjectShortName">pc_branch_ack</obj_property>
    </wvobject>
 </wave_config>
