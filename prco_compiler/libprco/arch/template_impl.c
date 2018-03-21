@@ -6,6 +6,7 @@
 #include "dbug.h"
 #include "arch/template_impl.h"
 #include "arch/prco_isa.h"
+#include "gen.h"
 
 #define ASM_OFFSET_BYTES 1
 
@@ -103,6 +104,30 @@ void cg_target_template_init(struct target_delegate *dt)
         eprintf("_main:\r\n");
 }
 
+
+void create_verilog_memh_file(void) {
+        FILE    *fcoe;
+        int     it;
+        // asm instruction iterator
+        struct prco_op_struct *op;
+
+        fcoe = fopen("verilog_memh.txt", "w");
+        if(!fcoe) {
+                dprintf(D_ERR, "Unable to open uvm_coe.coe!\r\n");
+                return;
+        }
+
+        // Write each instruction opcode on each line
+        for_each_asm(it, op) {
+                fprintf(fcoe, "%04x\n", op->opcode);
+        }
+
+        // Write top of stack address
+        // /fprintf(fcoe, "@ff\n00ff");
+
+        fclose(fcoe);
+}
+
 void cg_precode_template(void)
 {
         int it;
@@ -150,9 +175,8 @@ void cg_postcode_template(void)
 
         dprintf(D_INFO, "Postcode:\r\n");
 
+        // Print each instruction in human readable format
         for_each_asm(it, op) {
-                //dprintf(D_INFO, "asm_list: %s\r\n", OP_STR[asm_list[asm_list_it].op]);
-                //fwrite(&asm_list[asm_list_it].opcode, 2, 1, g_file_out);
                 printf("0x%02X\t", op->asm_offset);
                 assert_opcode(op, 1);
         }
@@ -160,24 +184,20 @@ void cg_postcode_template(void)
         printf("\r\n\r\n");
         asm_calc_labels();
 
+        // Print each instruction in human readable format
         for_each_asm(it, op) {
-                //dprintf(D_INFO, "asm_list: %s\r\n", OP_STR[asm_list[asm_list_it].op]);
-                //fwrite(&asm_list[asm_list_it].opcode, 2, 1, g_file_out);
                 printf("0x%02X\t", op->asm_offset);
                 assert_opcode(op, 1);
         }
 
-        //create_coe_file();
-        //create_verilog_memh_file();
-        //create_verilog_instr();
-
-        for_each_asm(it, op) {
-                //printf("X\"%04x\",\n", op->opcode);
-        }
-
+        // Debug
+        // Inline verilog prco_lmem.v memory
         for_each_asm(it, op) {
                 printf("r_lmem[%d] = 16'h%04x;\n", it, op->opcode);
         }
+
+        // Write machine code to file
+        create_verilog_memh_file();
 }
 
 void cg_push_prco(enum prco_reg rd)

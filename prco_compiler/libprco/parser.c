@@ -761,9 +761,44 @@ parse_bin_rhs(int min_prec, struct ast_item *lhs)
         }
 }
 
+struct ast_item *parse_if_expr(void)
+{
+        struct ast_item *cond = NULL;
+        struct ast_item *then = NULL;
+        struct ast_item *els  = NULL;
+
+        // if '('
+        lexer_match_next(TOK_IF);
+        lexer_match_next(TOK_LBRACE);
+
+        // <cond> ')'
+        cond = parse_expr();
+        lexer_match_next(TOK_RBRACE);
+
+        // '{' <body> '}'
+        then = parse_block();
+        lexer_match_next(TOK_RCBRACE);
+
+        // else '{' <body> '}'
+        if(lexer_match(TOK_ELSE)) {
+                lexer_match_next(TOK_ELSE);
+                lexer_match_next(TOK_LCBRACE);
+                els = parse_block();
+                lexer_match_next(TOK_RCBRACE);
+        }
+
+        return new_expr(new_if(cond, then, els), AST_IF);
+}
+
 struct ast_item *parse_expr(void)
 {
-        struct ast_item *lhs = parse_primary();
+        struct ast_item *lhs;
+
+        if(lexer_match(TOK_IF))
+                return parse_if_expr();
+
+
+        lhs = parse_primary();
         if(!lhs) return NULL;
         return parse_bin_rhs(0, lhs);
 }
@@ -862,5 +897,15 @@ new_call(char *callee, struct list_item *args, int argc)
         ret->callee = callee;
         ret->args = args;
         ret->argc = argc;
+        return ret;
+}
+
+struct ast_if *
+new_if(struct ast_item *cond, struct ast_item *then, struct ast_item *els)
+{
+        struct ast_if *ret = calloc(1, sizeof(*ret));
+        ret->cond = cond;
+        ret->then;
+        ret->els = els;
         return ret;
 }

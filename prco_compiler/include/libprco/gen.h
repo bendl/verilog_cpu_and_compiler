@@ -11,4 +11,6 @@
 void cg_dump(struct module *m,
              enum target_arch arch);
 
+void eprintf(char *fmt, ...);
+
 #endif //LIBPRCO_TOP_GEN_H

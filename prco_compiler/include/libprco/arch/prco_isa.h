@@ -145,6 +145,8 @@ static const char *REG_STR[] = { FOREACH_REG(GENERATE_STR) };
 static const char *OP_STR[] = { FOREACH_OP(GENERATE_STR) };
 static const char *PORT_STR[] = { FOREACH_PORT(GENERATE_STR) };
 
+
+void assert_opcode(struct prco_op_struct *op, char print);
 void print_opcode(struct prco_op_struct *prco_op);
 
 struct prco_op_struct opcode_t1(enum prco_op iop, enum prco_reg rd, enum prco_reg ra,
