@@ -552,10 +552,26 @@ The \scname{} compiler can identify some unreachable code segments, such as cont
 \subsection{Code Generation}
 The compiler Code Generation stage converts the optimised AST into an intermediatary list of \mintinline{c}{struct prco_op_struct}. It does this by iterating over each \mintinline{c}{struct ast_item} in the AST and checks whether the item requires code generation. For example, an \mintinline{c}{struct ast_item} with type \mintinline{c}{AST_FUNC} is one which requires code generation. The AST is then passed to the \mintinline{c}{void cg_func_prco(...)} function where the code generation takes please. For this type, the stack frame header is generated first, before the body of the function. At the end of the function's body, the stack frame end code generation routing is run.
 
-This code generation stage is named intermediatary because absolute addresses of \verb|JMP| instructions have not been calculated. The calculation of these addresses is performed in the following stage, Assembling. In addition, the location (and offset's) of functions may need to be rearranged.
+This code generation stage is named intermediatary because absolute addresses of \verb|JMP| instructions have not been calculated. The calculation of these addresses is performed in the following Assembling stage. In addition, the location (and offset's) of functions may need to be rearranged.
 
 \subsection{Assembling}
-The final stage of the compiler is the assembling stage. This stage takes the list of \verb|struct prco_op_struct| and outputs a list of machine code instructions. The assembler accomplishes this by calculating offsets and addresses of functions, branching instructions, and global variable addresses. It may also rearrange function locations so that the main function is the first instruction to be outputted.
+The final stage of the compiler is the assembling stage. This stage takes the list of \mintinline{c}{struct prco_op_struct} and outputs a list of machine code instructions. The assembler accomplishes this by calculating offsets and addresses of functions, branching instructions, and global variable addresses. It may also rearrange function locations so that the main function is the first instruction to be outputted.
+
+Another role of the assembler in the \scname{} processor is to lay out the output code.
+
+This format is not enforced by the processor core and it's up to the compiler to lay out the processor's memory contents. The only feature that the processor states is that it will start reading instructions from address \verb|0x00|. The compiler uses this information to structure the output program. The first two words of memory (\verb|0x00| and \verb|0x01|) contain \verb|MOVI| and \verb|JMP| instructions to jump the processor to the address of the \verb|main()| function.
+
+%\begin{figure}[H]
+\begin{wrapfigure}{r}{0.3\textwidth}
+\begin{center}
+\includegraphics[scale=0.4]{prco_memory_layout}
+\end{center}
+\caption{\scname{} memory layout.}
+\label{fig:constant_fold_ast}
+%\end{figure}
+\end{wrapfigure}
+
+Assembling code is found in \verb|arch/template_impl.c:38|.
 
 \section{Testing and Verification}
 Verifying the output assembly is a bit more involved as there are multiple layers of tests required. The output code generation must be tested for:
