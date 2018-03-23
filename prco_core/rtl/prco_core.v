@@ -183,7 +183,7 @@ module prco_core(
                 core_state <= 0;
             end
         end
-    end    
+    end
 
 
     // Instantiate the module
