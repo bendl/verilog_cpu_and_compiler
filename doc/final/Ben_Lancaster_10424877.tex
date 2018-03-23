@@ -19,9 +19,10 @@
 \usepackage{hyperref}
 \hypersetup{
     colorlinks=true,
-    linkcolor=red,
-    filecolor=magenta,      
-    urlcolor=red,
+    linkcolor=blue,
+    filecolor=blue,
+    urlcolor=blue,
+    citecolor=gray,
 }
  
 \usepackage{float}
@@ -115,6 +116,37 @@
 	%\fancyfoot[RO]{\textbf{\thepage}}
 }
 
+%s comments
+\usepackage{verbatim}
+
+%inline graphs
+\usepackage{wrapfig}
+% multiple figures on line
+\usepackage{subfig}
+
+\usepackage{graphicx}
+\graphicspath{{img/}}
+
+% Caption font size
+% https://tex.stackexchange.com/questions/86120/font-size-of-figure-caption-header
+\usepackage[font=scriptsize,labelfont=bf]{caption}
+
+%\setlength{\belowcaptionskip}{-10pt}
+%\setlength{\abovecaptionskip}{-5pt} % Chosen fairly arbitrarily
+
+
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\lhead{\rightmark}
+\chead{}
+%\rhead{FPGA-based RISC Microprocessor and Compiler (Rev. \dlatestv{})}
+\rhead{PRCO304 (Rev. \dlatestv{})}
+\lfoot{Ben Lancaster 10424877}
+\cfoot{}
+\rfoot{Page \thepage}
+
+\renewcommand{\subsectionmark}[1]{\markright{\thesubsection\ #1}}
+
 
 %% Make bibliography show in table of contents
 %% https://tex.stackexchange.com/questions/8458/making-the-bibliography-appear-in-the-table-of-contents
@@ -123,7 +155,7 @@
 \renewcommand{\bibname}{References}
 
 \RequirePackage{filecontents}
-\begin{filecontents}{prco304_h4.bib}
+\begin{filecontents}{prco304.bib}
 @inproceedings{safety_fpga,
   title={FPGAs in critical hardware/software systems},
   author={Hilton, Adrian J and Townson, Gemma and Hall, Jon G},
@@ -189,41 +221,15 @@ Processor Reference
 Guide},
 journal={Xilinx},
 year={2017}
-} 
+}
+
+@misc{crenshaw1988let,
+  title={Let's Build a Compiler!},
+  author={Crenshaw, Jack W},
+  year={1988}
+}
 
 \end{filecontents}
-
-%s comments
-\usepackage{verbatim}
-
-%inline graphs
-\usepackage{wrapfig}
-% multiple figures on line
-\usepackage{subfig}
-
-\usepackage{graphicx}
-\graphicspath{ {img/} }
-
-% Caption font size
-% https://tex.stackexchange.com/questions/86120/font-size-of-figure-caption-header
-\usepackage[font=scriptsize,labelfont=bf]{caption}
-
-%\setlength{\belowcaptionskip}{-10pt}
-%\setlength{\abovecaptionskip}{-5pt} % Chosen fairly arbitrarily
-
-
-\usepackage{fancyhdr}
-\pagestyle{fancy}
-\lhead{\rightmark}
-\chead{}
-%\rhead{FPGA-based RISC Microprocessor and Compiler (Rev. \dlatestv{})}
-\rhead{PRCO304 (Rev. \dlatestv{})}
-\lfoot{Ben Lancaster 10424877}
-\cfoot{}
-\rfoot{Page \thepage}
-
-\renewcommand{\subsectionmark}[1]{\markright{\thesubsection\ #1}}
-
 
 \begin{document}
 
@@ -460,12 +466,15 @@ It should be noted that the grammar and compiler do not have any terminals for d
 \subsection{Text Parser}
 The compiler implements it's own recursive descent parser for the grammar described in \ref{sect:compiler_grammar}. The parser is able to recognise all context free grammars and therefore would be capable of parsing more complete programming languages such as C and Python. 
 
+The text parser is inspired by Jack Crenshaw's "Let's Build a Compiler" book, \citep{crenshaw1988let}.
+
 While parser generators already exist, such as Bison and Java's ANTLR, it was decided to implement the parser by hand using recursive descent principles as a matter of learning rather than ease of use. Although parsing a more complex grammar would easily be more achievable using a parse generator, the overhead of generating compliant assembly for that complex grammar would be too time consuming and is hence out of scope (see extended deliverable \ref{sect:deliv:ed:gcc}).
 
 \subsection{AST Generation}\label{sect:compiler_ast}
-The recursive descent parser stores all terminals in the grammar as structures in \textit{ast.h} containing relocatable information about the parsed text and it's future implementation. This AST result of the text parser is the initial immediate representation used by the compiler.
-
-\begin{wrapfigure}{r}{0.4\textwidth}
+%\begin{wrapfigure}{r}{0.4\textwidth}
+\begin{figure}
+\centering 
+\begin{minipage}{0.4\textwidth}
 \begin{minted}{C}
 struct ast_func {
     struct ast_proto *proto;
@@ -476,8 +485,12 @@ struct ast_func {
     int    num_local_vars;
 };
 \end{minted}
+\end{minipage}
 \caption{An AST structure representing a parsed function. It contains sub-structures pointing to it's prototype, body, exit statement, and a list of local variables. (\textit{ast.h:63})}
-\end{wrapfigure}
+\end{figure}
+
+The recursive descent parser stores all terminals in the grammar as structures in \textit{ast.h} containing relocatable information about the parsed text and it's future implementation. This AST result of the text parser is the initial immediate representation used by the compiler.
+
 
 \lipsum[1]
 
@@ -488,9 +501,9 @@ The \scname{} compiler can optionally perform simple optimisations, such as unre
 The techniques used by the optimiser to perform these optimisations are primitive; the optimiser is not given AST information in SSA (static single assignment) form; and because of this limitation, only basic optimisations can be identified.
 
 \subsubsection{Constant Folding}
-Constant folding is performed by the optimiser to reduce (fold) expressions that can be identified as constant. This allows the optimiser to replace AST tree structures containing constant values and no dependencies with shorter and simpler AST items. 
+Constant folding is performed by the optimiser to reduce (fold) expressions that can be identified as constant. This allows the optimiser to replace AST tree structures containing constant values and no dependencies with shorter and simpler AST items. This optimisation can drastically improve the performance of the output code by reducing the number of instructions emitted.
 
-For example, the following expression in Figure \ref{fig:constant_fold} can be identified as constant and can be reduced.
+For example, the following expression in Figure \ref{fig:constant_fold_yes} can be identified as constant and can be reduced to a single AST node as shown in Figure \ref{fig:constant_fold_ast}. As the optimiser is not passed AST information in SSA form, the optimiser cannot follow or track variable references and modifications throughout the life-cycle of the program. Although the parser does a contain a primitive symbol table, the symbol table does not map variables to values, and so the code segment in Figure \ref{fig:constant_fold_no} cannot be identified as constant by the optimiser.
 
 
 \begin{figure}[H]
@@ -500,9 +513,10 @@ For example, the following expression in Figure \ref{fig:constant_fold} can be i
 int a = 1 + (2 + 3) * 4;
 \end{minted}
 \end{minipage}
-\caption{An expression suitable for constant folding.}
-\label{fig:constant_fold}
+\caption{Example of an expression suitable for constant folding.}
+\label{fig:constant_fold_yes}
 \end{figure}
+
 \begin{figure}[H]
 \centering 
 \begin{minipage}{0.4\textwidth}
@@ -513,7 +527,7 @@ int c = a + b;
 \end{minted}
 \end{minipage}
 \caption{Example of an expression the optimiser cannot identify as constant.}
-\label{fig:constant_fold}
+\label{fig:constant_fold_no}
 \end{figure}
 
 \begin{figure}[H]
@@ -522,7 +536,7 @@ int c = a + b;
 \includegraphics[scale=0.4]{compiler_cf}
 \end{center}
 \caption{AST transformation performed by Constant Folding.}
-\label{fig:compiler_constant_folder}
+\label{fig:constant_fold_ast}
 \end{figure}
 %\end{wrapfigure}
 %\lipsum[1]
@@ -533,10 +547,10 @@ int c = a + b;
 \subsubsection{Unreachable Code Elimination}
 Unreachable code elimination is the removal of code that will never be run on the processor. This can be in the form of uncalled function, unused variables, and control statements that operate on constant values.
 
-The \scname{} compiler can identify some unreachable code segments, such as control statements that operate on constant values, by utilising it's constant folding optimisation discussed previously. By first running the constant folding optimisation on the body of functions, the optimiser looks at the conditions of \textit{for} loop AST items. If their condition has been constant folded to a number and the number is \textit{true} (i.e. not 0) then the AST tree can be replaced with the items in it's body.
+The \scname{} compiler can identify some unreachable code segments, such as control statements that operate on constant values, by utilising it's constant folding optimisation discussed previously. By first running the constant folding optimisation on the body of functions, the optimiser looks at the conditions of \textit{if} statements. If it's condition has been constant folded to a constant and is \textit{true} (i.e. not 0) then the AST tree can be replaced with the items in it's body, effectively removing the condition check if it's always true, or the whole structure if it's false.
 
 \subsection{Code Generation}
-The compiler Code Generation stage converts the optimised AST into an intermediatary list of \mintinline{c}{struct prco_op_struct}. It does this by iterating over each \mintinline{c}{struct ast_item} in the AST and checks whether the item requires code generation. For example, an \mintinline{c}{struct ast_item} with type \mintinline{c}{AST_FUNC} is one which requires code generation. The AST is then passed to the \mintinline{c}{void cg_func_prco(...)} function where the code generation takes please. For this type, the stack frame header is generated first, before the body of the body. At the end of the function's body, the stack frame end code generation routing is run.
+The compiler Code Generation stage converts the optimised AST into an intermediatary list of \mintinline{c}{struct prco_op_struct}. It does this by iterating over each \mintinline{c}{struct ast_item} in the AST and checks whether the item requires code generation. For example, an \mintinline{c}{struct ast_item} with type \mintinline{c}{AST_FUNC} is one which requires code generation. The AST is then passed to the \mintinline{c}{void cg_func_prco(...)} function where the code generation takes please. For this type, the stack frame header is generated first, before the body of the function. At the end of the function's body, the stack frame end code generation routing is run.
 
 This code generation stage is named intermediatary because absolute addresses of \verb|JMP| instructions have not been calculated. The calculation of these addresses is performed in the following stage, Assembling. In addition, the location (and offset's) of functions may need to be rearranged.
 
@@ -558,6 +572,10 @@ Another potential solution for verifying output code that is not employed is to 
 \chapter{Conclusion}
 \section{Project Post-mortem}
 
+\newpage
+\bibliography{build/prco304} 
+
+\newpage
 \chapter{Appendices}
 \section{Appendix A. \scname{} Core Reference Guide}
 \section{Appendix B. \scname{} Compiler Reference Guide}
@@ -573,6 +591,4 @@ Another potential solution for verifying output code that is not employed is to 
 
 \section{Appendix C. Project Initiation Document}
 
-\newpage
-\bibliography{prco304_h4} 
 \end{document}
