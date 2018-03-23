@@ -69,7 +69,7 @@
 
 %% Report variables
 \newcommand{\scname}{PRCO304}
-\newcommand{\dlatestv}{1.00}
+\newcommand{\dlatestv}{2.10}
 
 \definecolor{babyblueeyes}{rgb}{0.63, 0.79, 0.95}
 \definecolor{ballblue}{rgb}{0.13, 0.67, 0.8}
@@ -272,9 +272,9 @@ PRCO304 - Final Stage Computing Project
     \hline
     Date & Version & Changes \\
 	\specialrule{2pt}{-2pt}{0pt}
-	22/03/2018 & 1 & Add section \ref{sect:compiler_ast} \nameref{sect:compiler_ast}. \\ \hline
-	15/03/2018 & 1 & Add section \ref{sect:compiler_grammar} \nameref{sect:compiler_grammar}. \\ \hline
-	11/03/2018 & 1 & Initial section outline. \\ \hline
+	22/03/2018 & 2.10 & Add section \ref{sect:compiler_ast} \nameref{sect:compiler_ast}. \\ \hline
+	15/03/2018 & 2.00 & Add section \ref{sect:compiler_grammar} \nameref{sect:compiler_grammar}. \\ \hline
+	11/03/2018 & 1.00 & Initial section outline. \\ \hline
     \end{tabularx}
     \caption{Document revisions.}
 \end{table}
@@ -522,19 +522,21 @@ int c = a + b;
 \includegraphics[scale=0.4]{compiler_cf}
 \end{center}
 \caption{AST transformation performed by Constant Folding.}
-\label{fig:dft_algorithm}
+\label{fig:compiler_constant_folder}
 \end{figure}
 %\end{wrapfigure}
 %\lipsum[1]
 %\lipsum[1]
 
+
+
 \subsubsection{Unreachable Code Elimination}
 Unreachable code elimination is the removal of code that will never be run on the processor. This can be in the form of uncalled function, unused variables, and control statements that operate on constant values.
 
-The \scname{} compiler can identify some unreachable code segments, such as control statements that operate on constant values, by utilising it's constant folding optimisation discussed previously. By first running the constant folding optimisation on the body of functions, the optimiser looks at the conditions of \textit{for} loop AST items. If their condition has been constant folded to a number, if the number is \textit{true} (i.e. not 0) then the \textit{it} AST tree can be replaced with the items in it's body.
+The \scname{} compiler can identify some unreachable code segments, such as control statements that operate on constant values, by utilising it's constant folding optimisation discussed previously. By first running the constant folding optimisation on the body of functions, the optimiser looks at the conditions of \textit{for} loop AST items. If their condition has been constant folded to a number and the number is \textit{true} (i.e. not 0) then the AST tree can be replaced with the items in it's body.
 
 \subsection{Code Generation}
-The compiler Code Generation stage converts the optimised AST into an intermediatary list of \verb|struct prco_op_struct|. It does this by iterating over each \verb|struct ast_item| in the AST and checks whether the item requires code generation. For example, an \verb|struct ast_item| with type \verb|AST_FUNC| is one which requires code generation. The AST is then passed to the \verb|cg_func_prco| function where the code generation takes please. For this type, the stack frame header is generated first, before the body of the body. At the end of the function's body, the stack frame end code generation routing is run.
+The compiler Code Generation stage converts the optimised AST into an intermediatary list of \mintinline{c}{struct prco_op_struct}. It does this by iterating over each \mintinline{c}{struct ast_item} in the AST and checks whether the item requires code generation. For example, an \mintinline{c}{struct ast_item} with type \mintinline{c}{AST_FUNC} is one which requires code generation. The AST is then passed to the \mintinline{c}{void cg_func_prco(...)} function where the code generation takes please. For this type, the stack frame header is generated first, before the body of the body. At the end of the function's body, the stack frame end code generation routing is run.
 
 This code generation stage is named intermediatary because absolute addresses of \verb|JMP| instructions have not been calculated. The calculation of these addresses is performed in the following stage, Assembling. In addition, the location (and offset's) of functions may need to be rearranged.
 
@@ -542,7 +544,16 @@ This code generation stage is named intermediatary because absolute addresses of
 The final stage of the compiler is the assembling stage. This stage takes the list of \verb|struct prco_op_struct| and outputs a list of machine code instructions. The assembler accomplishes this by calculating offsets and addresses of functions, branching instructions, and global variable addresses. It may also rearrange function locations so that the main function is the first instruction to be outputted.
 
 \section{Testing and Verification}
+Verifying the output assembly is a bit more involved as there are multiple layers of tests required. The output code generation must be tested for:
+\begin{itemize}
+\item{(A) Correct machine code output for different code generation routines.}
+\item{(B) Correct and complete flow of the output program.}
+\end{itemize}
+For (A), a code generation routine refers to the code generation function used to produce machine code for a specific structure, for example a function or assignment expression. When machine code instructions are emitted from the code generation routines, they are pushed to a list of \mintinline{c}{struct prco_op_struct} containing information about the emitted instruction. Using this information, the final output machine code word (e.g. \mintinline{c}{0x2020}) is rebuilt into an equivalent \mintinline{c}{struct prco_op_struct} structure and compared against the original. If they are the same, the encoded machine code word is considered correct. This check happens every time an instruction is emitted from the code generation routines.
 
+For (B), two approaches are used. The first is to emit equivalent assembly for another architecture to be compiled are run on the host computer. If the return value of this program is correct, the assembly is assumed to be correct. These tests can be launched by running the \mintinline{bash}{test/run_tests.bat} file. The second approach is to run the compiler output directly on the \scname{} processor, however, this requires rebuilding the FPGA design with the new program code which is time consuming and not always practical.
+
+Another potential solution for verifying output code that is not employed is to create an emulator for the \scname{} processor and have it run the output machine code. This suffers the same problem as (B) where we are relying on systems that may not exactly share the behaviour of the physical processor, be it through unknown bugs, assembly printing errors, or architecture differences.
 
 \chapter{Conclusion}
 \section{Project Post-mortem}
