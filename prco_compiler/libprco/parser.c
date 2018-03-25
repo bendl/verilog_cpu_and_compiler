@@ -372,7 +372,7 @@ lexer_next(void)
                 resv_it = g_resv_words;
                 list_for_each(resv_it) {
                         struct resv_word *w = (struct resv_word*)resv_it->value;
-                        printf("Comparing %s to resv %s\r\n", buf, w->lpstr_name);
+                        printf("Comparing '%s' to resv '%s'\r\n", buf, w->lpstr_name);
                         if(strcmp(buf, w->lpstr_name) == 0) {
                                 dprintf(D_INFO, "Resv word found! %s\r\n", w->lpstr_name);
                                 g_cur_token = w->tok;
@@ -808,6 +808,8 @@ struct ast_item *parse_block(void)
 {
         struct ast_item *start = NULL;
         struct ast_item *last  = NULL;
+
+        lexer_match_opt(TOK_LCBRACE);
 
         while(!lexer_match(TOK_RCBRACE)) {
                 struct ast_item *e = parse_expr();

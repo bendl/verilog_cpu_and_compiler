@@ -56,6 +56,7 @@ typedef void (*cg_number_d)     (struct ast_num *n);    ///< Cg number expressio
 typedef void (*cg_var_d)        (struct ast_var *v);    ///< Cg variable/ident reference
 typedef void (*cg_call_d)       (struct ast_call *c);   ///< Cg function call
 typedef void (*cg_local_decl_d) (struct ast_lvar *v);   ///< Cg variable declaration
+typedef void (*cg_if_d)         (struct ast_if *v);     ///< Cg if expression
 
 /*
 typedef void (*cg_if_d)(ast_if_t *i);           ///< Cg if expression
@@ -80,8 +81,8 @@ struct target_delegate {
         cg_call_d       cg_call;
         cg_local_decl_d cg_local_decl;
 
-        /*
         cg_if_d         cg_if;
+        /*
         cg_for_d        cg_for;
         cg_assignment_d cg_assignment;
         cg_var_ref_d    cg_var_ref;

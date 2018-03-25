@@ -38,13 +38,23 @@ void assert_opcode(struct prco_op_struct *op, char print)
         case PUSH:
         case POP:
         case NEG:
-        case JMP:
             assert((op->opcode >> 11) == op->op);
             assert(((op->opcode >> 8) & PRCO_OP_BITS_REG) == op->regD);
             printf("%s\t%s\t\t%04x\t%s\r\n", OP_STR[op->op],
                 REG_STR[op->regD],
                 op->opcode, 
                 op->comment);
+            break;
+
+
+        case JMP:
+            assert((op->opcode >> 11) == op->op);
+            assert(((op->opcode >> 8) & PRCO_OP_BITS_REG) == op->regD);
+            printf("%s\t%s,\t%s\t\t%04x\t%s\r\n", OP_STR[op->op],
+                   REG_STR[op->regD],
+                   JMP_STR[op->imm8],
+                   op->opcode,
+                   op->comment);
             break;
 
         case ADDI:
@@ -378,6 +388,21 @@ struct prco_op_struct opcode_write(enum prco_reg rd, enum prco_port port)
     op.opcode |= op.op << 11;
     op.opcode |= op.regD << 8;
     op.opcode |= op.port << 0;
+
+    assert_opcode(&op, 0);
+    return op;
+}
+
+struct prco_op_struct opcode_jmp_rc(enum prco_reg rd, enum prco_jmp cond)
+{
+    struct prco_op_struct op = { 0 };
+    op.flags = 0;
+    op.op = JMP;
+    op.regD = rd;
+    op.imm8 = cond;
+    op.opcode |= op.op << 11;
+    op.opcode |= op.regD << 8;
+    op.opcode |= op.imm8 << 0;
 
     assert_opcode(&op, 0);
     return op;

@@ -11,29 +11,52 @@
 #define ASM_OFFSET_BYTES 1
 
 struct prco_op_struct asm_list[64] = {0};
-int asm_list_it   = 0;
+int asm_list_it         = 0;
+
+unsigned int g_asm_id   = 0;
+
+int asm_tag_next        = 0;
+int asm_tag_id          = 0;
+
+void cg_target_template_init(struct target_delegate *dt)
+{
+        dprintf(D_INFO, "cg: %s\r\n", __FUNCTION__);
+        dt->cg_function = cg_function_template;
+        dt->cg_bin = cg_bin_template;
+        dt->cg_expr = cg_expr_template;
+        dt->cg_local_decl = cg_local_decl_template;
+        dt->cg_number = cg_number_template;
+        dt->cg_var = cg_var_template;
+        dt->cg_postcode = cg_postcode_template;
+        dt->cg_precode = cg_precode_template;
+        dt->cg_if = cg_if_template;
+
+        eprintf(".text\r\n");
+        eprintf(".globl _main\r\n");
+        eprintf("_main:\r\n");
+}
 
 #define asm_push(instr)                                                        \
-    asm_list[asm_list_it] = instr;                                             \
-    asm_list[asm_list_it].asm_offset = asm_list_it * ASM_OFFSET_BYTES;         \
-    asm_list_it++;
+        asm_list[asm_list_it] = instr;                                         \
+        asm_list[asm_list_it].asm_offset = asm_list_it * ASM_OFFSET_BYTES;     \
+        asm_list_it++;
 
 #define asm_comment(s)                                                         \
-    asm_list[(asm_list_it - 1) < 0 ? 0 : (asm_list_it-1)].comment = s;
+        asm_list[(asm_list_it - 1) < 0 ? 0 : (asm_list_it-1)].comment = s;
 
 #define asm_flags(i, f)                                                        \
-    asm_list[(asm_list_it - i) < 0 ? 0 : (asm_list_it - 1)].flags f;
+        asm_list[(asm_list_it - i) < 0 ? 0 : (asm_list_it - 1)].flags f;
 
 #define for_each_asm(it, asm_p)                                                \
         for (it = 0, asm_p = &asm_list[it];                                    \
-             it < asm_list_it;                                                 \
-             it++, asm_p = &asm_list[it])
+                it < asm_list_it;                                              \
+                it++, asm_p = &asm_list[it])
 
 void asm_calc_labels(void)
 {
-        int it, find;
-        int offset_check = 0x00;
-        struct prco_op_struct *op, *findop;
+        int     it, find;
+        int     offset_check = 0x00;
+        struct  prco_op_struct *op, *findop;
 
         dprintf(D_ALL, "asm_calc_labels:\r\n");
 
@@ -41,9 +64,11 @@ void asm_calc_labels(void)
                 assert(op->asm_offset == offset_check);
                 offset_check += ASM_OFFSET_BYTES;
 
-                // If we need to work out the return address of
-                // a function
+                // If we need to work out the return address
+                // of a function
                 if(op->asm_flags & ASM_CALL_NEXT) {
+                        // Return addresses are placed into a register
+                        // by a MOVI instsruction
                         assert(op->op == MOVI);
                         // 5 is the number of instructions to Create and push
                         //  the return pointer for the call
@@ -52,7 +77,7 @@ void asm_calc_labels(void)
                         op->opcode |= (op->imm8 & 0xff);
                         assert((op->opcode & 0xff) == op->imm8);
 
-                        // Remove the flag
+                        // Remove the flag as we are done with it
                         op->asm_flags &= ~ASM_CALL_NEXT;
                         continue;
                 }
@@ -86,24 +111,6 @@ int is_entry_func(struct ast_proto *p)
 {
         return strcmp(p->name, "main") == 0;
 }
-
-void cg_target_template_init(struct target_delegate *dt)
-{
-        dprintf(D_INFO, "cg: %s\r\n", __FUNCTION__);
-        dt->cg_function = cg_function_template;
-        dt->cg_bin = cg_bin_template;
-        dt->cg_expr = cg_expr_template;
-        dt->cg_local_decl = cg_local_decl_template;
-        dt->cg_number = cg_number_template;
-        dt->cg_var = cg_var_template;
-        dt->cg_postcode = cg_postcode_template;
-        dt->cg_precode = cg_precode_template;
-
-        eprintf(".text\r\n");
-        eprintf(".globl _main\r\n");
-        eprintf("_main:\r\n");
-}
-
 
 void create_verilog_memh_file(void) {
         FILE    *fcoe;
@@ -227,9 +234,10 @@ void cg_expr_template(struct ast_item *e)
 {
         list_for_each(e) {
                 switch(e->type) {
-                case AST_NUM: cg_number_template((struct ast_num*)e->expr); break;
-                case AST_BIN: cg_bin_template((struct ast_bin*)e->expr); break;
-                case AST_CALL: cg_call_template((struct ast_call*)e->expr); break;
+                case AST_NUM:   cg_number_template((struct ast_num*)e->expr);   break;
+                case AST_BIN:   cg_bin_template((struct ast_bin*)e->expr);      break;
+                case AST_CALL:  cg_call_template((struct ast_call*)e->expr);    break;
+                case AST_IF:    cg_if_template((struct ast_if*)e->expr);        break;
                 default: dprintf(D_ERR, "Unknown cg routine for %d\r\n",
                                  e->type);
                 }
@@ -285,6 +293,41 @@ void cg_call_template(struct ast_call *c)
         asm_comment("JMP");
 }
 
+void cg_if_template(struct ast_if *v)
+{
+        struct prco_op_struct
+                op_movi,
+                op_dest,
+                op_jmp;
+        unsigned int jmp_id = ++g_asm_id;
+
+        cg_expr_template(v->cond);
+
+        asm_push(opcode_mov_ri(Cx, 0));
+        asm_push(opcode_cmp_rr(Ax, Cx));
+
+        // Create jmp location
+        op_movi = opcode_mov_ri(Bx, 0x00);
+        op_movi.asm_flags = ASM_JMP_JMP;
+        op_movi.comment = "Jmp if false";
+        op_movi.id = jmp_id;
+        asm_push(op_movi);
+
+        op_jmp = opcode_jmp_rc(Bx, JMP_JE);
+        op_jmp.id = jmp_id;
+        asm_push(op_jmp);
+
+        // If true
+        cg_expr_template(v->then);
+
+        // After
+        op_dest = opcode_mov_ri(Ax, 0);
+        op_dest.asm_flags = ASM_NOP_NOP;
+        op_dest.id = jmp_id;
+        op_dest.comment = "NOP_JMP_DEST";
+        asm_push(op_dest);
+
+}
 
 void cg_function_template(struct ast_func *f)
 {

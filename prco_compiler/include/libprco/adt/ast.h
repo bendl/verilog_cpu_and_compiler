@@ -113,6 +113,8 @@ struct ast_if {
         struct ast_item *cond;
         struct ast_item *then;
         struct ast_item *els;
+
+        int asm_id;
 };
 
 struct ast_for {
