@@ -907,7 +907,7 @@ new_if(struct ast_item *cond, struct ast_item *then, struct ast_item *els)
 {
         struct ast_if *ret = calloc(1, sizeof(*ret));
         ret->cond = cond;
-        ret->then;
+        ret->then = then;
         ret->els = els;
         return ret;
 }

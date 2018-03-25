@@ -42,7 +42,8 @@ void asm_push(struct prco_op_struct op)
         asm_list[asm_list_it].asm_offset = asm_list_it * ASM_OFFSET_BYTES;
 
         if(asm_tag_next) {
-                asm_list[asm_list_it].asm_flags &= asm_tag_next;
+                dprintf(D_GEN, "GEN: asm_tag_next: %x\r\n", asm_tag_next);
+                asm_list[asm_list_it].asm_flags |= asm_tag_next;
                 asm_list[asm_list_it].id = asm_tag_id;
                 asm_tag_next = 0;
         }
@@ -112,6 +113,30 @@ void asm_calc_labels(void)
                         }
 
                         continue;
+                }
+
+                // Opcode is a JMP instruction jumping somewhere
+                // Find where...
+                if(op->asm_flags & ASM_JMP_JMP) {
+                        // Jump operation start with a MOVI to
+                        // put address of destination into a register
+                        assert(op->op == MOVI);
+
+                        // Find findop with same <id>
+                        for_each_asm(find, findop) {
+                                if(it == find) continue;
+
+                                if(findop->id == op->id) {
+                                        dprintf(D_GEN, "GEN: Found JMP destination! %d %d - %d\r\n",
+                                                it, find,
+                                                findop->asm_offset);
+                                        op->imm8 = findop->asm_offset;
+                                        op->opcode |= op->imm8 & 0xFF;
+
+                                        // Remove the flag
+                                        op->asm_flags &= ~ASM_JMP_JMP;
+                                }
+                        }
                 }
         }
 }
@@ -323,7 +348,6 @@ void cg_if_template(struct ast_if *v)
         asm_push(op_movi);
 
         op_jmp = opcode_jmp_rc(Bx, JMP_JE);
-        op_jmp.id = jmp_id;
         asm_push(op_jmp);
 
         // If true
