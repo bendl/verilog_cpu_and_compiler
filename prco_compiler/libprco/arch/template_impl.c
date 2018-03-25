@@ -36,10 +36,19 @@ void cg_target_template_init(struct target_delegate *dt)
         eprintf("_main:\r\n");
 }
 
-#define asm_push(instr)                                                        \
-        asm_list[asm_list_it] = instr;                                         \
-        asm_list[asm_list_it].asm_offset = asm_list_it * ASM_OFFSET_BYTES;     \
+void asm_push(struct prco_op_struct op)
+{
+        asm_list[asm_list_it] = op;
+        asm_list[asm_list_it].asm_offset = asm_list_it * ASM_OFFSET_BYTES;
+
+        if(asm_tag_next) {
+                asm_list[asm_list_it].asm_flags &= asm_tag_next;
+                asm_list[asm_list_it].id = asm_tag_id;
+                asm_tag_next = 0;
+        }
+
         asm_list_it++;
+}
 
 #define asm_comment(s)                                                         \
         asm_list[(asm_list_it - 1) < 0 ? 0 : (asm_list_it-1)].comment = s;
@@ -321,12 +330,8 @@ void cg_if_template(struct ast_if *v)
         cg_expr_template(v->then);
 
         // After
-        op_dest = opcode_mov_ri(Ax, 0);
-        op_dest.asm_flags = ASM_NOP_NOP;
-        op_dest.id = jmp_id;
-        op_dest.comment = "NOP_JMP_DEST";
-        asm_push(op_dest);
-
+        asm_tag_next = ASM_JMP_DEST;
+        asm_tag_id   = jmp_id;
 }
 
 void cg_function_template(struct ast_func *f)
