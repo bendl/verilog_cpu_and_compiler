@@ -15,6 +15,7 @@ int asm_list_it         = 0;
 
 unsigned int g_asm_id   = 0;
 
+int asm_tag_stack       = -1;
 int asm_tag_next        = 0;
 int asm_tag_id          = 0;
 
@@ -41,11 +42,13 @@ void asm_push(struct prco_op_struct op)
         asm_list[asm_list_it] = op;
         asm_list[asm_list_it].asm_offset = asm_list_it * ASM_OFFSET_BYTES;
 
-        if(asm_tag_next) {
-                dprintf(D_GEN, "GEN: asm_tag_next: %x\r\n", asm_tag_next);
+        // Depraced, using NOPs for now
+        if(0 && asm_tag_stack > 0) {
+                dprintf(D_GEN, "GEN: asm_tag_next: %d\r\n", asm_tag_next);
                 asm_list[asm_list_it].asm_flags |= asm_tag_next;
                 asm_list[asm_list_it].id = asm_tag_id;
-                asm_tag_next = 0;
+                asm_tag_stack--;
+                if(asm_tag_stack < 0) asm_tag_stack = 0;
         }
 
         asm_list_it++;
@@ -126,15 +129,18 @@ void asm_calc_labels(void)
                         for_each_asm(find, findop) {
                                 if(it == find) continue;
 
-                                if(findop->id == op->id) {
-                                        dprintf(D_GEN, "GEN: Found JMP destination! %d %d - %d\r\n",
+                                if((findop->asm_flags & ASM_JMP_DEST) &&
+                                        (findop->id == op->id)) {
+                                        dprintf(D_GEN, "GEN: Found JMP destination! %x %x - %x\r\n",
                                                 it, find,
                                                 findop->asm_offset);
+                                        dprintf(D_GEN, "%x %x\r\n", op->id, findop->id);
                                         op->imm8 = findop->asm_offset;
                                         op->opcode |= op->imm8 & 0xFF;
 
                                         // Remove the flag
-                                        op->asm_flags &= ~ASM_JMP_JMP;
+                                        //op->asm_flags &= ~ASM_JMP_JMP;
+                                        continue;
                                 }
                         }
                 }
@@ -333,10 +339,14 @@ void cg_if_template(struct ast_if *v)
                 op_movi,
                 op_dest,
                 op_jmp;
-        unsigned int jmp_id = ++g_asm_id;
 
+        unsigned int jmp_id = ++g_asm_id;
+        dprintf(D_GEN, "jmp_id %d\r\n", jmp_id);
+
+        // Emit condition
         cg_expr_template(v->cond);
 
+        // Emit comparison
         asm_push(opcode_mov_ri(Cx, 0));
         asm_push(opcode_cmp_rr(Ax, Cx));
 
@@ -353,9 +363,16 @@ void cg_if_template(struct ast_if *v)
         // If true
         cg_expr_template(v->then);
 
-        // After
-        asm_tag_next = ASM_JMP_DEST;
-        asm_tag_id   = jmp_id;
+        // Tag after instruction
+        //asm_tag_stack++;
+        //asm_tag_next = ASM_JMP_DEST;
+        //asm_tag_id   = jmp_id;
+
+        op_dest = opcode_nop();
+        op_dest.id = jmp_id;
+        op_dest.comment = "JMP IF FALSE DEST";
+        op_dest.asm_flags |= ASM_JMP_DEST;
+        asm_push(op_dest);
 }
 
 void cg_function_template(struct ast_func *f)

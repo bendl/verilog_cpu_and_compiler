@@ -170,6 +170,8 @@ void print_opcode(struct prco_op_struct *prco_op);
 struct prco_op_struct opcode_t1(enum prco_op iop, enum prco_reg rd, enum prco_reg ra,
                               signed char simm5);
 
+struct prco_op_struct opcode_nop(void);
+
 struct prco_op_struct opcode_mov_rr(enum prco_reg regD, enum prco_reg regA);
 struct prco_op_struct opcode_mov_ri(enum prco_reg regD, unsigned char imm8);
 struct prco_op_struct opcode_mov_rri(enum prco_reg regA, enum prco_reg regD, signed char imm6);
