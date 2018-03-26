@@ -354,6 +354,7 @@ lexer_next(void)
         case ',': lexer_fgetc(); return TOK_COMMA;
         case '{': lexer_fgetc(); return TOK_LCBRACE;
         case '}': lexer_fgetc(); return TOK_RCBRACE;
+        case '=': lexer_fgetc(); return TOK_ASSIGNMENT;
         case EOF: return TOK_EOF;
         }
 
@@ -475,11 +476,16 @@ int lexer_match_req(enum token_type t)
 struct ast_proto *parse_proto(enum token_type t)
 {
         struct list_item *args;
+        struct list_item *arg;
+        struct ast_lvar *lvarg;
+        struct ast_lvar *parg;
         struct list_item *arg_it;
         struct ast_proto *proto;
         struct ast_proto *proto_it;
         char *fn_name;
         int argc = 0;
+        int pargc = 0;
+        int argc_bp = 0;
 
         args = calloc(1, sizeof(*args));
 
@@ -493,15 +499,25 @@ struct ast_proto *parse_proto(enum token_type t)
         // args, arg1
         lexer_match_opt(TOK_VARIABLE);
         while(lexer_match(TOK_ID) || lexer_match(TOK_VARIABLE)) {
-                struct ast_lvar *arg;
                 lexer_match_opt(TOK_VARIABLE);
-                arg = new_lvar(new_var(ident_str, dtINT));
-                append_ll_item(args, arg);
+                lvarg = new_lvar(new_var(ident_str, dtINT));
+                append_ll_item(args, lvarg);
                 argc++;
 
                 // TODO: make lexer_next() set g_cur_token
                 g_cur_token = lexer_next();
                 lexer_match_opt(TOK_COMMA);
+        }
+
+        pargc = argc + 1;
+        arg = args;
+        list_for_each(arg) {
+                if(!arg->value) break;
+                parg = (struct ast_lvar*)arg->value;
+                parg->bp_offset = pargc * 1;
+                pargc--;
+                dprintf(D_INFO, "Parsed proto arg: %s offset %x\r\n",
+                        parg->var->name, parg->bp_offset);
         }
 
         // Eat closing )
@@ -557,6 +573,20 @@ struct ast_func *parse_def(void)
         ret->locals = g_locals;
         get_g_module()->functions = ret;
 
+
+        struct list_item *l = ret->locals;
+        struct ast_lvar *v;
+        list_for_each(l) {
+                v = l->value;
+                if(!v) break;
+                dprintf(D_INFO, "FUNC: %s\tVAR: '%s' %d\r\n",
+                        ret->proto->name,
+                        v->var->name,
+                        v->bp_offset);
+        }
+
+        // Finished parsing,
+        // clear global lists
         g_locals = g_params = NULL;
 
         dprintf(D_INFO, "Parsed def: %s argc: %d\r\n",
@@ -567,6 +597,26 @@ struct ast_func *parse_def(void)
         }
 
         return ret;
+}
+
+struct list_item *add_var_to_scope(struct list_item *scope,
+        struct ast_lvar *v)
+{
+        struct list_item *old_scope;
+        if(scope == NULL) {
+                scope = calloc(1, sizeof(*scope));
+        }
+
+        if(scope->value == NULL) {
+                scope->value = v;
+        } else {
+                old_scope = scope;
+                scope = calloc(1, sizeof(*scope));
+                scope->value = v;
+                scope->next = old_scope;
+        }
+
+        return scope;
 }
 
 struct ast_lvar *
@@ -656,6 +706,31 @@ struct ast_item *parse_call(char *ident)
         }
 }
 
+struct ast_item *parse_assignment(char *ident)
+{
+        struct ast_lvar         *v;
+        struct ast_item         *val;
+        struct ast_assign       *a;
+
+        lexer_match_next(TOK_ASSIGNMENT);
+        v = get_var(ident);
+        if(!v) {
+                dprintf(D_ERR,
+                        "ERR: Var assignment ident '%s' not found in scope\r\n",
+                        ident);
+                return NULL;
+        }
+
+        val = parse_expr();
+        if(!val) return NULL;
+
+        a = calloc(1, sizeof(*a));
+        a->var = v;
+        a->val = val;
+
+        return new_expr(a, AST_ASSIGNMENT);
+}
+
 struct ast_item *parse_ident(void)
 {
         struct ast_item *id_expr;
@@ -667,6 +742,10 @@ struct ast_item *parse_ident(void)
         // call expr: <ident>(...)
         if(lexer_match(TOK_LBRACE)) {
                 return parse_call(ident);
+        }
+
+        if(lexer_match(TOK_ASSIGNMENT)) {
+                return parse_assignment(ident);
         }
 
         // else its a variable reference
@@ -709,12 +788,50 @@ struct ast_item *parse_paren(void)
 
 }
 
+struct ast_item *parse_var(void)
+{
+        char *ident             = NULL;
+        struct ast_lvar *v      = NULL;
+        struct ast_item *nvar   = NULL;
+
+        dprintf(D_INFO, "Parseing variable\r\n");
+
+        lexer_match_next(TOK_VARIABLE);
+        lexer_match(TOK_ID);
+        ident = ident_str;
+        lexer_match_next(TOK_ID);
+
+        if((v = get_var(ident)) == NULL) {
+                v = new_ldecl(new_var(ident, dtINT));
+                nvar = new_expr(v, AST_LOCAL_VAR);
+                g_locals = add_var_to_scope(g_locals, nvar->expr);
+        }
+
+        if(lexer_match(TOK_ASSIGNMENT)) {
+                if(nvar) {
+                        nvar->next = parse_assignment(v->var->name);
+                        if(nvar->next == NULL)
+                                return NULL;
+                        return nvar;
+                } else {
+                        nvar = parse_assignment(v->var->name);
+                }
+        }
+
+        if(nvar == NULL) {
+                nvar = new_expr(v, AST_VAR_REF);
+        }
+
+        return nvar;
+}
+
 struct ast_item *parse_primary(void)
 {
         switch(lexer_token()) {
-        case TOK_ID: return parse_ident();
-        case TOK_NUM: return parse_num();
-        case TOK_LBRACE: return parse_paren();
+        case TOK_VARIABLE:      return parse_var();
+        case TOK_ID:            return parse_ident();
+        case TOK_NUM:           return parse_num();
+        case TOK_LBRACE:        return parse_paren();
         // TODO: Fix
         case ';': g_cur_token = lexer_next(); break;
         default: dprintf(D_ERR, "Unknown primary token: %d %c\r\n",
@@ -947,5 +1064,13 @@ struct ast_for *new_for(struct ast_item *start,
         ret->start = start;
         ret->cond = cond;
         ret->step = step;
+        return ret;
+}
+
+struct ast_lvar  *new_ldecl  (struct ast_var *var)
+{
+        struct ast_lvar *ret = calloc(1, sizeof(*ret));
+        ret->bp_offset = 0;
+        ret->var = var;
         return ret;
 }

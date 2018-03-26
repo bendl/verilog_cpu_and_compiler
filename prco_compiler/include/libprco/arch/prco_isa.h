@@ -54,24 +54,24 @@ struct prco_simm6 {
 #define PRCO_OP_BITS_PORT 0b11111111
 
 struct prco_op_struct {
-    regw_t              opcode;
-    unsigned char       op;
-    unsigned char       flags;  //< Depracated
+        regw_t              opcode;
+        unsigned char       op;
+        unsigned char       flags;  //< Depracated
 
-    unsigned char       regD;
-    unsigned char       regA;
-    unsigned char       regB;
+        unsigned char       regD;
+        unsigned char       regA;
+        unsigned char       regB;
 
-    unsigned char imm8  : 8;
-    signed char   simm5 : 5;
+        unsigned char imm8  : 8;
+        signed char   simm5 : 5;
 
-    unsigned char       port;
-    
-    void *ast;
-    unsigned char asm_offset;
-    unsigned int asm_flags;
-    char *comment;
-    unsigned int id;
+        unsigned char   port;
+
+        void            *ast;
+        unsigned char   asm_offset;
+        unsigned int    asm_flags;
+        char            *comment;
+        unsigned int    id;
 };
 
 #define ASM_FUNC_EXIT   0x001

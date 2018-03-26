@@ -21,12 +21,13 @@ extern void cg_call_template            (struct ast_call *c);
 extern void cg_precode_template         (void);
 extern void cg_postcode_template        (void);
 extern void cg_if_template              (struct ast_if *v);
+extern void cg_assignment_template      (struct ast_assign *a);
+extern void cg_var_ref_template         (struct ast_lvar *v);
+extern void cg_local_decl_template      (struct ast_lvar *v);
 /*
 extern void cg_call_template(struct ast_call *v);
 extern void cg_if_template(ast_if_t *i);
 extern void cg_for_template(ast_for_t *f);
-extern void cg_assignment_template(ast_assign_t *a);
-extern void cg_var_ref_template(ast_lvar_t *v);
 extern void cg_dir_extern_template(ast_proto_t *p);
 */
 extern int get_dt_size_template         (target_datatype dt);

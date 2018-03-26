@@ -22,15 +22,18 @@ int asm_tag_id          = 0;
 void cg_target_template_init(struct target_delegate *dt)
 {
         dprintf(D_INFO, "cg: %s\r\n", __FUNCTION__);
+
         dt->cg_function = cg_function_template;
         dt->cg_bin = cg_bin_template;
         dt->cg_expr = cg_expr_template;
-        dt->cg_local_decl = cg_local_decl_template;
         dt->cg_number = cg_number_template;
-        dt->cg_var = cg_var_template;
+
         dt->cg_postcode = cg_postcode_template;
         dt->cg_precode = cg_precode_template;
+
         dt->cg_if = cg_if_template;
+
+        dt->cg_local_decl = cg_local_decl_template;
 
         eprintf(".text\r\n");
         eprintf(".globl _main\r\n");
@@ -65,13 +68,13 @@ void asm_push(struct prco_op_struct op)
                 it < asm_list_it;                                              \
                 it++, asm_p = &asm_list[it])
 
-void asm_calc_labels(void)
+void assembler_labels(void)
 {
         int     it, find;
         int     offset_check = 0x00;
         struct  prco_op_struct *op, *findop;
 
-        dprintf(D_ALL, "asm_calc_labels:\r\n");
+        dprintf(D_ALL, "assembler_labels:\r\n");
 
         for_each_asm(it, op) {
                 assert(op->asm_offset == offset_check);
@@ -231,7 +234,7 @@ void cg_postcode_template(void)
         }
 
         printf("\r\n\r\n");
-        asm_calc_labels();
+        assembler_labels();
 
         // Print each instruction in human readable format
         for_each_asm(it, op) {
@@ -280,6 +283,7 @@ void cg_expr_template(struct ast_item *e)
                 case AST_BIN:   cg_bin_template((struct ast_bin*)e->expr);      break;
                 case AST_CALL:  cg_call_template((struct ast_call*)e->expr);    break;
                 case AST_IF:    cg_if_template((struct ast_if*)e->expr);        break;
+                case AST_LOCAL_VAR: cg_local_decl_template(e->expr); break;
                 default: dprintf(D_ERR, "Unknown cg routine for %d\r\n",
                                  e->type);
                 }
@@ -311,6 +315,49 @@ void cg_sf_exit(void)
         asm_comment("Function/sf exit");
         // Pop Bp
         cg_pop_prco(Bp);
+}
+
+void cg_assignment_template (struct ast_assign *a)
+{
+
+}
+
+void cg_var_ref_template(struct ast_lvar *v)
+{
+
+}
+
+void cg_local_decl_template(struct ast_lvar *v)
+{
+        struct list_item *item_it;
+        int offset = -1;
+
+        struct ast_lvar *sv;
+        struct prco_op_struct op_stack_alloc;
+
+        dprintf(D_INFO, "cg_local_decl_template\r\n");
+
+        item_it = cg_cur_function->locals;
+        list_for_each(item_it) {
+                sv = item_it->value;
+                sv->bp_offset = offset;
+
+                if(strcmp(v->var->name, sv->var->name) == 0) {
+                        dprintf(D_INFO, "Found var: %s %+d\r\n",
+                                sv->var->name,
+                                sv->bp_offset);
+                        break;
+                }
+
+                offset -= 1;
+        }
+
+        op_stack_alloc = opcode_sub_ri(Sp, 1);
+        op_stack_alloc.comment = malloc(32);
+        snprintf(op_stack_alloc.comment, 32, "VAR ALLOC %s %d",
+                 v->var->name,
+                 v->bp_offset);
+        asm_push(op_stack_alloc);
 }
 
 void cg_call_template(struct ast_call *c)
@@ -414,8 +461,8 @@ void cg_if_template(struct ast_if *v)
 
 void cg_function_template(struct ast_func *f)
 {
-        dprintf(D_GEN, "Starting cg for function: %s\r\n",
-                f->proto->name);
+        dprintf(D_GEN, "Starting cg for function: %s %d\r\n",
+                f->proto->name, f->num_local_vars);
 
         assert(f);
         assert(f->proto);
@@ -492,6 +539,3 @@ void cg_number_template(struct ast_num *n)
         asm_push(opcode_mov_ri(Ax, n->val));
         asm_comment("NUMBER");
 }
-
-void cg_var_template(struct ast_var *v) {}
-void cg_local_decl_template(struct ast_lvar *v) {}

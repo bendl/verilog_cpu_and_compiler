@@ -1,7 +1,7 @@
 /*
 MIT License
 
-Copyright (c) 2017 Ben Lancaster
+Copyright (c) 2018 Ben Lancaster
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -165,6 +165,7 @@ extern struct ast_for   *new_for(struct ast_item *start,
                                  struct ast_item *cond,
                                  struct ast_item *step,
                                  struct ast_item *body);
+extern struct ast_lvar  *new_ldecl  (struct ast_var *var);
 
 
 #endif
