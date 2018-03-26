@@ -125,7 +125,7 @@ struct prco_op_struct {
     OP(__prco_op_MAX) \
 
 #define FOREACH_JMP(COND) \
-        COND(JMP_UNCOND)        \
+        COND(JMP_UC)            \
         COND(JMP_JE)            \
         COND(JMP_JNE)           \
         COND(JMP_JG)            \

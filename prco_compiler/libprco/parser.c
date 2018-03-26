@@ -790,12 +790,38 @@ struct ast_item *parse_if_expr(void)
         return new_expr(new_if(cond, then, els), AST_IF);
 }
 
+struct ast_item *parse_for_expr(void)
+{
+        struct ast_item *start,
+                        *cond,
+                        *step,
+                        *body;
+        struct ast_for  *f;
+
+        lexer_match_next(TOK_FOR);
+        lexer_match_next(TOK_LBRACE);
+        start = parse_expr();
+        cond = parse_expr();
+        step = parse_expr();
+        lexer_match_next(TOK_RBRACE);
+
+        lexer_match_next(TOK_LCBRACE);
+        body = parse_block();
+        lexer_match_next(TOK_RCBRACE);
+
+        return new_expr(new_for(start, cond, step, body), AST_FOR);
+
+}
+
 struct ast_item *parse_expr(void)
 {
         struct ast_item *lhs;
 
         if(lexer_match(TOK_IF))
                 return parse_if_expr();
+
+        if(lexer_match(TOK_FOR))
+                return parse_for_expr();
 
 
         lhs = parse_primary();
@@ -909,5 +935,17 @@ new_if(struct ast_item *cond, struct ast_item *then, struct ast_item *els)
         ret->cond = cond;
         ret->then = then;
         ret->els = els;
+        return ret;
+}
+
+struct ast_for *new_for(struct ast_item *start,
+                        struct ast_item *cond,
+                        struct ast_item *step,
+                        struct ast_item *body)
+{
+        struct ast_for *ret = calloc(1, sizeof(*ret));
+        ret->start = start;
+        ret->cond = cond;
+        ret->step = step;
         return ret;
 }

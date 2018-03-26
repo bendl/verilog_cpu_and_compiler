@@ -161,6 +161,10 @@ extern struct ast_var   *new_var   (char *name, int dt);
 extern struct ast_lvar  *new_lvar  (struct ast_var *var);
 extern struct ast_call  *new_call(char *callee, struct list_item *args, int argc);
 extern struct ast_if    *new_if(struct ast_item *cond, struct ast_item *then, struct ast_item *els);
+extern struct ast_for   *new_for(struct ast_item *start,
+                                 struct ast_item *cond,
+                                 struct ast_item *step,
+                                 struct ast_item *body);
 
 
 #endif

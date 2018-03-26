@@ -152,11 +152,13 @@ int is_entry_func(struct ast_proto *p)
         return strcmp(p->name, "main") == 0;
 }
 
-void create_verilog_memh_file(void) {
+void create_verilog_memh_file(void)
+{
         FILE    *fcoe;
         int     it;
-        // asm instruction iterator
         struct prco_op_struct *op;
+
+        dprintf(D_GEN, "\r\ncreate_verilgo_memh_file...\r\n");
 
         fcoe = fopen("verilog_memh.txt", "w");
         if(!fcoe) {
@@ -340,8 +342,18 @@ void cg_if_template(struct ast_if *v)
                 op_dest,
                 op_jmp;
 
-        unsigned int jmp_id = ++g_asm_id;
-        dprintf(D_GEN, "jmp_id %d\r\n", jmp_id);
+        struct prco_op_struct op_else;
+        struct prco_op_struct op_else_dest;
+        struct prco_op_struct op_true_jmp;
+        struct prco_op_struct op_after;
+
+
+        unsigned int jmp_else = g_asm_id;
+        g_asm_id++;
+        unsigned int jmp_after = g_asm_id;
+        g_asm_id++;
+        dprintf(D_GEN, "IF: else: %d after: %d\r\n",
+                jmp_else, jmp_after);
 
         // Emit condition
         cg_expr_template(v->cond);
@@ -352,27 +364,52 @@ void cg_if_template(struct ast_if *v)
 
         // Create jmp location
         op_movi = opcode_mov_ri(Bx, 0x00);
-        op_movi.asm_flags = ASM_JMP_JMP;
-        op_movi.comment = "Jmp if false";
-        op_movi.id = jmp_id;
-        asm_push(op_movi);
+        op_movi.asm_flags |= ASM_JMP_JMP;
+        op_movi.comment = malloc(32);
 
-        op_jmp = opcode_jmp_rc(Bx, JMP_JE);
-        asm_push(op_jmp);
+        if(v->els) {
+                op_movi.id = jmp_else;
+                snprintf(op_movi.comment, 32, "JMP ELSE %x", op_movi.id);
+        } else {
+                op_movi.id = jmp_after;
+                snprintf(op_movi.comment, 32, "JMP AFTER %x", op_movi.id);
+        }
+
+
+        asm_push(op_movi);
+        asm_push(opcode_jmp_rc(Bx, JMP_JE));
 
         // If true
         cg_expr_template(v->then);
 
-        // Tag after instruction
-        //asm_tag_stack++;
-        //asm_tag_next = ASM_JMP_DEST;
-        //asm_tag_id   = jmp_id;
+        if(v->els) {
+                op_true_jmp = opcode_mov_ri(Bx, 0x00);
+                op_true_jmp.asm_flags |= ASM_JMP_JMP;
+                op_true_jmp.id = jmp_after;
+                op_true_jmp.comment = malloc(32);
+                snprintf(op_true_jmp.comment, 32, "JMP AFTER %x", op_true_jmp.id);
 
-        op_dest = opcode_nop();
-        op_dest.id = jmp_id;
-        op_dest.comment = "JMP IF FALSE DEST";
-        op_dest.asm_flags |= ASM_JMP_DEST;
-        asm_push(op_dest);
+                asm_push(op_true_jmp);
+                asm_push(opcode_jmp_rc(Bx, JMP_UC));
+
+                op_else_dest = opcode_nop();
+                op_else_dest.asm_flags |= ASM_JMP_DEST;
+                op_else_dest.id = jmp_else;
+                op_else_dest.comment = malloc(32);
+                snprintf(op_else_dest.comment, 32, "JMP ELSE DEST %x", op_else_dest.id);
+
+                asm_push(op_else_dest);
+
+                // Emit else code
+                cg_expr_template(v->els);
+        }
+
+        op_after = opcode_nop();
+        op_after.asm_flags |= ASM_JMP_DEST;
+        op_after.id = jmp_after;
+        op_after.comment = malloc(32);
+        snprintf(op_after.comment, 32, "JMP AFTER DEST %x", op_after.id);
+        asm_push(op_after);
 }
 
 void cg_function_template(struct ast_func *f)
