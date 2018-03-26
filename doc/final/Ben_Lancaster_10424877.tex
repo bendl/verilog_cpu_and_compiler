@@ -557,7 +557,9 @@ This code generation stage is named intermediatary because absolute addresses of
 \subsection{Assembling}
 The final stage of the compiler is the assembling stage. This stage takes the list of \mintinline{c}{struct prco_op_struct} and outputs a list of machine code instructions. The assembler accomplishes this by calculating offsets and addresses of functions, branching instructions, and global variable addresses. It may also rearrange function locations so that the main function is the first instruction to be outputted.
 
-Another role of the assembler in the \scname{} processor is to lay out the output code.
+\subsubsection{Executable Layout}
+Another role of the assembler in the \scname{} processor is to output the machine code in a format that allows the widest range of programs to be run by the processor.
+
 
 This format is not enforced by the processor core and it's up to the compiler to lay out the processor's memory contents. The only feature that the processor states is that it will start reading instructions from address \verb|0x00|. The compiler uses this information to structure the output program. The first two words of memory (\verb|0x00| and \verb|0x01|) contain \verb|MOVI| and \verb|JMP| instructions to jump the processor to the address of the \verb|main()| function.
 
