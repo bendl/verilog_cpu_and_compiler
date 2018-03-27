@@ -26,10 +26,15 @@ module prco_lmem (
     integer i = 0;
 
     initial begin
+        // Load compiled program into memory
+        $readmemh(
+            "/home/ise/XilinxVM/prco304/prco_compiler/test/verilog_memh.txt",
+            r_lmem);
+    
         // Write initial memory contents for debug
         $display("r_lmem:");
         for (i = 0; i < 10; i = i + 1) begin
-            r_lmem[i] = 0;
+            //r_lmem[i] = 0;
             $display("RAM[0x%h] = %h", i, r_lmem[i]);
         end
         // Print out top value
@@ -89,7 +94,7 @@ module prco_lmem (
         //*/
 		
 		// Test Compiler
-		//*
+        /*
 r_lmem[0] = 16'h4fff;
 r_lmem[1] = 16'h16e0;
 r_lmem[2] = 16'h1ee0;
