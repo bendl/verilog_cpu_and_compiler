@@ -18,7 +18,7 @@ struct module *new_module(void)
 
         if(g_module) {
                 dprintf(D_ERR, "ERR: Only 1 g_module can exist!\r\n");
-                return R_ERROR;
+                return NULL;
         }
 
         ret = calloc(1, sizeof(*ret));

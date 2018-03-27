@@ -9,7 +9,6 @@
 void cg_dump(struct module *m,
              enum target_arch arch)
 {
-        struct ast_proto *p = m->prototypes;
         struct ast_func  *f = m->functions;
 
         // Initialise the target code generator
@@ -31,9 +30,9 @@ void eprintf(char *fmt, ...)
         vfprintf(g_file_out, fmt, args);
         va_end(args);
 
-        if (module_dump) {
+        //if (module_dump) {
                 va_start(args, fmt);
                 vprintf(fmt, args);
                 va_end(args);
-        }
+        //}
 }

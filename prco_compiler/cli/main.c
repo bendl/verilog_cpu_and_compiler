@@ -99,7 +99,8 @@ int main(int argc, char **argv)
 
         // run_passes(module);
 
-        module_dump(module);
+        if(module_dump_output)
+                module_dump(module);
 
         fclose(g_file_out);
 

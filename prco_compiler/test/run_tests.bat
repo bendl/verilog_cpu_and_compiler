@@ -35,7 +35,7 @@ rem del a.exe
 goto :eof
 
 :build_std
-cd libccl/std
+cd libprco/std
 gcc -c stdio.c -o stdio.o
 echo Built stdio.o
 cd ../..

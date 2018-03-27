@@ -113,6 +113,7 @@ extern int                 g_cur_parser_index;
 
 /// get next lexer token
 extern token_type lexer_next(void);
+extern int lexer_match(enum token_type t);
 
 
 /// Attempts to open a file handle given a relative or full path.
@@ -123,7 +124,7 @@ extern token_type lexer_next(void);
 /// #include "C:\foo.h" -> cwd = C:/
 ///
 /// Precendence: (higher number = higher precedence)
-/// 0. LIBCCL include directory. \see COMPILER_INCLUDE_ENV_VAR
+/// 0. LIBPRCO include directory. \see COMPILER_INCLUDE_ENV_VAR
 /// 1. Directory of file being parsed
 extern struct text_parser*
 parser_fopen(_in_ const char *fname,

@@ -255,6 +255,7 @@ static char lexer_fgetc()
 int parse_top_level(void) 
 {
         assert("Unimplemented" && 0);
+        return 1;
 }
 
 int parser_run(_in_ struct text_parser *parser)
@@ -402,33 +403,10 @@ lexer_next(void)
         // If its an semi-colon, ignore id
         else if (g_ch == ';') {
                 lexer_fgetc();
-                lexer_next();
+                return lexer_next();
         } else {
                 dprintf(D_ERR, "Unknown character: %d %c\r\n", g_ch, g_ch);
                 return TOK_ERROR;
-        }
-}
-
-void
-parser_test(struct text_parser *parser)
-{
-        char c;
-        int parse_result;
-
-        // Push new parser to stack
-        parse_result = parser_pushp(parser);
-        if (parse_result != R_OK) {
-                dprintf(D_ERR, "ERROR: Parser stack limit (%d) reached!\r\n",
-                        PARSER_MAX_STACK);
-                return;
-        }
-
-        printf("Parser test\r\n");
-        printf("Lexing file: %s\r\n", g_cur_parser()->lpstr_input_fp);
-
-        while((c = lexer_fgetc())) {
-                printf("char: %c %d\r\n", c, c);
-                if(c == EOF) break;
         }
 }
 
@@ -479,13 +457,12 @@ struct ast_proto *parse_proto(enum token_type t)
         struct list_item *arg;
         struct ast_lvar *lvarg;
         struct ast_lvar *parg;
-        struct list_item *arg_it;
         struct ast_proto *proto;
         struct ast_proto *proto_it;
+
         char *fn_name;
         int argc = 0;
         int pargc = 0;
-        int argc_bp = 0;
 
         args = calloc(1, sizeof(*args));
 
@@ -733,7 +710,6 @@ struct ast_item *parse_assignment(char *ident)
 
 struct ast_item *parse_ident(void)
 {
-        struct ast_item *id_expr;
         struct ast_lvar *v;
         char *ident = ident_str;
 
@@ -833,7 +809,9 @@ struct ast_item *parse_primary(void)
         case TOK_NUM:           return parse_num();
         case TOK_LBRACE:        return parse_paren();
         // TODO: Fix
-        case ';': g_cur_token = lexer_next(); break;
+        case ';':
+                g_cur_token = lexer_next();
+                return parse_primary();
         default: dprintf(D_ERR, "Unknown primary token: %d %c\r\n",
                          lexer_token(), lexer_token());
                 return NULL;
@@ -913,7 +891,6 @@ struct ast_item *parse_for_expr(void)
                         *cond,
                         *step,
                         *body;
-        struct ast_for  *f;
 
         lexer_match_next(TOK_FOR);
         lexer_match_next(TOK_LBRACE);

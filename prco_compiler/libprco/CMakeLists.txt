@@ -4,6 +4,11 @@ project(libprco)
 set(CMAKE_BUILD_TYPE Debug)
 set(CMAKE_C_STANDARD 99)
 set(CMAKE_C_FLAGS "--std=c99 ${CMAKE_C_FLAGS}")
+# Set default compile flags for GCC
+if(CMAKE_COMPILER_IS_GNUCXX)
+    message(STATUS "GCC detected, adding compile flags")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++98 -pedantic -Wall -Wextra -Wno-comment")
+endif(CMAKE_COMPILER_IS_GNUCXX)
 
 include_directories(../include/${PROJECT_NAME})
 include_directories("C:/Program Files (x86)/libprco/include")

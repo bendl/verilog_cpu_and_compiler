@@ -3,6 +3,10 @@
 //
 
 #include <assert.h>
+
+#include <stdlib.h>
+#include <string.h>
+
 #include "dbug.h"
 #include "arch/template_impl.h"
 #include "arch/prco_isa.h"
@@ -10,16 +14,19 @@
 
 #define ASM_OFFSET_BYTES 1
 
-struct prco_op_struct asm_list[64] = {0};
-int asm_list_it         = 0;
+// https://gcc.gnu.org/bugzilla/show_bug.cgi?id=53119
+struct prco_op_struct asm_list[64] = {{0}};
+int asm_list_it = 0;
 
-unsigned int g_asm_id   = 0;
+unsigned int g_asm_id = 0;
+#define NEW_ASM_ID() ++g_asm_id
 
-int asm_tag_stack       = -1;
-int asm_tag_next        = 0;
-int asm_tag_id          = 0;
+int asm_tag_stack = -1;
+int asm_tag_next = 0;
+int asm_tag_id = 0;
 
-void cg_target_template_init(struct target_delegate *dt)
+void
+cg_target_template_init(struct target_delegate *dt)
 {
         dprintf(D_INFO, "cg: %s\r\n", __FUNCTION__);
 
@@ -40,18 +47,19 @@ void cg_target_template_init(struct target_delegate *dt)
         eprintf("_main:\r\n");
 }
 
-void asm_push(struct prco_op_struct op)
+void
+asm_push(struct prco_op_struct op)
 {
         asm_list[asm_list_it] = op;
         asm_list[asm_list_it].asm_offset = asm_list_it * ASM_OFFSET_BYTES;
 
         // Depraced, using NOPs for now
-        if(0 && asm_tag_stack > 0) {
+        if (0 && asm_tag_stack > 0) {
                 dprintf(D_GEN, "GEN: asm_tag_next: %d\r\n", asm_tag_next);
                 asm_list[asm_list_it].asm_flags |= asm_tag_next;
                 asm_list[asm_list_it].id = asm_tag_id;
                 asm_tag_stack--;
-                if(asm_tag_stack < 0) asm_tag_stack = 0;
+                if (asm_tag_stack < 0) asm_tag_stack = 0;
         }
 
         asm_list_it++;
@@ -68,11 +76,12 @@ void asm_push(struct prco_op_struct op)
                 it < asm_list_it;                                              \
                 it++, asm_p = &asm_list[it])
 
-void assembler_labels(void)
+void
+assembler_labels(void)
 {
-        int     it, find;
-        int     offset_check = 0x00;
-        struct  prco_op_struct *op, *findop;
+        int it, find;
+        int offset_check = 0x00;
+        struct prco_op_struct *op, *findop;
 
         dprintf(D_ALL, "assembler_labels:\r\n");
 
@@ -82,7 +91,7 @@ void assembler_labels(void)
 
                 // If we need to work out the return address
                 // of a function
-                if(op->asm_flags & ASM_CALL_NEXT) {
+                if (op->asm_flags & ASM_CALL_NEXT) {
                         // Return addresses are placed into a register
                         // by a MOVI instsruction
                         assert(op->op == MOVI);
@@ -99,16 +108,17 @@ void assembler_labels(void)
                 }
 
                 // If we need to work out where to jump
-                if(op->asm_flags & ASM_FUNC_CALL) {
-                        struct ast_call *caller = (struct ast_call*)op->ast;
+                if (op->asm_flags & ASM_FUNC_CALL) {
+                        struct ast_call *caller = (struct ast_call *) op->ast;
 
                         // Find offset of function entry
                         for_each_asm(find, findop) {
-                                if(it == find) continue;
+                                if (it == find) continue;
 
                                 if ((findop->asm_flags & ASM_FUNC_START) && findop->ast) {
-                                        struct ast_func *callee = (struct ast_func*)findop->ast;
-                                        if(strcmp(caller->callee, callee->proto->name) == 0) {
+                                        struct ast_func *callee = (struct ast_func *) findop->ast;
+                                        if (strcmp(caller->callee, callee->proto->name) ==
+                                            0) {
                                                 op->imm8 = findop->asm_offset;
                                                 op->opcode |= op->imm8 & 0xFF;
 
@@ -123,18 +133,19 @@ void assembler_labels(void)
 
                 // Opcode is a JMP instruction jumping somewhere
                 // Find where...
-                if(op->asm_flags & ASM_JMP_JMP) {
+                if (op->asm_flags & ASM_JMP_JMP) {
                         // Jump operation start with a MOVI to
                         // put address of destination into a register
                         assert(op->op == MOVI);
 
                         // Find findop with same <id>
                         for_each_asm(find, findop) {
-                                if(it == find) continue;
+                                if (it == find) continue;
 
-                                if((findop->asm_flags & ASM_JMP_DEST) &&
-                                        (findop->id == op->id)) {
-                                        dprintf(D_GEN, "GEN: Found JMP destination! %x %x - %x\r\n",
+                                if ((findop->asm_flags & ASM_JMP_DEST) &&
+                                    (findop->id == op->id)) {
+                                        dprintf(D_GEN,
+                                                "GEN: Found JMP destination! %x %x - %x\r\n",
                                                 it, find,
                                                 findop->asm_offset);
                                         dprintf(D_GEN, "%x %x\r\n", op->id, findop->id);
@@ -150,21 +161,23 @@ void assembler_labels(void)
         }
 }
 
-int is_entry_func(struct ast_proto *p)
+int
+is_entry_func(struct ast_proto *p)
 {
         return strcmp(p->name, "main") == 0;
 }
 
-void create_verilog_memh_file(void)
+void
+create_verilog_memh_file(void)
 {
-        FILE    *fcoe;
-        int     it;
+        FILE *fcoe;
+        int it;
         struct prco_op_struct *op;
 
         dprintf(D_GEN, "\r\ncreate_verilgo_memh_file...\r\n");
 
         fcoe = fopen("verilog_memh.txt", "w");
-        if(!fcoe) {
+        if (!fcoe) {
                 dprintf(D_ERR, "Unable to open uvm_coe.coe!\r\n");
                 return;
         }
@@ -180,22 +193,20 @@ void create_verilog_memh_file(void)
         fclose(fcoe);
 }
 
-void cg_precode_template(void)
+void
+cg_precode_template(void)
 {
         int it;
-        struct prco_op_struct op;
 
         dprintf(D_GEN, ".precode\r\n");
         for (it = NOP; it < __prco_op_MAX; it++) {
-                //printf("%02x %s\r\n", it, OP_STR[it]);
-                printf("`define PRCO_OP_%s\t5'b"BINP5"\n",
-                OP_STR[it], BIN5(it));
+                dprintf(D_GEN, "`define PRCO_OP_%s\t5'b"BINP5"\n",
+                        OP_STR[it], BIN5(it));
         }
 
         for (it = UART1; it < __prco_port_MAX; it++) {
-                //printf("%02x %s\r\n", it, OP_STR[it]);
-                printf("`define PRCO_PORT_%s\t\t8'b"BINP5"\n",
-                       PORT_STR[it], BIN5(it));
+                dprintf(D_GEN, "`define PRCO_PORT_%s\t\t8'b"BINP5"\n",
+                        PORT_STR[it], BIN5(it));
         }
 
         /*
@@ -217,10 +228,11 @@ void cg_precode_template(void)
         opcode_jmp_r(Bx);
         */
 
-        printf("\r\n\r\n");
+        dprintf(D_GEN, "\r\n\r\n");
 }
 
-void cg_postcode_template(void)
+void
+cg_postcode_template(void)
 {
         int it;
         struct prco_op_struct *op;
@@ -238,67 +250,76 @@ void cg_postcode_template(void)
 
         // Print each instruction in human readable format
         for_each_asm(it, op) {
-                printf("0x%02X\t", op->asm_offset);
+                dprintf(D_GEN, "0x%02X\t", op->asm_offset);
                 assert_opcode(op, 1);
         }
 
         // Debug
         // Inline verilog prco_lmem.v memory
         for_each_asm(it, op) {
-                printf("r_lmem[%d] = 16'h%04x;\n", it, op->opcode);
+                dprintf(D_GEN, "r_lmem[%d] = 16'h%04x;\n", it, op->opcode);
         }
 
         // Write machine code to file
         create_verilog_memh_file();
 }
 
-void cg_push_prco(enum prco_reg rd)
+void
+cg_push_prco(enum prco_reg rd)
 {
         asm_push(opcode_add_ri(Sp, -1));
         asm_push(opcode_sw(rd, Sp, 0));
         asm_comment("PUSH");
 }
 
-void cg_pop_prco(enum prco_reg rd)
+void
+cg_pop_prco(enum prco_reg rd)
 {
         asm_push(opcode_lw(rd, Sp, 0));
         asm_comment("POP");
         asm_push(opcode_add_ri(Sp, 1));
 }
 
-
-void cg_debug_bin(struct ast_bin* b)
-{
-        cg_expr_template(b->lhs);
-        if(b->rhs) {
-                cg_expr_template(b->rhs);
-        }
-}
-
-void cg_expr_template(struct ast_item *e)
+void
+cg_expr_template(struct ast_item *e)
 {
         list_for_each(e) {
-                switch(e->type) {
-                case AST_NUM:   cg_number_template((struct ast_num*)e->expr);   break;
-                case AST_BIN:   cg_bin_template((struct ast_bin*)e->expr);      break;
-                case AST_CALL:  cg_call_template((struct ast_call*)e->expr);    break;
-                case AST_IF:    cg_if_template((struct ast_if*)e->expr);        break;
-                case AST_LOCAL_VAR: cg_local_decl_template(e->expr); break;
-                default: dprintf(D_ERR, "Unknown cg routine for %d\r\n",
-                                 e->type);
+                switch (e->type) {
+                case AST_NUM:
+                        cg_number_template((struct ast_num *) e->expr);
+                        break;
+                case AST_BIN:
+                        cg_bin_template((struct ast_bin *) e->expr);
+                        break;
+                case AST_CALL:
+                        cg_call_template((struct ast_call *) e->expr);
+                        break;
+                case AST_IF:
+                        cg_if_template((struct ast_if *) e->expr);
+                        break;
+                case AST_LOCAL_VAR:
+                        cg_local_decl_template(e->expr);
+                        break;
+                default:
+                        dprintf(D_ERR, "Unknown cg routine for %d\r\n",
+                                e->type);
                 }
         }
 }
 
-inline void cg_sf_start(struct ast_func *f)
+inline void
+cg_sf_start(struct ast_func *f)
 {
         struct prco_op_struct op;
-        op = opcode_add_ri(Sp, -1);
+
         printf("SF START for %s\r\n", f->proto->name);
+
+        op = opcode_add_ri(Sp, -1);
         op.ast = f;
         op.asm_flags |= ASM_FUNC_START;
         op.comment = "Function/sf entry";
         asm_push(op);
+
         asm_push(opcode_sw(Bp, Sp, 0));
         // Mov Sp -> Bp
         asm_push(opcode_mov_rr(Bp, Sp));
@@ -308,7 +329,8 @@ inline void cg_sf_start(struct ast_func *f)
         eprintf("mov %%bp, %%sp\r\n");
 }
 
-void cg_sf_exit(void)
+void
+cg_sf_exit(void)
 {
         // Mov Bp -> Sp
         asm_push(opcode_mov_rr(Sp, Bp));
@@ -317,23 +339,25 @@ void cg_sf_exit(void)
         cg_pop_prco(Bp);
 }
 
-void cg_assignment_template (struct ast_assign *a)
+void
+cg_assignment_template(struct ast_assign *a)
 {
 
 }
 
-void cg_var_ref_template(struct ast_lvar *v)
+void
+cg_var_ref_template(struct ast_lvar *v)
 {
 
 }
 
-void cg_local_decl_template(struct ast_lvar *v)
+void
+cg_local_decl_template(struct ast_lvar *v)
 {
         struct list_item *item_it;
-        int offset = -1;
-
         struct ast_lvar *sv;
         struct prco_op_struct op_stack_alloc;
+        int offset = -1;
 
         dprintf(D_INFO, "cg_local_decl_template\r\n");
 
@@ -342,7 +366,7 @@ void cg_local_decl_template(struct ast_lvar *v)
                 sv = item_it->value;
                 sv->bp_offset = offset;
 
-                if(strcmp(v->var->name, sv->var->name) == 0) {
+                if (strcmp(v->var->name, sv->var->name) == 0) {
                         dprintf(D_INFO, "Found var: %s %+d\r\n",
                                 sv->var->name,
                                 sv->bp_offset);
@@ -360,7 +384,8 @@ void cg_local_decl_template(struct ast_lvar *v)
         asm_push(op_stack_alloc);
 }
 
-void cg_call_template(struct ast_call *c)
+void
+cg_call_template(struct ast_call *c)
 {
         struct prco_op_struct op_next, op_call;
         op_next = opcode_mov_ri(Cx, 0x00);
@@ -382,25 +407,16 @@ void cg_call_template(struct ast_call *c)
         asm_comment("JMP");
 }
 
-void cg_if_template(struct ast_if *v)
+void
+cg_if_template(struct ast_if *v)
 {
-        struct prco_op_struct
-                op_movi,
-                op_dest,
-                op_jmp;
-
-        struct prco_op_struct op_else;
+        struct prco_op_struct op_movi;
         struct prco_op_struct op_else_dest;
         struct prco_op_struct op_true_jmp;
         struct prco_op_struct op_after;
 
-
-        unsigned int jmp_else = g_asm_id;
-        g_asm_id++;
-        unsigned int jmp_after = g_asm_id;
-        g_asm_id++;
-        dprintf(D_GEN, "IF: else: %d after: %d\r\n",
-                jmp_else, jmp_after);
+        unsigned int jmp_else = NEW_ASM_ID();
+        unsigned int jmp_after = NEW_ASM_ID();
 
         // Emit condition
         cg_expr_template(v->cond);
@@ -414,7 +430,7 @@ void cg_if_template(struct ast_if *v)
         op_movi.asm_flags |= ASM_JMP_JMP;
         op_movi.comment = malloc(32);
 
-        if(v->els) {
+        if (v->els) {
                 op_movi.id = jmp_else;
                 snprintf(op_movi.comment, 32, "JMP ELSE %x", op_movi.id);
         } else {
@@ -429,7 +445,7 @@ void cg_if_template(struct ast_if *v)
         // If true
         cg_expr_template(v->then);
 
-        if(v->els) {
+        if (v->els) {
                 op_true_jmp = opcode_mov_ri(Bx, 0x00);
                 op_true_jmp.asm_flags |= ASM_JMP_JMP;
                 op_true_jmp.id = jmp_after;
@@ -459,7 +475,8 @@ void cg_if_template(struct ast_if *v)
         asm_push(op_after);
 }
 
-void cg_function_template(struct ast_func *f)
+void
+cg_function_template(struct ast_func *f)
 {
         dprintf(D_GEN, "Starting cg for function: %s %d\r\n",
                 f->proto->name, f->num_local_vars);
@@ -483,32 +500,34 @@ void cg_function_template(struct ast_func *f)
         // clean up
         cg_cur_function = NULL;
 
-        printf("End function");
+        dprintf(D_GEN, "End function");
 
-        if(is_entry_func(f->proto)) {
+        if (is_entry_func(f->proto)) {
                 asm_push(opcode_t1(HALT, 0, 0, 0));
                 asm_comment("MAIN HALT\r\n------------------------------------");
         } else {
                 cg_pop_prco(Cx);
                 asm_push(opcode_jmp_r(Cx));
-                asm_comment("FUNC RETURN to CALL\r\n---------------------------------------");
+                asm_comment(
+                        "FUNC RETURN to CALL\r\n------------------------------");
         }
-        printf("\r\n");
+        dprintf(D_GEN, "\r\n");
 }
 
-void cg_bin_template(struct ast_bin *b)
+void
+cg_bin_template(struct ast_bin *b)
 {
         dprintf(D_GEN, "Starting cg for bin\r\n");
 
         cg_expr_template(b->lhs);
 
-        if(b->rhs) {
+        if (b->rhs) {
                 eprintf("PUSH %%ax\r\n");
                 cg_push_prco(Ax);
                 cg_expr_template(b->rhs);
         }
 
-        switch(b->op) {
+        switch (b->op) {
         case TOK_PLUS:
                 eprintf("POP %%cx\r\n");
                 cg_pop_prco(Cx);
@@ -517,7 +536,7 @@ void cg_bin_template(struct ast_bin *b)
                 asm_comment("BIN ADD");
                 break;
 
-        case TOK_SUB: 
+        case TOK_SUB:
                 eprintf("POP %%cx\r\n");
                 cg_pop_prco(Cx);
                 eprintf("SUB %%cx, %%ax");
@@ -529,11 +548,14 @@ void cg_bin_template(struct ast_bin *b)
                 eprintf("POP %%cx\r\n");
                 break;
 
-        default: assert("Unimplemented cg_bin_template b->op!" && 0); break;
+        default:
+                assert("Unimplemented cg_bin_template b->op!" && 0);
+                break;
         }
 }
 
-void cg_number_template(struct ast_num *n)
+void
+cg_number_template(struct ast_num *n)
 {
         eprintf("mov $%d, %%ax\r\n", n->val);
         asm_push(opcode_mov_ri(Ax, n->val));

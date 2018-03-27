@@ -13,7 +13,6 @@
 extern "C" {
 #endif
 
-
 #define BINP "%c%c%c%c%c%c%c%c %c%c%c%c%c%c%c%c"
 #define BIN(byte)  \
   (byte & 0x8000 ? '1' : '0'), \
@@ -43,10 +42,6 @@ extern "C" {
     (byte & 0x0001 ? '1' : '0')
 
 typedef unsigned short regw_t;
-
-struct prco_simm6 {
-    signed char simm6 : 6;
-};
 
 #define PRCO_OP_BITS_OP   0b11111
 #define PRCO_OP_BITS_REG  0b111
@@ -158,14 +153,13 @@ STATIC_ASSERT(__prco_op_MAX <= PRCO_OP_BITS_OP+1, opcode_bit_length_exceeded);
 STATIC_ASSERT(__prco_reg_MAX <= PRCO_OP_BITS_REG+1, 3_bit_opcode_exceeded); 
 
 
-static const char *REG_STR[] = { FOREACH_REG(GENERATE_STR) };
-static const char *OP_STR[] = { FOREACH_OP(GENERATE_STR) };
-static const char *PORT_STR[] = { FOREACH_PORT(GENERATE_STR) };
-static const char *JMP_STR[] = { FOREACH_JMP(GENERATE_STR) };
+static const char *REG_STR[]    = { FOREACH_REG (GENERATE_STR) };
+static const char *OP_STR[]     = { FOREACH_OP  (GENERATE_STR) };
+static const char *PORT_STR[]   = { FOREACH_PORT(GENERATE_STR) };
+static const char *JMP_STR[]    = { FOREACH_JMP (GENERATE_STR) };
 
 
 void assert_opcode(struct prco_op_struct *op, char print);
-void print_opcode(struct prco_op_struct *prco_op);
 
 struct prco_op_struct opcode_t1(enum prco_op iop, enum prco_reg rd, enum prco_reg ra,
                               signed char simm5);
@@ -174,10 +168,6 @@ struct prco_op_struct opcode_nop(void);
 
 struct prco_op_struct opcode_mov_rr(enum prco_reg regD, enum prco_reg regA);
 struct prco_op_struct opcode_mov_ri(enum prco_reg regD, unsigned char imm8);
-struct prco_op_struct opcode_mov_rri(enum prco_reg regA, enum prco_reg regD, signed char imm6);
-
-struct prco_op_struct opcode_push_r(enum prco_reg regD);
-struct prco_op_struct opcode_pop_r(enum prco_reg regD);
 
 struct prco_op_struct opcode_add_rr(enum prco_reg regA, enum prco_reg regD);
 struct prco_op_struct opcode_add_ri(enum prco_reg regD, signed char imm8);
@@ -188,8 +178,6 @@ struct prco_op_struct opcode_jmp_r(enum prco_reg rd);
 struct prco_op_struct opcode_jmp_rc(enum prco_reg rd, enum prco_jmp cond);
 struct prco_op_struct opcode_cmp_rr(enum prco_reg rd, 
               enum prco_reg ra);
-struct prco_op_struct opcode_call_i(unsigned char imm8);
-struct prco_op_struct opcode_ret_i(unsigned char imm8);
 
 struct prco_op_struct opcode_neg_r(enum prco_reg regD);
 
