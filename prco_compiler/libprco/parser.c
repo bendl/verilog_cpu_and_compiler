@@ -100,7 +100,6 @@ parser_fopen(_in_ const char *fname,
              _in_ struct text_parser *parser)
 {
         struct text_parser      *new_parser;
-        char                    buf_run_dir[MAX_PATH];
 
         dprintf(D_INFO, "parser_fopen: %s\r\n", fname);
 
@@ -530,7 +529,6 @@ struct ast_func *parse_def(void)
         int num_lvars =  0;
 
         struct ast_item  *body;
-        struct ast_item  *body_exit;
         struct ast_proto *proto;
 
         // def ident ( args, ... )
@@ -680,6 +678,7 @@ struct ast_item *parse_call(char *ident)
                 return new_expr(call, AST_CALL);
         } else {
                 dprintf(D_ERR, "ERR: Undefined reference to: %s\r\n", ident);
+                return NULL;
         }
 }
 

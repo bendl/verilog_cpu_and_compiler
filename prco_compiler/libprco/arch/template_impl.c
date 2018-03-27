@@ -18,9 +18,12 @@
 struct prco_op_struct asm_list[64] = {{0}};
 int asm_list_it = 0;
 
+// Unique instruction IDs
 unsigned int g_asm_id = 0;
 #define NEW_ASM_ID() ++g_asm_id
 
+// Deprecated instruction tagging scheme
+// Replaced with inserting NOPs (easier, but slower)
 int asm_tag_stack = -1;
 int asm_tag_next = 0;
 int asm_tag_id = 0;
@@ -65,16 +68,13 @@ asm_push(struct prco_op_struct op)
         asm_list_it++;
 }
 
-#define asm_comment(s)                                                         \
-        asm_list[(asm_list_it - 1) < 0 ? 0 : (asm_list_it-1)].comment = s;
+#define asm_comment(s)                                                        \
+        asm_list[(asm_list_it - 1) < 0 ? 0 : (asm_list_it-1)].comment = (s);
 
-#define asm_flags(i, f)                                                        \
-        asm_list[(asm_list_it - i) < 0 ? 0 : (asm_list_it - 1)].flags f;
-
-#define for_each_asm(it, asm_p)                                                \
-        for (it = 0, asm_p = &asm_list[it];                                    \
-                it < asm_list_it;                                              \
-                it++, asm_p = &asm_list[it])
+#define for_each_asm(it, asm_p)                                               \
+        for ((it) = 0, (asm_p) = &asm_list[(it)];                             \
+                (it) < asm_list_it;                                           \
+                (it)++, (asm_p) = &asm_list[(it)])
 
 void
 assembler_labels(void)
@@ -104,6 +104,7 @@ assembler_labels(void)
 
                         // Remove the flag as we are done with it
                         op->asm_flags &= ~ASM_CALL_NEXT;
+
                         continue;
                 }
 
@@ -137,24 +138,16 @@ assembler_labels(void)
                         // Jump operation start with a MOVI to
                         // put address of destination into a register
                         assert(op->op == MOVI);
-
                         // Find findop with same <id>
                         for_each_asm(find, findop) {
                                 if (it == find) continue;
 
                                 if ((findop->asm_flags & ASM_JMP_DEST) &&
                                     (findop->id == op->id)) {
-                                        dprintf(D_GEN,
-                                                "GEN: Found JMP destination! %x %x - %x\r\n",
-                                                it, find,
-                                                findop->asm_offset);
-                                        dprintf(D_GEN, "%x %x\r\n", op->id, findop->id);
                                         op->imm8 = findop->asm_offset;
                                         op->opcode |= op->imm8 & 0xFF;
-
                                         // Remove the flag
                                         //op->asm_flags &= ~ASM_JMP_JMP;
-                                        continue;
                                 }
                         }
                 }
@@ -248,6 +241,19 @@ cg_postcode_template(void)
         printf("\r\n\r\n");
         assembler_labels();
 
+        // Final pass
+        // Check each label address is OK
+        for_each_asm(it, op) {
+                if(op->asm_flags & ASM_JMP_JMP) {
+                        if(!op->imm8) {
+                                dprintf(D_GEN,
+                                        "GEN: ERR: [0x%02x] Jump address error\r\n",
+                                        it);
+                                assert(op->imm8);
+                        }
+                }
+        }
+
         // Print each instruction in human readable format
         for_each_asm(it, op) {
                 dprintf(D_GEN, "0x%02X\t", op->asm_offset);
@@ -259,6 +265,7 @@ cg_postcode_template(void)
         for_each_asm(it, op) {
                 dprintf(D_GEN, "r_lmem[%d] = 16'h%04x;\n", it, op->opcode);
         }
+
 
         // Write machine code to file
         create_verilog_memh_file();
@@ -415,7 +422,7 @@ cg_if_template(struct ast_if *v)
         struct prco_op_struct op_true_jmp;
         struct prco_op_struct op_after;
 
-        unsigned int jmp_else = NEW_ASM_ID();
+        unsigned int jmp_else  = NEW_ASM_ID();
         unsigned int jmp_after = NEW_ASM_ID();
 
         // Emit condition
@@ -485,6 +492,7 @@ cg_function_template(struct ast_func *f)
         assert(f->proto);
         assert(f->body);
 
+        // Set current function
         cg_cur_function = f;
 
         // Create stack frame
