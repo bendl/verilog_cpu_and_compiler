@@ -50,8 +50,6 @@ int main(int argc, char **argv)
         int parse_result = 0;
         int module_dump_output = 0;
 
-        printf("sizeof struct ast_item: %d\r\n", sizeof(struct ast_item));
-
         // Parse command line
         int opt;
         while ((opt = getopt(argc, argv, "i:dD:")) != -1) {

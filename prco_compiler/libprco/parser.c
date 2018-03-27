@@ -373,9 +373,11 @@ lexer_next(void)
                 resv_it = g_resv_words;
                 list_for_each(resv_it) {
                         struct resv_word *w = (struct resv_word*)resv_it->value;
-                        printf("Comparing '%s' to resv '%s'\r\n", buf, w->lpstr_name);
+                        dprintf(D_PARSE, "Comparing '%s' to resv '%s'\r\n",
+                                buf, w->lpstr_name);
+
                         if(strcmp(buf, w->lpstr_name) == 0) {
-                                dprintf(D_INFO, "Resv word found! %s\r\n", w->lpstr_name);
+                                dprintf(D_PARSE, "Resv word found! %s\r\n", w->lpstr_name);
                                 g_cur_token = w->tok;
                                 return w->tok;
                         }

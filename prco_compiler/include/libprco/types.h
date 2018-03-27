@@ -31,8 +31,6 @@ typedef char *pstr;
 #define YEL "\e[0;33m"
 #define RST "\e[0;0m"
 
-#define tcol(c) printf(c)
-
 #define STATIC_ASSERT(COND,MSG) typedef char static_assertion_##MSG[(COND)?1:-1]
 
 #endif //LIBPRCO_TYPES_H

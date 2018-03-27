@@ -5,6 +5,7 @@
 #include "gen.h"
 #include "module.h"
 #include <stdarg.h>
+#include "dbug.h"
 
 void cg_dump(struct module *m,
              enum target_arch arch)
@@ -30,9 +31,7 @@ void eprintf(char *fmt, ...)
         vfprintf(g_file_out, fmt, args);
         va_end(args);
 
-        //if (module_dump) {
-                va_start(args, fmt);
-                vprintf(fmt, args);
-                va_end(args);
-        //}
+        va_start(args, fmt);
+        dprintf(D_GEN, fmt, args);
+        va_end(args);
 }

@@ -83,7 +83,7 @@ assembler_labels(void)
         int offset_check = 0x00;
         struct prco_op_struct *op, *findop;
 
-        dprintf(D_ALL, "assembler_labels:\r\n");
+        dprintf(D_GEN, "assembler_labels:\r\n");
 
         for_each_asm(it, op) {
                 assert(op->asm_offset == offset_check);
@@ -234,11 +234,11 @@ cg_postcode_template(void)
 
         // Print each instruction in human readable format
         for_each_asm(it, op) {
-                printf("0x%02X\t", op->asm_offset);
+                dprintf(D_GEN, "0x%02X\t", op->asm_offset);
                 assert_opcode(op, 1);
         }
 
-        printf("\r\n\r\n");
+        dprintf(D_GEN, "\r\n\r\n");
         assembler_labels();
 
         // Final pass
@@ -319,7 +319,7 @@ cg_sf_start(struct ast_func *f)
 {
         struct prco_op_struct op;
 
-        printf("SF START for %s\r\n", f->proto->name);
+        dprintf(D_GEN, "SF START for %s\r\n", f->proto->name);
 
         op = opcode_add_ri(Sp, -1);
         op.ast = f;
