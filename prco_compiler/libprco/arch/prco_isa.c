@@ -382,6 +382,7 @@ opcode_sw(enum prco_reg rd, enum prco_reg ra, signed char imm5)
         op.op = SW;
         op.regD = rd;
         op.regA = ra;
+        op.simm5 = imm5;
         op.opcode |= op.op << 11;
         op.opcode |= op.regD << 8;
         op.opcode |= op.regA << 5;

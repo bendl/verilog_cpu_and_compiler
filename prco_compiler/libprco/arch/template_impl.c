@@ -33,21 +33,23 @@ cg_target_template_init(struct target_delegate *dt)
 {
         dprintf(D_INFO, "cg: %s\r\n", __FUNCTION__);
 
+        // Initialise function pointers to codegen routines
+        dt->cg_postcode = cg_postcode_template;
+        dt->cg_precode = cg_precode_template;
+
+        // Logic statements
         dt->cg_function = cg_function_template;
         dt->cg_bin = cg_bin_template;
         dt->cg_expr = cg_expr_template;
         dt->cg_number = cg_number_template;
 
-        dt->cg_postcode = cg_postcode_template;
-        dt->cg_precode = cg_precode_template;
-
+        // Control statements
         dt->cg_if = cg_if_template;
 
+        // Variable referencing
         dt->cg_local_decl = cg_local_decl_template;
-
-        eprintf(".text\r\n");
-        eprintf(".globl _main\r\n");
-        eprintf("_main:\r\n");
+        dt->cg_var_ref = cg_var_ref_template;
+        dt->cg_assignment = cg_assignment_template;
 }
 
 void
@@ -296,20 +298,27 @@ cg_expr_template(struct ast_item *e)
                         cg_number_template((struct ast_num *) e->expr);
                         break;
                 case AST_BIN:
-                        cg_bin_template((struct ast_bin *) e->expr);
+                        cg_bin_template(e->expr);
                         break;
                 case AST_CALL:
-                        cg_call_template((struct ast_call *) e->expr);
+                        cg_call_template(e->expr);
                         break;
                 case AST_IF:
-                        cg_if_template((struct ast_if *) e->expr);
+                        cg_if_template(e->expr);
                         break;
                 case AST_LOCAL_VAR:
                         cg_local_decl_template(e->expr);
                         break;
+                case AST_VAR_REF:
+                        cg_var_ref_template(e->expr);
+                        break;
+                case AST_ASSIGNMENT:
+                        cg_assignment_template(e->expr);
+                        break;
                 default:
                         dprintf(D_ERR, "Unknown cg routine for %d\r\n",
                                 e->type);
+                        assert("Unknown cg routine for %d\r\n" && 0);
                 }
         }
 }
@@ -349,13 +358,23 @@ cg_sf_exit(void)
 void
 cg_assignment_template(struct ast_assign *a)
 {
+        dprintf(D_GEN, "cg_assignment_template %s\r\n",
+                a->var->var->name);
 
+        // codegen the value
+        cg_expr_template(a->val);
+
+        // Value now in Ax register,
+        // store it in stack location
+        asm_push(opcode_sw(Ax, Bp, a->var->bp_offset));
+        asm_comment(a->var->var->name);
 }
 
 void
 cg_var_ref_template(struct ast_lvar *v)
 {
-
+        asm_push(opcode_lw(Ax, Bp, v->bp_offset));
+        asm_comment(v->var->name);
 }
 
 void
