@@ -162,6 +162,11 @@ module prco_alu (
             q_should_branch <= 0;
             end
             
+        `PRCO_OP_SUBI: begin
+            q_result <= i_datb - i_imm8;
+            q_should_branch <= 0;
+            end
+            
         `PRCO_OP_WRITE,
         `PRCO_OP_READ: begin
             $display("ALU_OP_WRITE/READ %h", i_datb);

@@ -101,6 +101,7 @@ module prco_decoder (
                 $display("PRCO_OP_ADD\ta%h, d%h", i_instr[7:5], i_instr[10:8]);
                 end
 
+            `PRCO_OP_SUBI,
             `PRCO_OP_ADDI: begin
                 q_sela <= i_instr[7:5];
                 q_third_sel     <= 0;
@@ -112,7 +113,7 @@ module prco_decoder (
                 q_req_ram_we <= 0;
                 q_new_uart1_data <= 0;
                 q_halt <= 0;
-                $display("PRCO_OP_ADDI\t%h, %h", q_imm8, i_instr[10:8]);
+                $display("PRCO_OP_ATHI\t%h, %h", q_imm8, i_instr[10:8]);
                 end
 
             `PRCO_OP_LW: begin
