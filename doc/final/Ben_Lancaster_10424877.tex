@@ -385,17 +385,39 @@ The second half of development will require deploying and debugging on real hard
 \\\\
 The following FPGA development kits are suitable for this project:
 \begin{enumerate}
-\item{MiniSpartan6+ - Scarab Hardware - £79 (already owned) \citep{scarabhardware}. The MiniSpartan6+ features a Spartan-6 XC6SLX9 FPGA, 8 LEDs, 2 digital and analogue headers, FT2232 FTDI USB to JTAG, 64Mb SPI flash memory, 32MB SDRAM, an audio output jack, and a MicroSD socket.}
+\item{MiniSpartan6+ - Scarab Hardware - £79 (already owned) \citep{scarabhardware}. The MiniSpartan6+ features a Spartan-6 XC6SLX9 FPGA, 8 LEDs, 2 digital and analogue headers, FT2232 FTDI USB to JTAG, 64Mb SPI flash memory, 32MB SDRAM, an audio output jack, and a MicroSD socket.
+
+\begin{figure}[ht]
+\centering
+     \includegraphics[width=0.5\textwidth]{minispartan}
+      \caption{Scarab Hardware MiniSpartan6+ board layout.}
+       \label{fig:res:minispartan}
+\end{figure}
+}
 
 \item{Arty Artix-7 FPGA Development Board - Digilent - £100 \citep{arty}. The Arty development board features a larger Artix-35T FPGA with over 20x the number of logic cells and block memory compared to the LX9 in the MiniSpartan6+. The board components include 256MB DDR3 RAM, 16MBx4 SPI flash memory, USB-JTAG, 8 LEDs (4 of which are RGB), 4 switches, 4 buttons, and multiple Pmod connectors.
 \\\\
 The greater number of IO options and larger FPGA make the Arty board better suited to emulating real customer products.
+
+
+\begin{figure}[ht]
+\centering
+     \includegraphics[width=0.5\textwidth]{arty}
+      \caption{Digilent Arty Artix-7 board.}
+       \label{fig:res:arty}
+\end{figure}
 }
 \end{enumerate}
 
 The project will require a computer or laptop to develop the core and compiler on and continuous integration systems to perform testing on the incremental builds. For the project demo, an oscilloscope (already owned) or digital logic analyser may be required to demonstrate some of the core's features.
 
 \chapter{\scname{} Processor Design}
+\section{Introduction}
+The \scname{} Processor Design is the first of two deliverable sub-projects required for this project. The processor is designed to be a small, instantiated, Verilog module that can be easily inserted into existing FPGA-based Verilog projects.
+
+The processor core is not designed for physical implementation in silicon but rather for FPGA devices.
+
+
 \section{High Level Design}
 The \scname{} processor is a modularised processor with modular logic blocks for the ALU, Registers, RAM, and it's peripherals. 
 
@@ -409,11 +431,117 @@ The \scname{} processor is a modularised processor with modular logic blocks for
 \end{figure}
 
 \section{Registers}
+\scname{} has a total of 6 addressable, read and write, registers. These registers are identified by letters A through H.
+
+\subsection{General Purpose Registers}
+Registers A through E are designed for general purpose use and are safe to store user values over the run-time of the processor.
+
+\begin{table}[h]
+\def\arraystretch{1.5}%  1 is the default, change whatever you need
+    \begin{tabularx}{\textwidth}{|p{2cm}|l|X|}
+    \hline
+    Registers & Bits & Description \\
+	\specialrule{2pt}{-2pt}{0pt}
+	A through E & 15:0 & 5 General purpose registers
+	\\ \hline
+    \end{tabularx}
+    \caption{General purpose registers.}
+\end{table}
+
+Instructions that require a destination register, such as CMP, can reference any register (even special registers if that is your requirement). For the CMP instruction as an example, the processor will put the result of the comparison instruction in the destination register, overwriting any value present in that register.
+
+\subsection{Special Registers}
+Registers F through H are special registers within the processor. The processor cannot guarantee that a value written or read in these registers will persist over the run-time of the processor. Erroneously writing to these registers may severely affect program and processor behaviour.
+
+Even though all registers can be used at the will of the programmer, it is recommended to isolate a few registers to provide special features, such as RAM stack management, interrupts, and IO multiplexing.
+
+\begin{table}[h]
+\def\arraystretch{1.5}%  1 is the default, change whatever you need
+    \begin{tabularx}{\textwidth}{|p{2cm}|l|X|}
+    \hline
+    Registers & Bits & Description \\
+	\specialrule{2pt}{-2pt}{0pt}
+	F & 15:0 & {\nameref{sect:core_regs_sr}}
+	\\ \hline
+	G & 15:0 & RAM Base pointer
+	\\ \hline
+	H & 15:0 & RAM Stack pointer
+	\\ \hline
+    \end{tabularx}
+    \caption{Special registers.}
+\end{table}
+
+\subsubsection{Status Register}\label{sect:core_regs_sr}
+The Status Register is a dedicated register used by the ALU to provide additional information on results of instructions. Using the Status Register is essential for programs wanting to perform conditional branching or operate on dynamic data.
+
+\begin{table}[h]
+\def\arraystretch{1.5}%  1 is the default, change whatever you need
+    \begin{tabularx}{\textwidth}{|p{2cm}|l|X|}
+    \hline
+    Bit & Name & Description \\
+	\specialrule{2pt}{-2pt}{0pt}
+	0 & SR\_Z & Set if the result of a CMP instruction is 0.
+	\\ \hline
+	1 & SR\_E & Set if the two operands of a CMP instruction are equal.
+	\\ \hline
+	2 & SR\_S & Set if operand B is greater than operand A.
+	\\ \hline
+    \end{tabularx}
+    \caption{Status Register breakdown.}
+\end{table}
+
+By default, the JMP instruction will read the Status Register to compare against the instruction's conditional jump parameter. 
+
+\subsubsection{Base Pointer}\label{sect:core_regs_bp}
+The \scname{} processor assumes that the compiler will employ a stack management scheme similar to that of x86 machines. By doing so, the compiler assumes the last 2 registers are dedicated to stack management. The Base Pointer register is used in a similar way to the x86 Base Pointer register.
+
+Compilers and code generators should utilise this register for storing the address of the current stack frame. By utilising the register this way, features such as local and passed variables become available as they are addressable by offsetting the Base Pointer by a constant value.
+
+\subsubsection{Stack Pointer}\label{sect:core_regs_sp}
+The Stack Pointer is similar to the x86 Stack Pointer in that it stores the address of the top of the stack. This register is used primarily for PUSH and POP operations (see section \ref{sect:compiler_cg_push_pop} {\nameref{sect:compiler_cg_push_pop}} for example usage).
+
 \section{Pipeline Architecture}
+The \scname{} processor employs a \textit{feed-forward} pipeline strategy. 
+This pipeline supports:
+\begin{itemize}
+\item{Time-varying processes: Multi-clock cycle decoding; Memory access; ALU ops.}
+\item{Module re-ordering: Instruction dependencies; Module skipping; Output redirection. }
+\item{Interruption (see section \ref{sect:interrupts}: {\nameref{sect:interrupts}}).}
+\end{itemize}
+
+As the pipeline is feed-forward, no information is sent back to previous modules to tell them of their status. This means that if a module is stalled (due to mutli-cycle processes or future modules are stalled), and the previous module is ready, the previous module will signal the next module that information is ready and it should take it, but the current module is unable to as it is busy. The pipeline resolves this issue by it's cyclic nature. This means that only 1 module at any time is processing data. Of-course, the downside to this approach is that instruction parallelism is reduced.
+
+\begin{figure}[ht]
+\centering
+     \includegraphics[width=1.0\textwidth]{prco_forward_pipe}
+      \caption{The feed-forward pipeline interconnect diagram used by the \scname{} processor.}
+       \label{fig:prco_forward_pipe}
+\end{figure}
+
+The pipeline structure is described in figure \ref{fig:prco_forward_pipe} (above). The general order of the modules is shown from left to right, but this can change due to the pipelines re-ordering functionality.
+
+The Decoder module will decode instruction words from memory and will output appropriate signals containing the requirements of the instruction, such as requiring register write access, any ALU operation, and whether the instructions requires access to internal/external memory.
+\newline\newline
+To improve instruction performance, the decoder can also choose what modules are required and when they are called. For example, for the {\nameref{isa_movi}} (move immediate) instruction the Decoder will assign the following modules in the following order: ALU and Register write, resulting in a total of 5 stages (including PC, Fetch, and Decode). The last module in this pipeline, the Register write, will raise the \textit{q\_pipe\_end} signal indicating that the pipeline has finished and to start fetching the next instruction.
+
+For the {\nameref{isa_nop}} instruction, the decoder identifies that the instruction requires no dependencies and will hence signal the \textit{q\_pc\_inc} signal resulting in only 3 pipeline stages.
+
+For instructions that require RAM access, a typical pipeline order might look like: PC, Fetch, Decoder, Register Read, ALU, RAM, resulting in 6 stages being used.
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[scale=0.8]{td_instr}
+\end{center}
+\caption{\scname{} processor instruction cycle time diagram.}
+\label{fig:dft_algorithm}
+\end{figure}
+
 \section{Testing and Verification}
 
 \chapter{\scname{} Compiler}
 \section{Introduction}
+The \scname{} compiler is the second of two sub-project deliverables for this project.
+
 The \scname{} compiler is a command line based software tool used to convert a high-level text grammar (a programming language) into executable machine for the \scname{} processor.
 
 The compiler is invoked with parameters for the input code file and optional parameters specifying optimisation level, target architecture, verbosity, output file name, and include directory paths. The full command line parameter list can be found in {\nameref{sect:compiler_cli}}.
@@ -567,33 +695,33 @@ The compiler Code Generation stage converts the optimised AST into an intermedia
 
 This code generation stage is named intermediatary because absolute addresses of \verb|JMP| instructions have not been calculated. The calculation of these addresses is performed in the following Assembling stage. In addition, the location (and offset's) of functions may need to be rearranged.
 
-\subsubsection{PUSH and POP}
+\subsubsection{PUSH and POP}\label{sect:compiler_cg_push_pop}
 Due to limitations of the \scname{} processor's instruction set, high-level instructions such as PUSH and POP cannot be performed in a single instruction. Instead, the compiler is able to replicate the behaviour of these high level instructions by emitting multiple primitive instructions. Figure \ref{fig:compiler_cg_push_pop} below details how the compiler emulates these high-level instructions.
 
-\begin{figure}[!h]
+\begin{figure}[!h]    
     \begin{minipage}{0.5\textwidth}
         \centering
         \begin{minted}{C}
 void cg_push_prco(enum prco_reg rd)
 {
-        asm_push(opcode_add_ri(Sp, -1));
-        asm_push(opcode_sw(rd, Sp, 0));
-        asm_comment("PUSH");
+    asm_push(opcode_add_ri(Sp, -1));
+    asm_push(opcode_sw(rd, Sp, 0));
+    asm_comment("PUSH");
 }
         \end{minted}
-        \captionof{figure}{PUSH emulation. The stack pointer is subtracted the amount to store on the stack (1 word), followed by storing the destination register (\textit{rd}) at the new stack pointer.}
+        \captionof{figure}{PUSH emulation. The Stack Pointer is subtracted the amount to store on the stack (1 word), followed by storing the destination register (\textit{rd}) at the new Stack Pointer.}
     \end{minipage}
     \begin{minipage}{0.5\textwidth}
         \centering
         \begin{minted}{C}
 void cg_pop_prco(enum prco_reg rd)
 {
-        asm_push(opcode_lw(rd, Sp, 0));
-        asm_comment("POP");
-        asm_push(opcode_add_ri(Sp, 1));
+    asm_push(opcode_lw(rd, Sp, 0));
+    asm_comment("POP");
+    asm_push(opcode_add_ri(Sp, 1));
 }
         \end{minted}
-        \captionof{figure}{POP emulation. The value pointed to by the stack pointer is loaded in the destination register (\textit{rd}), followed by incrementing the stack pointer the size of the data type (1 word).}
+        \captionof{figure}{POP emulation. The value pointed to by the Stack Pointer is loaded in the destination register (\textit{rd}), followed by incrementing the Stack Pointer the size of the data type (1 word).}
     \end{minipage}
     \captionof{figure}{PUSH and POP emulation functions used by the \scname{} compiler (\textit{arch/prco\_impl.c:255}). Example of use:
     \mintinline{C}{cg_push_prco(Ax)} to push register Ax to the stack; \mintinline{C}{cg_pop_prco(Ax)} to pop stack into Ax.}
