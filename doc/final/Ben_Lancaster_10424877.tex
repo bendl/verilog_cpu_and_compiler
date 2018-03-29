@@ -15,16 +15,20 @@
 \usepackage{amssymb}
 
 
+%https://tex.stackexchange.com/questions/3001/list-sections-of-chapter-at-beginning-of-that-chapter
+% !!! NEEDS TO BE ABOVE HYPEREF !!!
+\usepackage{titletoc}
+
 % https://www.sharelatex.com/learn/Hyperlinks
 \usepackage{hyperref}
 \hypersetup{
-    colorlinks=true,
+    colorlinks,
+    citecolor=black,
+    filecolor=black,
     linkcolor=blue,
-    filecolor=blue,
-    urlcolor=blue,
-    citecolor=gray,
+    urlcolor=black,
+    linktoc=all
 }
- 
 \usepackage{float}
 
 % https://tex.stackexchange.com/questions/94224/how-to-create-a-list-with-a-fixed-prefix-and-incremental-numbers
@@ -70,7 +74,7 @@
 
 %% Report variables
 \newcommand{\scname}{PRCO304}
-\newcommand{\dlatestv}{2.30}
+\newcommand{\dlatestv}{2.50}
 
 \definecolor{babyblueeyes}{rgb}{0.63, 0.79, 0.95}
 \definecolor{ballblue}{rgb}{0.13, 0.67, 0.8}
@@ -232,6 +236,7 @@ year={2017}
 \end{filecontents}
 
 \begin{document}
+\arrayrulecolor{blue9}
 
 \makeatletter
 \DeclareRobustCommand*{\nameref}{%
@@ -277,7 +282,10 @@ PRCO304 - Final Stage Computing Project
     \begin{tabularx}{\textwidth}{|l|l|X|}
     \hline
     Date & Version & Changes \\
+    \arrayrulecolor{blue9}
 	\specialrule{2pt}{-2pt}{0pt}
+	29/03/2018 & 2.50 & Add chapter table of contents. \\ \hline
+	29/03/2018 & 2.40 & Add section \ref{sect:core_test} \nameref{sect:core_test}. \\ \hline
 	28/03/2018 & 2.30 & Add section \ref{sect:compiler_cg_vars} \nameref{sect:compiler_cg_vars}. \\ \hline
 	24/03/2018 & 2.20 & Add section \ref{sect:compiler_cg_push_pop} \nameref{sect:compiler_cg_push_pop}. \\ \hline
 	22/03/2018 & 2.10 & Add section \ref{sect:compiler_ast} \nameref{sect:compiler_ast}. \\ \hline
@@ -290,6 +298,8 @@ PRCO304 - Final Stage Computing Project
 
 
 \chapter*{Abstract}
+\startcontents[chapters]
+\printcontents[chapters]{}{1}{}
 ben
 
 \newpage
@@ -302,7 +312,13 @@ ben
  
 \newpage
 
-\chapter{Introduction}
+\chapter{Embedded Processors}
+{\hypersetup{linkcolor=black}
+\startcontents[chapters]
+\printcontents[chapters]{}{1}{}
+}
+
+\section{Introduction}
 Modern computing and electronics equipment, like function generators, oscilloscopes, and spectrum analysers, use FPGAs to implement their compute intensive logic. These FPGAs are often accompanied by a small, low-cost, microprocessor to supervise and provide interfaces to external peripherals.
 
 The aim of this project is to implement this side-microprocessor into the FPGA to save on BOM costs, PCB  space,  and  power  costs,  which  contribute  to  higher  development  and  product  costs.  While  savings can  be  made  by  the  lack  of  side  microprocessor,  the  product  may  need  a  larger  FPGA  to  accommodate the embedded microprocessor.  The project will produce a small, soft-core, CPU design and compiler. Although there is no direct client in this project, I believe this project will produce an attractive product
@@ -349,9 +365,11 @@ These extended (E) deliverables may not be achievable in the time frame specific
 The \scname{} processor will be able to read and write to all data passing through it and control all connected peripherals (such as UARTs, SDRAMs, and SD Cards). The processor does not track or store usage behaviour, instructions and their frequency,   memory contents, or timing statistics, or any other usage metric.
 
 \subsection{Fit for Purpose}
-The \scname{} processor is not designed to run general purpose operating systems, such as Linux or embedded RTOS systems. All memory devices attached to the FPGA are fully accessible to the processor core and instructions/programs running through it, meaning that operating systems or secure applications storing private and sensitive information is not protected by modern processor features such as privilege modes and virtual memory sections. The processor lacks common components required to run modern operating systems, such as a memory management unit (MMU) and privilege modes, and so should not be run on the processor.
+The \scname{} processor is \textbf{not} designed to run general purpose operating systems, such as Linux or embedded RTOS systems. All memory devices attached to the FPGA are fully accessible to the processor core and instructions/programs running through it, meaning that operating systems or secure applications storing private and sensitive information is not protected by modern processor features such as privilege modes and virtual memory sections. The processor lacks common components required to run modern operating systems, such as a memory management unit (MMU) and privilege modes, and so \textbf{should not be run on the processor}.
 
-The \scname{} processor is not designed to run in high-reliability or safety-critical environments that require established safety standards, such as the UK Defence Standard 00-56 \citep{defstan_0056_2} and IEC 61508 \citep{iec61508}.
+The \scname{} processor is \textbf{not} designed to run in high-reliability or safety-critical environments that require established safety standards, such as the UK Defence Standard 00-56 \citep{defstan_0056_2} and IEC 61508 \citep{iec61508}.
+
+The \scname{} processor is \textbf{not} designed for implementation in silicon and makes no guarantees of reliability or performance in this format.
 \newline\newline
 The \scname{} processor, by design, should be used as a replacement for a simple micro-controller accompanying a main processing module.
 
@@ -370,6 +388,11 @@ The code generated by the compiler is \textbf{not guaranteed} to:
 
 
 \chapter{Project Management}
+{\hypersetup{linkcolor=black}
+\startcontents[chapters]
+\printcontents[chapters]{}{1}{}
+}
+
 \section{Time Management}\label{sect:proj_time}
 \section{Version Control}
 Version control will be utilised to improve work-flow, reference and review code changes, and protect the project from data loss and corruption. GitHub, a git hosting provider, will be utilised to host all project files, including documentation and design files. 
@@ -414,6 +437,12 @@ The greater number of IO options and larger FPGA make the Arty board better suit
 The project will require a computer or laptop to develop the core and compiler on and continuous integration systems to perform testing on the incremental builds. For the project demo, an oscilloscope (already owned) or digital logic analyser may be required to demonstrate some of the core's features.
 
 \chapter{\scname{} Processor Design}
+{\hypersetup{linkcolor=black}
+\startcontents[chapters]
+\printcontents[chapters]{}{1}{}
+}
+
+
 \section{Introduction}
 The \scname{} Processor Design is the first of two deliverable sub-projects required for this project. The processor is designed to be a small, instantiated, Verilog module that can be easily inserted into existing FPGA-based Verilog projects.
 
@@ -465,9 +494,9 @@ Even though all registers can be used at the will of the programmer, it is recom
 	\specialrule{2pt}{-2pt}{0pt}
 	F & 15:0 & {\nameref{sect:core_regs_sr}}
 	\\ \hline
-	G & 15:0 & RAM Base pointer
+	G & 15:0 & {\nameref{sect:core_regs_bp}}
 	\\ \hline
-	H & 15:0 & RAM Stack pointer
+	H & 15:0 & {\nameref{sect:core_regs_sp}}
 	\\ \hline
     \end{tabularx}
     \caption{Special registers.}
@@ -538,9 +567,65 @@ For instructions that require RAM access, a typical pipeline order might look li
 \label{fig:dft_algorithm}
 \end{figure}
 
-\section{Testing and Verification}
+\section{Testing and Verification}\label{sect:core_test}
+Each module within the \scname{} processor has a corresponding Verilator and iSim testbench.
+
+\begin{itemize}
+\item{\textbf{Verilator testbenches} are used to automatically verify correct behaviour of the RTL code. These testbenches use the Verilator framework to compile and simulate Verilog modules. These tests produce an output report detailing test results and real register values. 
+The Verilator test benches used in this project are found in \verb|prco_core/rtl/test/verilator| and can be run using the script: \verb|make_test.sh|.
+
+\begin{minted}{text}
+Running test: ALU OR 2
+ALU_OP_WRITE/READ 000a
+PASS: 10 10
+
+Running test: ALU OR 3
+ALU_OP_WRITE/READ 0004
+FAIL: Got 4 Expected 7
+=============================
+14/27 tests passed.
+\end{minted}
+An example test report for the ALU running OR instructions on different operands and immediate values is shown above.
+}
+
+\item{\textbf{iSim testbenches} are used to better visualise signal states and changes over time. These testbenches require manual verification and so it can take a considerable amount of time to verify a module.
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[scale=0.5]{core_test_isim}
+\end{center}
+\caption{iSim simulation showing high-level signals in the processor core, including: Program Counter (pc); current Op code (q\_op); and ALU result (q\_result).}
+\label{fig:core_test_isim}
+\end{figure}
+}
+
+\item{\textbf{Single-step implementation runs} are used to verify the correct behaviour of the RTL code on a real FPGA device. 
+
+The \scname{} processor core features a single-step input line that can be pulsed to signal the core to execute the next instruction. In these tests, generally the first register Ax is redirected to the 8 LEDs on the development board, allowing the tester to visually see it's contents. However, only the higher-or-lower byte can be viewed at any single time (as registers are 16-bits wide). UART printing is also used to visualise register contents, however, integer to ASCII conversion is not implemented so only single digits can be displayed in ASCII.}
+\end{itemize}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 \chapter{\scname{} Compiler}
+{\hypersetup{linkcolor=black}
+\startcontents[chapters]
+\printcontents[chapters]{}{1}{}
+}
+
 \section{Introduction}
 The \scname{} compiler is the second of two sub-project deliverables for this project.
 
@@ -614,8 +699,9 @@ The text parser is inspired by Jack Crenshaw's "Let's Build a Compiler" book, \c
 While parser generators already exist, such as Bison and Java's ANTLR, it was decided to implement the parser by hand using recursive descent principles as a matter of learning rather than ease of use. Although parsing a more complex grammar would easily be more achievable using a parse generator, the overhead of generating compliant assembly for that complex grammar would be too time consuming and is hence out of scope (see extended deliverable \ref{sect:deliv:ed:gcc}).
 
 \subsection{AST Generation}\label{sect:compiler_ast}
-%\begin{wrapfigure}{r}{0.4\textwidth}
-\begin{figure}
+The recursive descent parser stores all terminals in the grammar as structures in \textit{ast.h} containing relocatable information about the parsed text and it's future implementation. This AST result of the text parser is the initial immediate representation used by the compiler.
+
+\begin{figure}[H]
 \centering 
 \begin{minipage}{0.4\textwidth}
 \begin{minted}{C}
@@ -632,10 +718,14 @@ struct ast_func {
 \caption{An AST structure representing a parsed function. It contains sub-structures pointing to it's prototype, body, exit statement, and a list of local variables. (\textit{ast.h:63})}
 \end{figure}
 
-The recursive descent parser stores all terminals in the grammar as structures in \textit{ast.h} containing relocatable information about the parsed text and it's future implementation. This AST result of the text parser is the initial immediate representation used by the compiler.
+\begin{figure}[H]
+\begin{center}
+\includegraphics[scale=0.4]{compiler_ast_item}
+\end{center}
+\caption{UML class diagram showing the AST structures and their connections. The \mintinline{C}{struct ast_item} structure is a top level structure that contains pointers to specific AST items (such as \mintinline{text}{ast_func} and \mintinline{text}{ast_lvar}). It is a self-referencing structure and can be iterated over in a linked-list using it's \mintinline{text}{*next} property using the provided macro: \mintinline{text}{list_for_each()}. It can be thought as a generic header for each AST type allowing it to be passed as a \mintinline{text}{void*} and still identified through it's \mintinline{C}{enum ast_type type} parameter.}
+\label{fig:compiler_ast_uml}
+\end{figure}
 
-
-\lipsum[1]
 
 
 \subsection{Optimisation}
@@ -820,13 +910,26 @@ For (B), two approaches are used. The first is to emit equivalent assembly for a
 Another potential solution for verifying output code that is not employed is to create an emulator for the \scname{} processor and have it run the output machine code. This suffers the same problem as (B) where we are relying on systems that may not exactly share the behaviour of the physical processor, be it through unknown bugs, assembly printing errors, or architecture differences.
 
 \chapter{Conclusion}
+{\hypersetup{linkcolor=black}
+\startcontents[chapters]
+\printcontents[chapters]{}{1}{}
+}
+
 \section{Project Post-mortem}
 
 \newpage
 \bibliography{build/prco304} 
 
+
+
+
 \newpage
 \chapter{Appendices}
+{\hypersetup{linkcolor=black}
+\startcontents[chapters]
+\printcontents[chapters]{}{1}{}
+}
+
 \section{Appendix A. \scname{} Core Reference Guide}
 \section{Appendix B. \scname{} Compiler Reference Guide}
 \subsection{CLI Arguments}\label{sect:compiler_cli}
