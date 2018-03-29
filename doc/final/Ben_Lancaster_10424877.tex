@@ -70,7 +70,7 @@
 
 %% Report variables
 \newcommand{\scname}{PRCO304}
-\newcommand{\dlatestv}{2.10}
+\newcommand{\dlatestv}{2.30}
 
 \definecolor{babyblueeyes}{rgb}{0.63, 0.79, 0.95}
 \definecolor{ballblue}{rgb}{0.13, 0.67, 0.8}
@@ -278,6 +278,8 @@ PRCO304 - Final Stage Computing Project
     \hline
     Date & Version & Changes \\
 	\specialrule{2pt}{-2pt}{0pt}
+	28/03/2018 & 2.30 & Add section \ref{sect:compiler_cg_vars} \nameref{sect:compiler_cg_vars}. \\ \hline
+	24/03/2018 & 2.20 & Add section \ref{sect:compiler_cg_push_pop} \nameref{sect:compiler_cg_push_pop}. \\ \hline
 	22/03/2018 & 2.10 & Add section \ref{sect:compiler_ast} \nameref{sect:compiler_ast}. \\ \hline
 	15/03/2018 & 2.00 & Add section \ref{sect:compiler_grammar} \nameref{sect:compiler_grammar}. \\ \hline
 	11/03/2018 & 1.00 & Initial section outline. \\ \hline
@@ -419,15 +421,15 @@ The processor core is not designed for physical implementation in silicon but ra
 
 
 \section{High Level Design}
-The \scname{} processor is a modularised processor with modular logic blocks for the ALU, Registers, RAM, and it's peripherals. 
+The \scname{} processor is a modularised processor with independent components for the ALU, Registers, RAM, and it's peripherals. 
 
 
 \begin{figure}[H]
 \begin{center}
 \includegraphics[scale=0.5]{hld}
 \end{center}
-\caption{test}
-\label{fig:hld}
+\caption{\scname{} processor block diagram showing.}
+\label{fig:core_hld}
 \end{figure}
 
 \section{Registers}
@@ -695,10 +697,54 @@ The compiler Code Generation stage converts the optimised AST into an intermedia
 
 This code generation stage is named intermediatary because absolute addresses of \verb|JMP| instructions have not been calculated. The calculation of these addresses is performed in the following Assembling stage. In addition, the location (and offset's) of functions may need to be rearranged.
 
+\subsubsection{Variables}\label{sect:compiler_cg_vars}
+The \scname{} compiler supports three types of variables in the high-level code: global variables (variables \textbf{declared} outside of functions); local variables (variables declared at the start of function bodies); and as function arguments.
+\begin{itemize}
+\item{Similar to C89, all local variables must be declared at the start of the function before any logic, such as function calling. This is because the compiler will not rearrange the AST tree to move variable declarations to the first child of the function AST tree.
+
+When a local variable is declared, stack space is immediately allocated for the variable by subtracting the data type size (1 word) from the Base Pointer variable. Although the code generator knows how many local variables are in a function, due to time constraints, it will not reduce/fold multiple stack allocations into a single SUBI instruction. The output machine code looks similar to Figure \ref{fig:compiler_cg_vars} below.
+
+\begin{figure}[!h]
+    \begin{minipage}{0.5\textwidth}
+        \centering
+\begin{minted}{asm}
+MOV   %Bp, %Sp     1ee0 (STACK FRAME)
+SUBI  %Sp, $1      5f01 (ALLOC a -3)
+SUBI  %Sp, $1      5f01 (ALLOC b -2)
+SUBI  %Sp, $1      5f01 (ALLOC c -1)
+LW    %Ax, -3(%Bp) 08dd (REF a -3)
+LW    %Ax, -2(%Bp) 08de (REF b -2)
+LW    %Ax, -1(%Bp) 08df (REF c -1)
+\end{minted}
+        \captionof{figure}{Machine code output and disassembly of the high-level code (\ref{fig:compiler_cg_vars_high}).}
+        \label{fig:compiler_cg_vars_asm}
+    \end{minipage}
+    \begin{minipage}{0.5\textwidth}
+        \centering
+\begin{minted}{C}
+def main() {
+    int a; int b; 
+    int c;
+    a; b;
+    c;
+}
+\end{minted}
+        \captionof{figure}{Input high-level code showing 3 variable declarations and references.}\label{fig:compiler_cg_vars_high}
+    \end{minipage}
+    \captionof{figure}{Example machine code generation for local variables.}
+    \label{fig:compiler_cg_vars}
+\end{figure}
+
+Variables are then accessed using the \verb|LW| instruction and passing a 5-bit signed immediate constant as seen above.
+}
+
+\item{TODO}
+\end{itemize}
+
 \subsubsection{PUSH and POP}\label{sect:compiler_cg_push_pop}
 Due to limitations of the \scname{} processor's instruction set, high-level instructions such as PUSH and POP cannot be performed in a single instruction. Instead, the compiler is able to replicate the behaviour of these high level instructions by emitting multiple primitive instructions. Figure \ref{fig:compiler_cg_push_pop} below details how the compiler emulates these high-level instructions.
 
-\begin{figure}[!h]    
+\begin{figure}[!h]
     \begin{minipage}{0.5\textwidth}
         \centering
         \begin{minted}{C}
