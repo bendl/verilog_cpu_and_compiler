@@ -637,6 +637,15 @@ The compiler is invoked with parameters for the input code file and optional par
 \section{Implementation}
 The compiler is implemented fully in the ANSI C programming language due to my familiarity and experience in the language. The compiler is self-contained and requires no dependencies other than the standard C library and CMake to build the project. The project strictly follows the ANSI C89 style guide to make the code more readable and is compiled with \verb| -Wall -Wextra -Wno-comment|.
 
+\subsection{Project Dependencies}
+The compiler's functional requirements are detailed in {\nameref{sect:compiler_func_req}} \ref{sect:compiler_func_req}. 
+
+\subsection{Program Operation}
+The program flow of the \scname{} compiler is detailed in {\nameref{sect:compiler_seq_uml}} \ref{sect:compiler_seq_uml}. 
+
+
+
+
 \subsection*{Building the Compiler}
 To build the compiler, run the following commands:
 \begin{minted}{bash}
@@ -698,7 +707,7 @@ The text parser is inspired by Jack Crenshaw's "Let's Build a Compiler" book, \c
 
 While parser generators already exist, such as Bison and Java's ANTLR, it was decided to implement the parser by hand using recursive descent principles as a matter of learning rather than ease of use. Although parsing a more complex grammar would easily be more achievable using a parse generator, the overhead of generating compliant assembly for that complex grammar would be too time consuming and is hence out of scope (see extended deliverable \ref{sect:deliv:ed:gcc}).
 
-\subsection{AST Generation}\label{sect:compiler_ast}
+\section{AST Generation}\label{sect:compiler_ast}
 The recursive descent parser stores all terminals in the grammar as structures in \textit{ast.h} containing relocatable information about the parsed text and it's future implementation. This AST result of the text parser is the initial immediate representation used by the compiler.
 
 \begin{figure}[H]
@@ -728,12 +737,12 @@ struct ast_func {
 
 
 
-\subsection{Optimisation}
+\section{Optimisation}
 The \scname{} compiler can optionally perform simple optimisations, such as unreachable code elimination and constant folding. The optimisations can be controlled by specifying the \verb|-On| parameter to the CLI, where \verb|n| is the level of optimisation.
 
 The techniques used by the optimiser to perform these optimisations are primitive; the optimiser is not given AST information in SSA (static single assignment) form; and because of this limitation, only basic optimisations can be identified.
 
-\subsubsection{Constant Folding}
+\subsection{Constant Folding}
 Constant folding is performed by the optimiser to reduce (fold) expressions that can be identified as constant. This allows the optimiser to replace AST tree structures containing constant values and no dependencies with shorter and simpler AST items. This optimisation can drastically improve the performance of the output code by reducing the number of instructions emitted.
 
 For example, the following expression in Figure \ref{fig:constant_fold_yes} can be identified as constant and can be reduced to a single AST node as shown in Figure \ref{fig:constant_fold_ast}. As the optimiser is not passed AST information in SSA form, the optimiser cannot follow or track variable references and modifications throughout the life-cycle of the program. Although the parser does a contain a primitive symbol table, the symbol table does not map variables to values, and so the code segment in Figure \ref{fig:constant_fold_no} cannot be identified as constant by the optimiser.
@@ -777,17 +786,17 @@ int c = a + b;
 
 
 
-\subsubsection{Unreachable Code Elimination}
+\subsection{Unreachable Code Elimination}
 Unreachable code elimination is the removal of code that will never be run on the processor. This can be in the form of uncalled function, unused variables, and control statements that operate on constant values.
 
 The \scname{} compiler can identify some unreachable code segments, such as control statements that operate on constant values, by utilising it's constant folding optimisation discussed previously. By first running the constant folding optimisation on the body of functions, the optimiser looks at the conditions of \textit{if} statements. If it's condition has been constant folded to a constant and is \textit{true} (i.e. not 0) then the AST tree can be replaced with the items in it's body, effectively removing the condition check if it's always true, or the whole structure if it's false.
 
-\subsection{Code Generation}
+\section{Code Generation}
 The compiler Code Generation stage converts the optimised AST into an intermediatary list of \mintinline{c}{struct prco_op_struct}. It does this by iterating over each \mintinline{c}{struct ast_item} in the AST and checks whether the item requires code generation. For example, an \mintinline{c}{struct ast_item} with type \mintinline{c}{AST_FUNC} is one which requires code generation. The AST is then passed to the \mintinline{c}{void cg_func_prco(...)} function where the code generation takes please. For this type, the stack frame header is generated first, before the body of the function. At the end of the function's body, the stack frame end code generation routing is run.
 
 This code generation stage is named intermediatary because absolute addresses of \verb|JMP| instructions have not been calculated. The calculation of these addresses is performed in the following Assembling stage. In addition, the location (and offset's) of functions may need to be rearranged.
 
-\subsubsection{Variables}\label{sect:compiler_cg_vars}
+\subsection{Variables}\label{sect:compiler_cg_vars}
 The \scname{} compiler supports three types of variables in the high-level code: global variables (variables \textbf{declared} outside of functions); local variables (variables declared at the start of function bodies); and as function arguments.
 \begin{itemize}
 \item{Similar to C89, all local variables must be declared at the start of the function before any logic, such as function calling. This is because the compiler will not rearrange the AST tree to move variable declarations to the first child of the function AST tree.
@@ -831,7 +840,7 @@ Variables are then accessed using the \verb|LW| instruction and passing a 5-bit 
 \item{TODO}
 \end{itemize}
 
-\subsubsection{PUSH and POP}\label{sect:compiler_cg_push_pop}
+\subsection{PUSH and POP}\label{sect:compiler_cg_push_pop}
 Due to limitations of the \scname{} processor's instruction set, high-level instructions such as PUSH and POP cannot be performed in a single instruction. Instead, the compiler is able to replicate the behaviour of these high level instructions by emitting multiple primitive instructions. Figure \ref{fig:compiler_cg_push_pop} below details how the compiler emulates these high-level instructions.
 
 \begin{figure}[!h]
@@ -866,12 +875,12 @@ void cg_pop_prco(enum prco_reg rd)
 
 
 
-\subsection{Assembling}
+\section{Assembling}
 The final stage of the compiler is the assembling stage. This stage takes the list of \mintinline{c}{struct prco_op_struct} and outputs a list of machine code instructions. The assembler accomplishes this by calculating offsets and addresses of functions, branching instructions, and global variable addresses. It may also rearrange function locations so that the main function is the first instruction to be emitted.
 
 Assembling code is found in \verb|assembler_labels()| at \verb|arch/template_impl.c:38|.
 
-\subsubsection{Executable Layout}
+\subsection{Executable Layout}
 %\begin{figure}[H]
 \begin{wrapfigure}{r}{0.3\textwidth}
 \begin{center}
@@ -886,7 +895,7 @@ Another role of the assembler in the \scname{} processor is to output the machin
 
 This format is not enforced by the processor core and it's up to the compiler to lay out the processor's memory contents. The only feature that the processor states is that it will start reading instructions from address \verb|0x00|. The compiler uses this information to structure the output program. The first two words of memory (\verb|0x00| and \verb|0x01|) contain \verb|MOVI| and \verb|JMP| instructions to jump the processor to the address of the \verb|main()| function.
 
-\subsubsection{Limitations}
+\subsection{Limitations}
 Due to time constraints, the assembler introduces many constraints to the output program that are not explicitly identified in the high-level code.
 
 The most prominent limitation is that the assembler can only address 255 words of memory. This is because the assembler only builds up instruction addresses using a single MOVI instruction, which is limited to an 8-bit immediate. This is easily fixable as the assembler could insert additional instructions to build up 16-bit addresses to use. For example, to build a 16-bit address, \textit{0xFECA}, the following instructions could be used:
@@ -931,9 +940,34 @@ Another potential solution for verifying output code that is not employed is to 
 }
 
 \section{Appendix A. \scname{} Core Reference Guide}
-\section{Appendix B. \scname{} Compiler Reference Guide}
-\subsection{CLI Arguments}\label{sect:compiler_cli}
 
+\section{Appendix B. \scname{} Compiler}
+\newpage
+\subsection{Appendix B. Compiler Functional Requirements}\label{sect:compiler_func_req}
+This section details the functional requirements (F) and their technical dependencies of the compiler to allow users to produce complete and functional programs. Figure \ref{fig:compiler_dependencies} below breaks down each functional requirement to show technical dependencies. For example, to support 'F4 User-defined program flow', the compiler needs to support control sequences such as 'for' and 'if' statements which themselves require implementation of 'variables' and 'conditional branching', and so on.
+
+\begin{enumerate}[label=F\arabic*.]
+\item{\textbf{Program flow manipulation.} The compiler will support the creation of divergent segments in the program code through the use of unconditional and conditional jumps.}
+\item{\textbf{User-defined values.} The compiler will support the creation of user-defined variables -- allowing the user to read and write values at their will.}
+\item{\textbf{User-defined value manipulation.} The compiler will allow the user to modify user-defined variables during program execution.}
+\item{\textbf{User-defined program flow.} The compiler will allow the user to control program divergence and repetition through the use of control statements (\verb|if| and \verb|for| statements).}
+\item{\textbf{User-defined functional program.} The compiler will allow the combination of the above features to produce a complete and functional sequence of instructions ready for execution.}
+\item{\textbf{User-defined encapsulated program.} The compiler will support encapsulating user-defined programs into functions to improve program control and support more complex programs.}
+\end{enumerate}
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[scale=0.4]{compiler_dependencies}
+\end{center}
+\caption{\scname{} compiler Functional requirements and their technical implementation requirements.}
+\label{fig:compiler_dependencies}
+\end{figure}
+
+\subsection{Appendix B. \scname{} Compiler Reference Guide}
+
+\subsection{Appendix B. CLI Arguments}\label{sect:compiler_cli}
+
+\subsection{Appendix B. Compiler Sequence Diagram}\label{sect:compiler_seq_uml}
 \begin{figure}[H]
 \begin{center}
 \includegraphics[scale=0.4]{fig_compiler_uml_seq}
