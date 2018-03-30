@@ -1,0 +1,227 @@
+
+\subsection{Project Initiation Document}
+\subsection*{Introduction}
+Field-Programmable Gate Array (FPGA) devices are an incredibly powerful and versatile solution to many electronics applications including digital signal processing and high-speed test and measurement tools. I will use this project opportunity to learn more about FPGA development and CPU architecture and apply knowledge learnt to create a solution to the need of a side-microprocessor in many FPGA-based applications.
+
+Modern computing and electronics equipment, like function generators, oscilloscopes, and spectrum analysers, use FPGAs to implement their compute intensive logic. These FPGAs are often accompanied by a small, low-cost, microprocessor to supervise and provide interfaces to external peripherals.
+
+The aim of this project is to implement this side-microprocessor into the FPGA to save on BOM costs, PCB space, and power costs, which contribute to higher development and product costs. While savings can be made by the lack of side microprocessor, the product may need a larger FPGA to accommodate the embedded microprocessor. The project will produce a small, soft-core, CPU design and compiler.
+
+Although there is no direct client in this project, I believe this project will produce an attractive product for FPGA-based product designers wishing to employ an embedded processor solution.
+
+\subsection*{Business Case}
+I will target my interest in FPGA development and apply my learning of such in tackling the issues resulting from the use of a side-microprocessor in FPGA based applications.
+
+The requirement of a side-microprocessor to control and provide external interfaces to FPGA-based applications carries a significant demand in both development and projects costs. Firstly, the inclusion of a external microprocessor in a project design will require more PCB space and design considerations, adding to the development time and costs of the project. The external microprocessor may also require a licensed compiler to compile and load the code onto the microprocessor, adding to the cost of the project. In addition, the  microprocessor's on-chip memory may not be large enough to store the compiled code and an external flash memory chip may also be required.
+
+Moving to an integrated microprocessor on the FPGA brings many significant advantages: reduction of required PCB space and development time, lower BOM (bill of materials) cost, and better in-field updating.
+
+Releasing updates to embedded projects is a challenging problem. With the integrated solution, FPGA bitstreams and the soft-microprocessor code can be bundled together, making it much easier to update products in the field without sending an engineer to the location or providing complicated instructions which require specific equipment (e.g. in-circuit debuggers).
+
+\newpage
+\subsection*{Project Objectives}
+The outcome of the project will be to design a small, portable, FPGA-based, CPU core that electronic Product Designers can choose as an alternative to a physical side-microprocessor to embed into their product.
+
+\subsubsection*{Core Deliverables}
+\begin{enumerate}
+\item{(Core deliverable) To improve my knowledge and experience of FPGA  development, CPU architecture, and low-level programming.}
+\item{(Core deliverable) To build a working and operational soft-core CPU core capable of performing simple tasks.}
+\item{(Core deliverable) To provide product designers with an affordable alternative to a side-microprocessor in their FPGA-based products.}
+\item{(Core deliverable) To provide a technical documentation and specification for the embedded core.}
+\item{(Sub deliverable) To provide embedded products a convenient solution to in-field updating.}
+\item{(Sub deliverable) To provide easy interfacing between the FPGA design and the embedded core.}  
+\end{enumerate}
+
+\subsection*{Initial Scope}
+\subsubsection*{Core Deliverables}
+These deliverables are the base requirement for the project to be released in a functional and worthwhile state.
+
+\begin{enumerate}
+\item{(Core deliverable) A small, portable, instantiate-able, FPGA-based CPU core.}\label{scope_core}
+
+\item{(Core deliverable) A C-like programming interface. A compiler taking input of a C-like grammar and outputting executable machine code for the embedded core. The machine code can be embedded into the FPGA bitstream and loaded onto the FPGA to run. Time estimate: 1 month.}\label{scope_compiler}
+
+\item{(Core deliverable) A 16-bit RISC instruction set architecture (ISA). The core (\ref{scope_core}) will decode and execute instructions encoded in this format. The compiler (\ref{scope_compiler}) will output machine code in this format. The ISA will support: fixed length instructions; 12-bit immediate values; primitive arithmetic instructions (ADD, SUB, MUL, etc.); GPIO read and write instructions; RAM stack operators (PUSH, POP). A custom ISA will be designed and implemented (see subsection \ref{sect:legal}).
+}
+\end{enumerate}
+
+
+\subsubsection*{Extended Deliverables}
+These deliverables may not be achievable in the time frame specific in subsection \ref{sect:plan}. These deliverables may require extra time to develop, require more experience and skill to develop, or require resources currently unattainable.
+
+\begin{enumerate}
+\item{GCC/LLVM/8CC compiler backend for C programming.}
+\item{Wishbone interface for easier modularity and inter-module communication.}\label{ext_wishbone}
+\item{Multi-core design with Wishbone (\ref{ext_wishbone}).}
+\item{Single-step debugging interface (with JTAG?).}
+\item{Configurable build options (register/bus widths, optimisations/pipelining, user/privileged user mode to support modern operating systems).}
+\item{Memory management modules to provide protected and virtual memory lookup tables.}
+\end{enumerate}
+
+\subsection*{Resources and Dependencies}
+For the first half of the development cycle, the core can be developed and verified using the Verilog simulator and test suite, Verilator, and VHDL and Verilog simulator, iSim.
+
+The second half of development will require deploying and debugging on real hardware. This will require an FPGA development kit. To better emulate customer products, the development kit should feature common components such as LEDs, GPIO, USB interface, flash-based storage and memory, and optionally an analogue audio output port.
+
+The low-middle range of FPGA devices I am targeting is the popular and affordable yet feature rich Spartan-6 and Artix-7 FPGAs. From my placement, I have gained experience in Xilinx FPGAs and so will be targeting them for this project to reduce risk and development time.
+\\\\
+The following FPGA development kits are suitable for this project:
+\begin{enumerate}
+\item{MiniSpartan6+ - Scarab Hardware - £79 (already owned) \citep{scarabhardware}. The MiniSpartan6+ features a Spartan-6 XC6SLX9 FPGA, 8 LEDs, 2 digital and analogue headers, FT2232 FTDI USB to JTAG, 64Mb SPI flash memory, 32MB SDRAM, an audio output jack, and a MicroSD socket.}
+
+\item{Arty Artix-7 FPGA Development Board - Digilent - £100 \citep{arty}. The Arty development board features a larger Artix-35T FPGA with over 20x the number of logic cells and block memory compared to the LX9 in the MiniSpartan6+. The board components include 256MB DDR3 RAM, 16MBx4 SPI flash memory, USB-JTAG, 8 LEDs (4 of which are RGB), 4 switches, 4 buttons, and multiple Pmod connectors.
+\\\\
+The greater number of IO options and larger FPGA make the Arty board better suited to emulating real customer products.
+}
+\end{enumerate}
+
+The project will require a computer or laptop to develop the core and compiler on and continuous integration systems to perform testing on the incremental builds. For the project demo, an oscilloscope (already owned) or digital logic analyser may be required to demonstrate some of the core's features.
+
+\subsection*{Method of Approach}
+Development of the core and compiler will be done in separate stages of the project (see subsection \ref{sect:plan}). The two deliverables will be split into 2 sub-projects. Both sub-projects will employ the Agile development process, using Agile's sprints to split up tasks into sub-tasks and Agile's scrums to discuss progress, features, and changes.
+\\\\
+Technologies used will be:
+\begin{enumerate}
+\item{Verilog - A hardware description language used to code the internal FPGA design.}
+
+\item{C - A low-level programming language to develop the compiler and assembler.}
+
+\item{Verilator - A C++ Verilog simulator and unit testing framework for verifying the FPGA design. Unit tests will be written for each component of the core: register set, decoder, arithmetic logic unit (ALU), and IO. This will aid the sprint approach by ensuring that requirements implied by the unit tests do not break over development iterations.}
+
+\item{iSim - A Verilog and VHDL Simulator. This will be used to visualize the timings of internal signals within the FPGA components such as the decoder and ALU.}
+\end{enumerate}
+
+\newpage
+\subsection*{Initial Project Plan}\label{sect:plan}
+
+\subsubsection*{Project time line breakdown}
+The project will be split into 4 parts: 
+
+\begin{enumerate}
+\item{Project information gathering and requirement generation.}
+\item{Active development sprints.}
+\item{Test and verification.}
+\item{Final report and clean up.}
+\end{enumerate}
+
+The following table breaks down the 4 parts into sub-tasks and provides their descriptions and estimated start and end times.
+
+%\newcolumntype{b}{X}
+%\newcolumntype{s}{>{\hsize=.5\hsize}X}
+\begin{table}[h]
+    \begin{tabularx}{\textwidth}{|p{5cm}|l|l|X|}
+    \hline
+    Stage & Start Date* & End Date* & Project Deliverables \\
+	\specialrule{2pt}{-2pt}{0pt}
+    %Type 2 & 15-11 & 10-8 & \multicolumn{2}{c|}{7-0} & Semantics \\
+    %\specialrule{2pt}{-2pt}{0pt}
+	1.0. Project Initiation & & 02 Feb & Process Initiation Document\\ \hline
+	1.1. Research and requirement gathering & 02 Feb & 09 Feb & Existing soft-core processor designs, constraints, features, implementation.
+	\\ \hline
+	1.2. Core high level design & 10 Feb & 17 Feb & Soft-core CPU architecture; Register definitions; Bus widths; Initial ISA instruction table.
+	\\
+	\specialrule{2pt}{-2pt}{0pt}
+	2.1. Core development sprints & 18 Feb & 10 Mar & Iterative soft-core development sprints
+	\\ \hline
+	\rowcolor{lightgray}
+	2.1.1. Core testing and verification & 11 Mar & 15 Mar & Any tasks required to meet design constraints.
+	\\ \hline
+	2.2. Compiler development sprints & 15 Mar & 31 Mar & Iterative compiler development sprints
+	\\ \hline
+	\rowcolor{lightgray}
+	2.2.1. Compiler testing and verification & 10 Apr & 14 Apr & Any tasks required for compiler to produce correct code generation.
+	\\
+	\specialrule{2pt}{-2pt}{0pt}
+	3.1. Real hardware deployment & 15 Apr & 19 Apr & Deployment of Verilog code to a real FPGA device.
+	\\ \hline
+	3.2. Final verification & 20 Apr & 24 Apr & Verification for FPGA design and compiler.
+	\\
+	\specialrule{2pt}{-2pt}{0pt}
+	4.1. Complete final report & 25 Apr & 4 May & PRCO304 Final Report.
+	\\ \hline
+    \end{tabularx}
+    \caption{Initial Project Plan time breakdown\\ *Expected time.\\Shaded stages are time varying periods for bug fixing.}
+\end{table}
+
+\subsubsection*{Control Plan}
+Management of the project will be done using the PRINCE2 technique. 
+
+The project initiation document (this) describes high-level requirements, objectives, and business cases.
+
+Weekly highlight reports and meetings will be held to ensure task proficiency and to identify any challenges that need attention.
+
+Project risks and challenges are identified in subsection \ref{sect:risk} along with proposed solutions for their occurrence.
+
+\newpage
+\subsection*{Initial Risk Assessment}\label{sect:risk}
+The following subsection outlines potential projects risks their suitable management strategy.
+
+\begin{enumerate}
+\item{
+Real hardware synthesis. 
+
+A challenge involved in the development of FPGA, CPLD, and other programmable logic devices, is the realization of the HDL code on real hardware. This can result in different behaviour of the real implementation to the simulated design - a major (and expensive) problem. This issue is caused by not meeting physical constraints required by the FPGA. These include timing, space, and power constraints.
+
+To help reduce this issue, I will utilise the ISE Design Suite's constraint validator tool. Before deploying to real hardware, the design must meet the constraints I declare that enable it to run correctly on real hardware. I can use these constraints to identify how much space, time, and power, I have left to implement features.
+}\label{risk:hw}
+\item{
+HDL programming. 
+
+HDL (Hardware Description Language) is a text based language used to describe hardware components and their inter-connections. Verilog, a HDL language closer to C than VHDL, is what my FPGA core will be programmed in. This language is taught very little of in the Computer Science course and will require external learning resources so I can use it effectively. 
+
+My placement,  telecommunications signal generator company, Spirent Communications, heavily utilise FPGA devices in their products, in which I gained valuable knowledge on the FPGA development life cycle and deployment. To improve my knowledge of the tools required (ISE Design Suite) gained from my placement experience, I shall learn from HDL programming books such as HDL Programming Fundamentals: VHDL and Verilog \citep{hdl}.
+}
+
+\item{Compiler development time. 
+
+A compiler will be required to provide an easy method of running user code on the FPGA core. The compiler is a lesser deliverable but will take considerable to time implement.
+
+If time is short, the compiler may only convert and assemble an assembly-like language with simple features (goto statements, stack management i.e. stack frames). If time is available, a better grammar can be developed with common language features such as if statements, scope blocks, and variables.
+
+The possibility also exists of using an existing compiler, such as GCC, LLVM, or 8CC, and creating a custom back-end for the FPGA core's architecture. My already brief experience with these compilers with their poor documentation means it may be quicker to build a compiler from scratch than create a custom back-end. A short period of time will be a given to allow exploration of compilers as it may allow using more language features (ANSI C) instead of a small subset. This will allow for a more complex demo of the FPGA core.
+}
+
+\item{
+Schedule overrun. 
+
+This is a complex project will multiple sub-projects (core \& compiler). Ensuring the large number of features will require a tight development schedule which is prone to over-running.
+
+I can identify and account for this by having weekly progress updates that will be scheduled with the project supervisor outlying feature progress and challenges. If the schedule slips largely due to an unforeseen problem or unreasonable requirement, this shall be brought up in the following meeting and a solution will be agreed upon, be it modifying deliverable or allowing extra time for the feature.
+}
+
+\item{Technology failure. 
+
+To overcome the risks of data loss all code and resources will be stored in local and remote Git repositories.
+In the event of the FPGA development kit failing, be it a component on the board or the FPGA itself, either: (a) a demo of the FPGA core not showing features of the failed component; or (b) a simulated design that meets constraints imposed by the physical FPGA will be provided and demonstrated in a simulator.
+}
+\end{enumerate}
+
+
+\subsection*{Quality Plan}
+The following quality strategies will be employed to achieve a successful project and product.
+
+\begin{table}[h]
+    \begin{tabularx}{\textwidth}{|l|X|}
+    \hline
+    Quality Check (QC) & Strategy \\
+	\specialrule{2pt}{-2pt}{0pt}
+	QC1. Requirement reality & Requirements will be checked during the weekly highlight reports to verify that when requirements begin to be implemented they are realistic and achievable within the time frame specified in subsection \ref{sect:plan}.
+	\\ \hline
+	
+	QC2. Soft-core design validation & While continuous testing and verification will be performed on the core (unit test, FPGA constraints reached), a variable period of time (stage 2.1.1) will be allocated after the development sprints to fix bugs and unexpected behaviour, and polish the final design. 
+	\\ \hline
+	
+	QC3. Compiler validation & As with QC2, unit tests and continuous integration tests will be performed for each code change to validate that changes do not produce bad code generation. A time varying period (stage 2.2.1) is also allocated to fix and polish the compiler.
+	\\ \hline
+	
+	QC4. Real hardware performance & Electronic test equipment, such oscilloscopes and digital logic analysers, will be used to verify the correct behaviour of the code on real hardware. Initial risk (\ref{risk:hw}) states that there is a risk of the FPGA deployed core will behave differently to the simulation.
+	\\ \hline
+    \end{tabularx}
+    \caption{Initial Quality Plan.}
+\end{table}
+
+
+\subsection*{Legal, Social, and Ethical Considerations}\label{sect:legal}
+Legal considerations need to be taken into account due to already existing commercial soft-processor designs. Existing soft-processor designs include the ARM family of soft-cores \citep{arm} and Xilinx's MicroBlaze soft-core \citep{microblaze}. Emulating another soft-core processor's architecture may result in legal challenges even if I do not distribute the final product. As this is a learning project, instead of emulating another architecture, I will design my own architecture from the ground up to learn first-hand the design considerations, implementation, and verification of CPU designs.
+
+Social and ethical considerations are not applicable for this project.

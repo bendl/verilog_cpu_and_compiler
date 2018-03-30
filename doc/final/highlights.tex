@@ -1,259 +1,6 @@
-\documentclass[11pt,a4paper]{article}
 
-
-% font
-%\usepackage{fontspec}
-%\setmainfont{Times New Roman}
-%\usepackage{tgschola}
-
-\usepackage{helvet}
-\renewcommand{\familydefault}{\sfdefault}
-
-\usepackage[margin=0.8in]{geometry}
-\usepackage[utf8]{inputenc}
-\usepackage{amsmath}
-\usepackage{amsfonts}
-\usepackage{amssymb}
-
-% https://www.sharelatex.com/learn/Hyperlinks
-\usepackage{hyperref}
-\hypersetup{
-    colorlinks=true,
-    linkcolor=blue9,
-    filecolor=magenta,      
-    urlcolor=red,
-}
- 
-\usepackage{float}
-
-\usepackage{lipsum}% http://ctan.org/pkg/lipsum
-
-%% Bibliography/references packages
-\usepackage[comma]{natbib}
-%%\bibliographystyle{agsm}
-\bibliographystyle{dcu}
-
-%% https://en.wikibooks.org/wiki/LaTeX/List_Structures
-\usepackage{scrextend}
-
-% tables, row colour
-\usepackage{tabularx,colortbl}
-% For vertical centering text in X column
-\renewcommand\tabularxcolumn[1]{m{#1}}
-
-% https://tex.stackexchange.com/questions/22751/how-to-force-table-caption-on-top
-%\usepackage[tableposition=top]{caption}
-\usepackage{float}
-\floatstyle{plaintop}
-\restylefloat{table}
-
-% https://en.wikibooks.org/wiki/LaTeX/List_Structures
-\usepackage{enumitem}
-
-% https://jansoehlke.com/2010/06/strikethrough-in-latex/
-\usepackage{ulem}
-
-% Code highlighting
-\usepackage[outputdir=build]{minted}
-
-%% Report variables
-\newcommand{\scname}{PRCO304}
-\newcommand{\dlatestv}{7.00}
-
-
-\definecolor{babyblueeyes}{rgb}{0.63, 0.79, 0.95}
-\definecolor{ballblue}{rgb}{0.13, 0.67, 0.8}
-\definecolor{beaublue}{rgb}{0.74, 0.83, 0.9}
-\definecolor{blue8}{rgb}{0.09, 0.39, 0.67}
-\definecolor{blue9}{rgb}{0.00, 0.30, 0.51}
-\definecolor{blue9d}{rgb}{0.00, 0.21, 0.36}
-
-
-%\usepackage{etoolbox}
-%\patchcmd{\chapter}{\thispagestyle{plain}}{\thispagestyle{fancy}}{}{}
-
-%https://tex.stackexchange.com/questions/75667/change-colour-on-chapter-section-headings-lyx
-\usepackage{sectsty}
-\chapterfont{\color{blue9d}}
-\sectionfont{\color{blue9d}}
-\subsectionfont{\color{blue9d}}
-%\allchapterfont{\itshape}
-
-\usepackage{titlesec}
-
-\usepackage{array,booktabs,arydshln,xcolor}
-\usepackage{xcolor}% http://ctan.org/pkg/xcolor
-\usepackage{fancyhdr}% http://ctan.org/pkg/fancyhdr
-\fancypagestyle{plain}{%
-	\renewcommand{\headrulewidth}{3pt}
-	\renewcommand{\headrule}{\hbox to\headwidth{%
-		\color{blue9}\leaders\hrule height \headrulewidth\hfill}}
-	\renewcommand{\footrulewidth}{3pt}
-	\renewcommand{\footrule}{\hbox to\headwidth{%
-		\color{blue9}\leaders\hrule height \headrulewidth\hfill}}
-	
-	%\fancyhf{}
-	%\fancyhead[LE]{\textbf{\leftmark}}
-	%\fancyhead[RE]{\textbf{\scname{}}}
-	%\fancyhead[LO]{\textbf{\scname{}}}
-	%\fancyhead[RO]{\textbf{\rightmark}}
-
-	%\fancyfoot[LE]{\textbf{\thepage}}
-	%\fancyfoot[RE]{\textbf{\scname{} Configuration Guide}}
-	%\fancyfoot[LO]{\textbf{\scname{} Configuration Guide}}
-	%\fancyfoot[RO]{\textbf{\thepage}}
-}
-
-
-%% Make bibliography show in table of contents
-%% https://tex.stackexchange.com/questions/8458/making-the-bibliography-appear-in-the-table-of-contents
-\usepackage[nottoc,numbib]{tocbibind}
-%% ^^^ overwrites \bibname, so set it back
-\renewcommand{\bibname}{References}
-
-\RequirePackage{filecontents}
-\begin{filecontents}{prco304_h4.bib}
-@online{wikipedia:dft,
-  author = {Wikipedia},
-  title = {Discrete Fourier transform},
-  year = 2018,
-  url = {https://en.wikipedia.org/wiki/Discrete\_Fourier\_transform},
-  urldate = {2018-01-15}
-}
-@online{server:gpu,
-  author = {Amazon AWS},
-  title = {Introducing Amazon EC2 P2 Instances, the largest GPU-Powered virtual machine in the cloud},
-  year = 2018,
-  url = {https://aws.amazon.com/about-aws/whats-new/2016/09/introducing-amazon-ec2-p2-instances-the-largest-gpu-powered-virtual-machine-in-the-cloud/},
-  urldate = {2016-09-26}
-}
-@misc{scarabhardware,
-title={MiniSpartan6+}, 
-journal={{Scarab Hardware}},
-url={https://www.scarabhardware.com/minispartan6/},
-year=2014
-}
-@misc{arty,
-title={Arty Artix-7 FPGA Development Board}, 
-journal={{Avnet}},
-url={https://uk.rs-online.com/web/p/programmable-logic-development-kits/1346478/},
-year=2015
-}
-@misc{arndt2002algorithms,
-  title={Algorithms For Programmers},
-  author={Arndt, J{\"o}rg},
-  year = 2002
-}
-@book{hdl,
-title={HDL Programming Fundamentals: VHDL and Verilog},
-author={Nazeih Botros},
-year={2006},
-publisher={Da Vinci Engineering Press}
-}
-
-@misc{arm, title={ARM in the World of FPGA-Based Prototyping}, url={https://community.arm.com/processors/b/blog/posts/arm-in-the-world-of-fpga-based-prototyping}, journal={Arm Community},
-year={2016}}
-
-@book{microblaze,
-title={MicroBlaze 
-Processor Reference 
-Guide},
-journal={Xilinx},
-year={2017}
-} 
-
-\end{filecontents}
-
-%s comments
-\usepackage{verbatim}
-
-%inline graphs
-\usepackage{wrapfig}
-% multiple figures on line
-\usepackage{subfig}
-
-\usepackage{graphicx}
-\graphicspath{ {img/} }
-
-% Caption font size
-% https://tex.stackexchange.com/questions/86120/font-size-of-figure-caption-header
-\usepackage[font=scriptsize,labelfont=bf]{caption}
-
-%\setlength{\belowcaptionskip}{-10pt}
-%\setlength{\abovecaptionskip}{-5pt} % Chosen fairly arbitrarily
-
-
-\usepackage{fancyhdr}
-\pagestyle{fancy}
-\lhead{\rightmark}
-\chead{}
-\rhead{Highlight Report Document (Rev. \dlatestv{})}
-\lfoot{Page \thepage}
-\cfoot{}
-\rfoot{Ben Lancaster 10424877}
-
-\renewcommand{\subsectionmark}[1]{\markright{\thesubsection\ #1}}
-
-
-\begin{document}
-
-\begin{titlepage}
-\begin{center}
-
-\vspace*{5cm}
-\Large
-\textbf{
-%%PRCO304 - Project Initiation Document
-%Highlight Reports
-{\color{blue9d}Highlight Report Document (Rev. \dlatestv{})}
-}
-
-\vspace{0.4cm}
-\large
-%%Space optimised FPGA-based side-microprocessor.
-PRCO304 - FPGA-based RISC microprocessor
-%%EMBEDDED CPU - FPGA-based RISC microprocessor
-
-\vspace{4cm}
-\textbf{Ben Lancaster}\\
-\today 
-
-
-\end{center}
-
-\end{titlepage}
-
-\pagestyle{plain}
-
-\section*{Revision History}
-\begin{table}[h]
-\def\arraystretch{1.5}%  1 is the default, change whatever you need
-    \begin{tabularx}{\textwidth}{|l|l|X|}
-    \hline
-    Date & Highlight & Changes \\
-	\specialrule{2pt}{-2pt}{0pt}
-	21/03/2018 & 7 & Highlight report 7. \\ \hline
-	15/03/2018 & 6 & Highlight report 6. \\ \hline
-	07/03/2018 & 5 & Highlight report 5.\newline Added Highlight Attachments section. 
-	\\ \hline
-	28/02/2018 & 4 & Highlight report 4. \\ \hline
-	20/02/2018 & 3 & Highlight report 3.\newline Added Risks \& Challenges section.\newline Changed header (right) title. \\ \hline
-	14/02/2018 & 2 & Highlight report 2. \\ \hline
-	06/02/2018 & 1 & Highlight report 1. \\ \hline
-    \end{tabularx}
-    \caption{Document revisions.}
-\end{table}
-\newpage
-
-\renewcommand*\contentsname{Table of Contents}
-
-{\hypersetup{linkcolor=black}
-\tableofcontents
-}
-\newpage
-
-\section{Highlight Reports}
-\subsection{Highlight Report 1}
+\subsection{Highlight Reports}
+\subsection*{Highlight Report 1}
 \begin{table}[H]
 \def\arraystretch{1.5}%  1 is the default, change whatever you need
     \begin{tabularx}{\textwidth}{|X|}
@@ -301,11 +48,11 @@ gathering. \newline\newline
 	Ensure risks are carefully explored and project core deliverables are realistic and achievable.
 	\\ \hline
     \end{tabularx}
-    %\caption{Document revisions.}
+    %\caption[]{Document revisions.}
 \end{table}
 
 
-\subsection{Highlight Report 2}
+\subsection*{Highlight Report 2}
 \begin{table}[H]
 \def\arraystretch{1.5}%  1 is the default, change whatever you need
     \begin{tabularx}{\textwidth}{|X|}
@@ -352,10 +99,10 @@ gathering. \newline\newline
 	Discussion included comparing existing processor's (ARM, x86) features (privileged instructions, interrupts, IO, variable-length ISA) and designs (ISA and pipelining) to this processor.
 	\\ \hline
     \end{tabularx}
-    %\caption{Document revisions.}
+    %\caption[]{Document revisions.}
 \end{table}
 
-\subsection{Highlight Report 3}
+\subsection*{Highlight Report 3}
 \begin{table}[H]
 \def\arraystretch{1.5}%  1 is the default, change whatever you need
     \begin{tabularx}{\textwidth}{|X|}
@@ -400,11 +147,11 @@ gathering. \newline\newline
 	This discussions was over email; it was decided that a physical meeting would not be beneficial as the current project stage was starting the \textit{PRCO Processor Reference Guide} booklet. Progress on the booklet was shared and a brief overview of the {\color{ballblue}Register-set} and {\color{ballblue}Decoder} implementation.
 	\\ \hline
     \end{tabularx}
-    %\caption{Document revisions.}
+    %\caption[]{Document revisions.}
 \end{table}
 
 \newpage
-\subsection{Highlight Report 4}
+\subsection*{Highlight Report 4}
 \begin{table}[H]
 \def\arraystretch{1.5}%  1 is the default, change whatever you need
     \begin{tabularx}{\textwidth}{|X|}
@@ -453,11 +200,11 @@ gathering. \newline\newline
 	Discussion included improving time management gantt chart by showing task dependencies; and potential final demo ideas (store ASCII string on SDcard/external memory and have processor loop over and print each character out over RS232.
 	\\ \hline
     \end{tabularx}
-    %\caption{Document revisions.}
+    %\caption[]{Document revisions.}
 \end{table}
 
 \newpage
-\subsection{Highlight Report 5}
+\subsection*{Highlight Report 5}
 \begin{table}[H]
 \def\arraystretch{1.5}%  1 is the default, change whatever you need
     \begin{tabularx}{\textwidth}{|X|}
@@ -504,12 +251,12 @@ gathering. \newline\newline
 	Biweekly meetings are held instead of weekly.
 	\\ \hline
     \end{tabularx}
-    %\caption{Document revisions.}
+    %\caption[]{Document revisions.}
 \end{table}
 
 
 \newpage
-\subsection{Highlight Report 6}
+\subsection*{Highlight Report 6}
 \begin{table}[H]
 \def\arraystretch{1.5}%  1 is the default, change whatever you need
     \begin{tabularx}{\textwidth}{|X|}
@@ -566,12 +313,12 @@ gathering. \newline\newline
 	RC6: Confirmation that PUSH/POP concepts will be split into 2 instructions due to limited complexity of the processor core.
 	\\ \hline
     \end{tabularx}
-    %\caption{Document revisions.}
+    %\caption[]{Document revisions.}
 \end{table}
 
 
 \newpage
-\subsection{Highlight Report 7}
+\subsection*{Highlight Report 7}
 \begin{table}[H]
 \def\arraystretch{1.5}%  1 is the default, change whatever you need
     \begin{tabularx}{\textwidth}{|X|}
@@ -632,18 +379,19 @@ gathering. \newline\newline
 	RC6: Confirmation that PUSH/POP concepts will be split into 2 instructions due to limited complexity of the processor core.
 	\\ \hline
     \end{tabularx}
-    %\caption{Document revisions.}
+    %\caption[]{Document revisions.}
 \end{table}
 
+
 \newpage
-\subsection{Highlight Attachments}
+\subsection*{Highlight Attachments}
 \subsubsection*{Highlight 5}
 \begin{figure}[H]%
     \centering
     \subfloat[Oscilloscope measurement of the \textit{q\_debug\_instr\_clk} signal running on the MiniSpartan6+ development board.]{{\includegraphics[scale=0.5]{instr_clk_impl} }}%
     \qquad
     \subfloat[Xilinx iSim simulation view of the \textit{q\_debug\_instr\_clk} signal.]{{\includegraphics[scale=0.5]{instr_clk_sim} }}%
-    \caption{Initial real-hardware implementation on the MiniSpartan6+ (XC6SLX9-3FTG256) development board showing timing of the \textit{q\_debug\_instr\_clk} signal. This signal is a 1 clock pulse indicating the start of an instruction cycle. In this example, instructions: MOVI \$10, \%Ra; MOVI \$10, \%Rb; and CMP \%Rc, \%Ra, \%Rb followed by 6 NOP instructions, are used.\newline\newline
+    \caption[]{Initial real-hardware implementation on the MiniSpartan6+ (XC6SLX9-3FTG256) development board showing timing of the \textit{q\_debug\_instr\_clk} signal. This signal is a 1 clock pulse indicating the start of an instruction cycle. In this example, instructions: MOVI \$10, \%Ra; MOVI \$10, \%Rb; and CMP \%Rc, \%Ra, \%Rb followed by 6 NOP instructions, are used.\newline\newline
     We can see that both implementations have a matching 660ns delay between instruction cycles for the same instructions, indicating that the real-hardware FPGA implementation is working correctly.}
     \label{fig:h5_impl}
 \end{figure}
@@ -653,7 +401,6 @@ gathering. \newline\newline
 Compiler input file contents:
 \begin{minted}
 [
-frame=lines,
 linenos
 ]
 {python}
@@ -667,10 +414,9 @@ def main() {
 }
 \end{minted}
 
-Compiler output machine code (pre-optimisation, post assembling):
+Compiler output machine code disassembly (pre-optimisation, post assembling):
 \begin{minted}
 [
-frame=lines,
 linenos
 ]
 {text}
@@ -705,35 +451,3 @@ linenos
 0x1B    ADDI    $+1,    Sp      4f01    (null)
 0x1C    JMP     Cx              6200    FUNC RETURN to CALL
 \end{minted}
-
-\newpage
-\section{Risks and Challenges}
-{\color{red} Urgent risks}\newline
-{\color{orange} New risks}\newline
-{\color{purple} Existing risks}\newline
-{\color{gray} Resolved risks}
-
-\subsection{Project Management}
-\begin{itemize}
-\item{{\color{gray} RC4: Schedule overrun. A gantt time chart has been created to better visualize task durations, requirements, and dependencies.}}
-\end{itemize}
-
-\subsection{CPU Core}
-\begin{itemize}
-\item{{\color{purple} RC5: Complex memory operations (PUSH, POP) may require multiple instructions. PUSH/POP might be split into: (1) Inc/dec stack pointer; (2) Read RAM[stack pointer]. The compiler will be able to resolve this issue.}}
-\item{
-{\color{orange} RC6: UART FIFO fills up too quickly, resulting in bad output.}
-}
-\end{itemize}
-
-
-\subsection{Compiler}
-There are currently no risks/challenges for the compiler.
-
-\subsection{Other}
-There are currently no additional risks/challenges.
-
-
-\newpage
-\bibliography{prco304_h4} 
-\end{document}
