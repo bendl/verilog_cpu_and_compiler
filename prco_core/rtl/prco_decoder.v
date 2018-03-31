@@ -172,6 +172,19 @@ module prco_decoder (
                 q_halt <= 0;
                 end
             
+            `PRCO_OP_SET: begin
+                $display("PRCO_OP_SET\t%d %d", i_instr[10:8], q_imm8);
+                q_sela          <= i_instr[10:8];
+                q_third_sel     <= 0;
+
+                q_reg_we        <= 1;
+                q_req_ram       <= 0;
+                q_ce            <= 1;
+                q_req_ram_we    <= 0;
+                q_new_uart1_data <= 0;
+                q_halt <= 0;
+                end
+            
             `PRCO_OP_WRITE: begin
                 $display("PRCO_OP_WRITE\t%d %d", q_seld, q_imm8);
                 q_sela          <= i_instr[7:5];

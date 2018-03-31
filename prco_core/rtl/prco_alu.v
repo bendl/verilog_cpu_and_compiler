@@ -112,6 +112,30 @@ module prco_alu (
             endcase;
         end
     endfunction;
+    
+    function [0:0] func_alu_should_set;
+        input [7:0] instr_flags;
+        input [15:0] sr_flags;
+        begin
+            $display("SET OP: %d", instr_flags);
+            case(instr_flags)
+            `PRCO_OP_JMP_JE: begin
+                    func_alu_should_set = (sr_flags[`SR_Z] == 1);
+                    end
+            `PRCO_OP_JMP_JL: begin
+                    func_alu_should_set = (sr_flags[`SR_S] != sr_flags[`SR_O]);
+                    end
+            `PRCO_OP_JMP_JG: begin
+                    func_alu_should_set = (sr_flags[`SR_Z] == 0 & 
+                        (sr_flags[`SR_S] == sr_flags[`SR_O]));
+                    end
+                default: begin
+                    $display("Unknown JMP OP %d", instr_flags);
+                    func_alu_should_set = 0;
+                    end
+            endcase;
+        end
+    endfunction;
 
     always @(posedge i_clk) begin
       if (i_ce) begin
@@ -139,6 +163,11 @@ module prco_alu (
             // data = SR register
             q_result <= i_datb;
             q_should_branch <= func_alu_should_jmp(i_imm8, r_sr);
+            end
+
+        `PRCO_OP_SET: begin
+            q_result <= func_alu_should_set(i_imm8, r_sr);
+            q_should_branch <= 0;
             end
 
         `PRCO_OP_MOVI: begin

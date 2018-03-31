@@ -37,6 +37,7 @@
 `define PRCO_OP_HALT        5'b10010
 `define PRCO_OP_WRITE       5'b10011
 `define PRCO_OP_READ        5'b10100
+`define PRCO_OP_SET         5'b10101
 
 `define PRCO_PORT_UART1     8'b00000
 `define PRCO_PORT_GPIO1     8'b00001

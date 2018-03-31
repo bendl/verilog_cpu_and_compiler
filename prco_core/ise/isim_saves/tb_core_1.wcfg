@@ -10,7 +10,7 @@
          </top_modules>
       </db_ref>
    </db_ref_list>
-   <WVObjectSize size="31" />
+   <WVObjectSize size="32" />
    <wvobject fp_name="/tb_prco_core/uut/i_clk" type="logic" db_ref_id="1">
       <obj_property name="ElementShortName">i_clk</obj_property>
       <obj_property name="ObjectShortName">i_clk</obj_property>
@@ -43,9 +43,9 @@
       <obj_property name="ElementShortName">pc_branch</obj_property>
       <obj_property name="ObjectShortName">pc_branch</obj_property>
    </wvobject>
-   <wvobject fp_name="/tb_prco_core/uut/core_state" type="logic" db_ref_id="1">
-      <obj_property name="ElementShortName">core_state</obj_property>
-      <obj_property name="ObjectShortName">core_state</obj_property>
+   <wvobject fp_name="/tb_prco_core/uut/core_state" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">core_state[3:0]</obj_property>
+      <obj_property name="ObjectShortName">core_state[3:0]</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_prco_core/uut/q_ce" type="logic" db_ref_id="1">
       <obj_property name="ElementShortName">q_ce</obj_property>
@@ -142,5 +142,10 @@
    <wvobject fp_name="/tb_prco_core/uut/inst_alu/q_should_branch" type="logic" db_ref_id="1">
       <obj_property name="ElementShortName">q_should_branch</obj_property>
       <obj_property name="ObjectShortName">q_should_branch</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_prco_core/uut/inst_alu/r_sr" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">r_sr[7:0]</obj_property>
+      <obj_property name="ObjectShortName">r_sr[7:0]</obj_property>
+      <obj_property name="Radix">BINARYRADIX</obj_property>
    </wvobject>
 </wave_config>

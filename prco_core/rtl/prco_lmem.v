@@ -27,9 +27,19 @@ module prco_lmem (
 
     initial begin
         // Load compiled program into memory
+        /*
         $readmemh(
             "/home/ise/XilinxVM/prco304/prco_compiler/test/verilog_memh.txt",
             r_lmem);
+        //*/
+        
+        //*
+        r_lmem[0] = 16'h2002; // MOVI   0b000, 2
+        r_lmem[1] = 16'h2102; // MOVI   0b001, 1
+        r_lmem[2] = 16'h6820; // CMP    Ax, Bx
+        r_lmem[3] = 16'ha805;
+        //*/
+        
     
         // Write initial memory contents for debug
         $display("r_lmem:");
