@@ -232,7 +232,7 @@ cg_postcode_template(void)
         int it;
         struct prco_op_struct *op;
 
-        dprintf(D_INFO, "Postcode:\r\n");
+        dprintf(D_INFO, "\r\n\r\nPostcode:\r\n");
 
         // Print each instruction in human readable format
         for_each_asm(it, op) {
@@ -306,6 +306,10 @@ cg_expr_template(struct ast_item *e)
                 case AST_IF:
                         cg_if_template(e->expr);
                         break;
+                case AST_FOR:
+                        cg_for_template(e->expr);
+                        break;
+
                 case AST_LOCAL_VAR:
                         cg_local_decl_template(e->expr);
                         break;
@@ -341,8 +345,8 @@ cg_sf_start(struct ast_func *f)
         asm_push(opcode_mov_rr(Bp, Sp));
         asm_comment(f->proto->name);
 
-        eprintf("push %%bp\r\n");
-        eprintf("mov %%bp, %%sp\r\n");
+        //("push %%bp\r\n");
+        //eprintf("mov %%bp, %%sp\r\n");
 }
 
 void
@@ -353,6 +357,57 @@ cg_sf_exit(void)
         asm_comment("Function/sf exit");
         // Pop Bp
         cg_pop_prco(Bp);
+}
+
+void
+cg_for_template(struct ast_for *a)
+{
+        struct prco_op_struct jmp_cond;
+        struct prco_op_struct cond_dest;
+        struct prco_op_struct jmp_after;
+        struct prco_op_struct for_after_dest;
+
+        int cond_dest_id = NEW_ASM_ID();
+        int for_after_id = NEW_ASM_ID();
+
+        cg_expr_template(a->start);
+
+        cond_dest = opcode_nop();
+        cond_dest.asm_flags |= ASM_JMP_DEST;
+        cond_dest.comment = malloc(32);
+        snprintf(cond_dest.comment, 32, "FOR COND DEST %d", cond_dest.id);
+        cond_dest.id = cond_dest_id;
+        asm_push(cond_dest);
+
+        cg_expr_template(a->cond);
+        asm_comment("FOR CONDITION CG");
+        asm_push(opcode_mov_ri(Bx, 0));
+        asm_push(opcode_cmp_rr(Ax, Bx));
+
+        jmp_after = opcode_mov_ri(Bx, 0);
+        jmp_after.asm_flags |= ASM_JMP_JMP;
+        jmp_after.id = for_after_id;
+        jmp_after.comment = malloc(32);
+        snprintf(jmp_after.comment, 32, "JMP AFTER %d", jmp_after.id);
+        asm_push(jmp_after);
+        asm_push(opcode_jmp_rc(Bx, JMP_JE));
+
+        cg_expr_template(a->body);
+        cg_expr_template(a->step);
+        jmp_cond = opcode_mov_ri(Bx, 0);
+        jmp_cond.asm_flags |= ASM_JMP_JMP;
+        jmp_cond.id = cond_dest_id;
+        jmp_cond.comment = malloc(32);
+        snprintf(jmp_cond.comment, 32, "FOR COND BACK %d", jmp_cond.id);
+        asm_push(jmp_cond);
+        asm_push(opcode_jmp_r(Bx));
+
+        for_after_dest = opcode_nop();
+        for_after_dest.asm_flags |= ASM_JMP_DEST;
+        for_after_dest.id = for_after_id;
+        for_after_dest.comment = "FOR LOOP AFTER";
+        asm_push(for_after_dest);
+
 }
 
 void
@@ -549,24 +604,19 @@ cg_bin_template(struct ast_bin *b)
         cg_expr_template(b->lhs);
 
         if (b->rhs) {
-                eprintf("PUSH %%ax\r\n");
                 cg_push_prco(Ax);
                 cg_expr_template(b->rhs);
         }
 
         switch (b->op) {
         case TOK_PLUS:
-                eprintf("POP %%cx\r\n");
                 cg_pop_prco(Cx);
-                eprintf("ADD %%cx, %%ax\r\n");
                 asm_push(opcode_add_rr(Ax, Cx));
                 asm_comment("BIN ADD");
                 break;
 
         case TOK_SUB:
-                eprintf("POP %%cx\r\n");
                 cg_pop_prco(Cx);
-                eprintf("SUB %%cx, %%ax");
                 asm_push(opcode_sub_rr(Ax, Cx));
                 asm_comment("BIN SUB");
                 break;
@@ -575,7 +625,35 @@ cg_bin_template(struct ast_bin *b)
                 eprintf("POP %%cx\r\n");
                 break;
 
+        case TOK_BOOL_L:
+                cg_pop_prco(Cx);
+                asm_push(opcode_cmp_rr(Ax, Cx));
+                asm_push(opcode_set_ri(Ax, JMP_JL));
+                break;
+        case TOK_BOOL_LE:
+                cg_pop_prco(Cx);
+                asm_push(opcode_cmp_rr(Ax, Cx));
+                asm_push(opcode_set_ri(Ax, JMP_JLE));
+                break;
+        case TOK_BOOL_G:
+                cg_pop_prco(Cx);
+                asm_push(opcode_cmp_rr(Ax, Cx));
+                asm_push(opcode_set_ri(Ax, JMP_JG));
+                break;
+        case TOK_BOOL_GE:
+                cg_pop_prco(Cx);
+                asm_push(opcode_cmp_rr(Ax, Cx));
+                asm_push(opcode_set_ri(Ax, JMP_JGE));
+                break;
+        case TOK_BOOL_EQ:
+                cg_pop_prco(Cx);
+                asm_push(opcode_cmp_rr(Ax, Cx));
+                asm_push(opcode_set_ri(Ax, JMP_JE));
+                break;
+
         default:
+                dprintf(D_ERR, "Unimplemented cg_bin_template b->op %d\r\n",
+                        b->op);
                 assert("Unimplemented cg_bin_template b->op!" && 0);
                 break;
         }
@@ -584,7 +662,6 @@ cg_bin_template(struct ast_bin *b)
 void
 cg_number_template(struct ast_num *n)
 {
-        eprintf("mov $%d, %%ax\r\n", n->val);
         asm_push(opcode_mov_ri(Ax, n->val));
         asm_comment("NUMBER");
 }

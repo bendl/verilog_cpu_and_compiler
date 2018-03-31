@@ -117,6 +117,7 @@ struct prco_op_struct {
     OP(HALT) \
     OP(WRITE) \
     OP(READ) \
+    OP(SET) \
     OP(__prco_op_MAX) \
 
 #define FOREACH_JMP(COND) \
@@ -187,6 +188,8 @@ struct prco_op_struct opcode_sw(enum prco_reg rd, enum prco_reg ra, signed char 
 // TODO: Combine these instructions?
 struct prco_op_struct opcode_read(enum prco_reg rd, enum prco_port port);
 struct prco_op_struct opcode_write(enum prco_reg rd, enum prco_port port);
+
+struct prco_op_struct opcode_set_ri(enum prco_reg rd, unsigned char imm8);
 
 #ifdef __cplusplus
 }
