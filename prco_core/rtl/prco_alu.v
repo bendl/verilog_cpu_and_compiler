@@ -113,6 +113,9 @@ module prco_alu (
         end
     endfunction;
     
+    // In0: JMP/BOOL condition
+    // In1: status register
+    // Out: 1 or 0 if JMP/BOOL condition met
     function [0:0] func_alu_should_set;
         input [7:0] instr_flags;
         input [15:0] sr_flags;

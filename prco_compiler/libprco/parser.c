@@ -1110,6 +1110,7 @@ new_for(struct ast_item *start,
         ret->start = start;
         ret->cond = cond;
         ret->step = step;
+        ret->body = body;
         return ret;
 }
 

@@ -393,6 +393,8 @@ cg_for_template(struct ast_for *a)
         asm_push(opcode_jmp_rc(Bx, JMP_JE));
 
         cg_expr_template(a->body);
+        asm_comment("BODY END");
+
         cg_expr_template(a->step);
         jmp_cond = opcode_mov_ri(Bx, 0);
         jmp_cond.asm_flags |= ASM_JMP_JMP;
