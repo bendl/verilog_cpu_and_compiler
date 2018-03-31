@@ -652,7 +652,7 @@ The \scname{} compiler is a command line based software tool used to convert a h
 The compiler is invoked with parameters for the input code file and optional parameters specifying optimisation level, target architecture, verbosity, output file name, and include directory paths. The full command line parameter list can be found in {\nameref{sect:compiler_cli}}.
 
 \section{Functional Requirements}
-This section details the functional requirements (F) and their technical dependencies of the compiler to allow users to produce complete and functional programs. Figure \ref{fig:compiler_dependencies} breaks down each functional requirement to show their technical dependencies. For example, to support 'F4 User-defined program flow', the compiler needs to support control sequences such as 'for' and 'if' statements which themselves require implementation of 'variables' and 'conditional branching', and so on.
+This section details the functional requirements (F) and their technical dependencies of the compiler to allow users to produce complete and functional programs. Figure \ref{fig:compiler_dependencies} breaks down each functional requirement to show their technical dependencies.
 
 \begin{enumerate}[label=F\arabic*.]
 \item{\textbf{Text Components.} The compiler will be able to parse the programming language's grammar's (see section {\nameref{sect:compiler_grammar}}  \ref{sect:compiler_grammar}) terminals into distinct groups, such as text strings, arithmetic symbols, and other text symbols.}
@@ -663,6 +663,8 @@ This section details the functional requirements (F) and their technical depende
 \item{\textbf{User-defined functional program.} The compiler will allow the combination of the above features to produce a complete and functional sequence of instructions ready for execution.}
 \item{\textbf{User-defined encapsulated program.} The compiler will support encapsulating user-defined programs into functions to improve program control and support more complex programs.}
 \end{enumerate}
+
+For example, to support 'F4 User-defined program flow', the compiler needs to support control sequences such as 'for' and 'if' statements which themselves require implementation of 'variables' and 'conditional branching', and so on.
 
 \section{Implementation}
 The compiler is implemented fully in the ANSI C programming language due to my familiarity and experience in the language. The compiler is self-contained and requires no dependencies other than the standard C library and CMake to build the project. The project strictly follows the ANSI C89 style guide to make the code more readable and is compiled with \verb| -Wall -Wextra -Wno-comment|.
@@ -951,13 +953,41 @@ For (B), two approaches are used. The first is to emit equivalent assembly for a
 
 Another potential solution for verifying output code that is not employed is to create an emulator for the \scname{} processor and have it run the output machine code. This suffers the same problem as (B) where we are relying on systems that may not exactly share the behaviour of the physical processor, be it through unknown bugs, assembly printing errors, or architecture differences.
 
-\chapter{Conclusion}
+\chapter{Post-Project}
 {\hypersetup{linkcolor=black}
 \startcontents[chapters]
 \printcontents[chapters]{}{1}{}
 }
 
 \section{Project Post-mortem}
+\subsection{Project Objectives}
+\subsection{Development Process}
+\subsection{Personal Contributions}
+
+
+
+
+\section{Conclusion}
+This project aimed at producing two complex technical systems: an embedded processor and a compiler. Both systems were developed and the output is an extremely valuable educational resource. The technologies created from this project spawning from the compiler include:
+\begin{itemize}
+\item{an easily extendible recursive-descent text parser;}
+\item{an AST optimiser for constant-folding and unreachable code elimination;}
+\item{a machine code generator;}
+\item{and assembler.}
+\end{itemize}
+And from the embedded processor:
+\begin{itemize}
+\item{a 16-bit instruction set and it's implementation;}
+\item{and a feed-forward pipeline architecture.}
+\end{itemize}
+I believe these technologies and their implementation details should be shared as an open, educational resource for future projects and people interested in low-level code generation and embedded processor architecture.
+
+
+
+
+
+
+
 
 \newpage
 \bibliography{build/prco304} 
@@ -972,27 +1002,36 @@ Another potential solution for verifying output code that is not employed is to 
 \printcontents[chapters]{}{1}{}
 }
 
-\section{Appendix A. \scname{} Core Reference Guide}
+\section{Appendix A. User Guides}
+\subsection{\scname{} Core Reference Guide}
+\subsection{\scname{} Compiler Reference Guide}
+\subsection{CLI Arguments}
+\label{sect:compiler_cli}
 
-\section{Appendix B. \scname{} Compiler}
+
+\subsection{\scname{} Compiler Reference Guide}
+
 \newpage
-\subsection{Appendix B. Compiler Functional Requirements}
+\section{Appendix B. Project Management Artefacts}
+\input{pid.tex}
+\newpage
+\input{highlights.tex}
+
+
+\newpage
+\section{Appendix C. Other Documents}
+\subsection{Compiler Functional Requirements}
 \label{sect:compiler_func_req}
 
 \begin{figure}[H]
 \begin{center}
-\includegraphics[scale=0.35]{compiler_dependencies}
+\includegraphics[scale=0.5]{compiler_dependencies}
 \end{center}
 \caption{\scname{} compiler Functional requirements and their technical implementation requirements.}
 \label{fig:compiler_dependencies}
 \end{figure}
 
-\subsection{Appendix B. \scname{} Compiler Reference Guide}
-
-\subsection{Appendix B. CLI Arguments}
-\label{sect:compiler_cli}
-
-\subsection{Appendix B. Compiler Sequence Diagram}
+\subsection{Compiler Sequence Diagram}
 \label{sect:compiler_seq_uml}
 \begin{figure}[H]
 \begin{center}
@@ -1001,8 +1040,6 @@ Another potential solution for verifying output code that is not employed is to 
 \caption{UML sequence diagram for the \scname{} compiler.}
 \label{fig:hld}
 \end{figure}
-
-\section{Appendix C. Project Initiation Document}
 
 
 \end{document}
