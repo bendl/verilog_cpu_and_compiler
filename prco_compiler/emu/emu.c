@@ -57,6 +57,8 @@ struct prco_emu_core core = {0};
 #define PRINT_SPACE(d) \
         dprintf((d), "\t\t\t\t\t\t\t\t");
 
+struct prco_op_struct emu_decode(unsigned short mc);
+void emu_exec(struct prco_op_struct *op);
 
 void dbug_print_regs(void)
 {
@@ -192,6 +194,8 @@ void emu_load_mem(char *fpath)
         char buf[32];
         int buf_i = 0;
         char c = 0;
+        unsigned short mc;
+        struct prco_op_struct op;
 
         f = fopen(fpath, "r");
         if(!f) return;
@@ -203,10 +207,12 @@ void emu_load_mem(char *fpath)
 
                 if (c == '\n') {
                         buf[buf_i] = 0;
-                        int num = strtol(buf, NULL, 16);
-                        //dprintf(D_EMU, "Read Word: '%s' %x\r\n", buf, num);
+                        mc = strtol(buf, NULL, 16);
+                        core.lmem[i++] = mc;
+
+                        emu_decode(mc);
+
                         buf_i = 0;
-                        core.lmem[i++] = num;
                 }
         }
 }

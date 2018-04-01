@@ -15,7 +15,7 @@ file(GLOB APP_HEADERS *.h)
 
 include_directories(../include)
 
-add_executable(${PROJECT_NAME} ${APP_SOURCES} main.c)
+add_executable(${PROJECT_NAME} ${APP_SOURCES} emu.c)
 
 target_link_libraries(${PROJECT_NAME} libprco Shlwapi.lib)
 
