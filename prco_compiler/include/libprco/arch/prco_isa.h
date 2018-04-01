@@ -5,8 +5,8 @@
 #ifndef PRCO_INSTR_H
 #define PRCO_INSTR_H
 
-#include "adt/ast.h"
-#include "types.h"
+#include "../adt/ast.h"
+#include "../types.h"
 #include <assert.h>
 
 #ifdef __cplusplus

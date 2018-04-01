@@ -11,7 +11,6 @@ if(CMAKE_COMPILER_IS_GNUCXX)
 endif(CMAKE_COMPILER_IS_GNUCXX)
 
 include_directories(../include/${PROJECT_NAME})
-include_directories("C:/Program Files (x86)/libprco/include")
 
 file(GLOB PRCO_SOURCES
         *.c

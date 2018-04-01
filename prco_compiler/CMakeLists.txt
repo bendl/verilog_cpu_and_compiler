@@ -5,3 +5,4 @@ include_directories(${CMAKE_SOURCE_DIR})
 
 add_subdirectory(libprco)
 add_subdirectory(cli)
+add_subdirectory(emu)
