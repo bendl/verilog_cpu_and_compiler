@@ -242,14 +242,14 @@ void emu_exec(struct prco_op_struct *op)
                 dbug_print_regs();
                 break;
         case SW:
-                core.lmem[core.r_regs[op->regA + op->simm5]] = core.r_regs[op->regD];
+                core.lmem[core.r_regs[op->regA] + op->simm5] = core.r_regs[op->regD];
                 PRINT_SPACE(D_EMU2);
                 dprintf(D_EMU2, "SW $%02x, mem[%02x]\r\n",
                         core.r_regs[op->regD],
                         core.r_regs[op->regA + op->simm5]);
                 break;
         case LW:
-                core.r_regs[op->regD] = core.lmem[core.r_regs[op->regA + op->simm5]];
+                core.r_regs[op->regD] = core.lmem[core.r_regs[op->regA] + op->simm5];
                 PRINT_SPACE(D_EMU2);
                 dprintf(D_EMU2, "LW mem[%02x], $%02x\r\n",
                         core.r_regs[op->regA + op->simm5],

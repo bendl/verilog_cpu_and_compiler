@@ -944,14 +944,22 @@ JMP   %Ax,     JE_UC (unconditional)
 \section{Testing and Verification}
 Verifying the output assembly is a bit more involved as there are multiple layers of tests required. The output code generation must be tested for:
 \begin{itemize}
-\item{(A) Correct machine code output for different code generation routines.}
-\item{(B) Correct and complete flow of the output program.}
+\item{(A) Correct instruction and machine code building.}
+\item{(B) Correct instruction sequences for different code generation routines.}
+\item{(C) Correct and complete flow of the output program and any divergent paths.}
 \end{itemize}
+
+\subsection*{Unit Testing}
 For (A), a code generation routine refers to the code generation function used to produce machine code for a specific structure, for example a function or assignment expression. When machine code instructions are emitted from the code generation routines, they are pushed to a list of \mintinline{c}{struct prco_op_struct} containing information about the emitted instruction. Using this information, the final output machine code word (e.g. \mintinline{c}{0x2020}) is rebuilt into an equivalent \mintinline{c}{struct prco_op_struct} structure and compared against the original. If they are the same, the encoded machine code word is considered correct. This check happens every time an instruction is emitted from the code generation routines.
 
-For (B), two approaches are used. The first is to emit equivalent assembly for another architecture to be compiled are run on the host computer. If the return value of this program is correct, the assembly is assumed to be correct. These tests can be launched by running the \mintinline{bash}{test/run_tests.bat} file. The second approach is to run the compiler output directly on the \scname{} processor, however, this requires rebuilding the FPGA design with the new program code which is time consuming and not always practical.
+\subsection*{Real Hardware Tests}
+The \textit{best} approach to verifying output machine code is to run it directly on the \scname{} processor. However, this requires rebuilding the FPGA design with the new program code which is time consuming and not always practical. In addition, viewing of internal registers and signals is much more difficult due to the lack of a debugging interface on the processor.
+ 
+\subsection*{Emulation}
+During the later stages of the project, it was decided to build a software emulator for the \scname{} processor. The emulator, found at \verb|prco_compiler/emu/emu.c|, would utilise structures used in the compiler's assembling stage to rebuild instructions and their contents from raw machine code words. Due to the late development of the emulator, and it not being a deliverable, and only developed as an alternate means to test the processor, the emulator is not a full emulation of the processor. The emulator implements most features of the processor, including registers, memory, ALU operations, and most instructions. It is capable of emulating all the test programs (found in \verb|proc_compiler/tests/*.prcp|) except the \verb|control_for_*| programs.
 
-Another potential solution for verifying output code that is not employed is to create an emulator for the \scname{} processor and have it run the output machine code. This suffers the same problem as (B) where we are relying on systems that may not exactly share the behaviour of the physical processor, be it through unknown bugs, assembly printing errors, or architecture differences.
+If extra time was allowed, the emulator could be integrated with the unit tests. This would allow for the dynamic compilation of high-level code test programs and analysing their behaviour during emulation against expected values. This would greatly speed up compiler code generation development times.
+
 
 \chapter{Post-Project}
 {\hypersetup{linkcolor=black}
@@ -972,8 +980,8 @@ This project aimed at producing two complex technical systems: an embedded proce
 \begin{itemize}
 \item{an easily extendible recursive-descent text parser;}
 \item{an AST optimiser for constant-folding and unreachable code elimination;}
-\item{a machine code generator;}
-\item{and assembler.}
+\item{a machine code generator and assembler;}
+\item{and an emulator.}
 \end{itemize}
 And from the embedded processor:
 \begin{itemize}
@@ -1004,9 +1012,52 @@ I believe these technologies and their implementation details should be shared a
 
 \section{Appendix A. User Guides}
 \subsection{\scname{} Core Reference Guide}
+\subsubsection*{Instantiating the core in your FPGA design}
+The \scname{} processor core can be instantiated in your FPGA design with the following code snippet:
+\begin{minted}{verilog}
+// Instantiate a processor core
+prco_core inst_core (
+    .i_clk(), 
+    .i_en(), 
+    .i_reset(),
+    
+    // Operating mode (HIGH=single-step)
+    .i_mode(),
+    // Single-step pulse
+    .i_step(),
+    
+    // UART comms
+    .i_rx(),
+    .q_tx(),
+    .q_tx_byte(),
+    
+    // Debug outputs
+    .q_debug_instr_clk(),
+    .q_debug()
+);
+\end{minted}
+
+
 \subsection{\scname{} Compiler Reference Guide}
-\subsection{CLI Arguments}
+\subsubsection*{Command Line Interface Arguments}
 \label{sect:compiler_cli}
+\begin{description}
+\item [Name]
+\verb|cli| - compile a program into executable machine code for the \scname{} processor.
+
+\item[Synopsis]
+\verb|cli [OPTION]... -i{FILE}|
+
+\item [Description]
+\verb|-d| Dump output machine code to a file
+
+\verb|-D{bits}| Select debug printing level. Example of use: \verb|-D0xFF| to enable all debug bits. 
+
+\verb|-i{file}| Pass the input file to the compiler. Example of use: \verb|-i code.prco|.
+
+\verb|-m{arch}| Pass the target architecture to the compiler. Deprecated.
+
+\end{description}
 
 
 \subsection{\scname{} Compiler Reference Guide}
