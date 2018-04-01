@@ -40,6 +40,9 @@ SOFTWARE.
 #include <string.h>
 #include <ctype.h>
 
+char uart_tx_buf[0xff];
+char uart_tx_buf_i = 0;
+
 struct prco_emu_core {
         unsigned short pc;
         unsigned short r_regs[8];
@@ -77,26 +80,34 @@ void print_mem(void)
         int width = 8;
         int i2;
 
+        dprintf(D_EMU, "\r\n\r\n");
+
         for (i = 0; i <= width; i++) {
-                printf("%02x\t", i);
+                dprintf(D_EMU, "%02x\t", i);
         }
 
-        printf("\r\n"
+        dprintf(D_EMU, "\r\n"
                "============================="
                "============================="
                "============================="
                 "\r\n");
 
         for (i = 0; i < 0xff; i++) {
-                dprintf(D_INFO, "%02x\t", core.lmem[i]);
+                dprintf(D_EMU, "%02x\t", core.lmem[i]);
                 if(i2 == width) {
-                        dprintf(D_INFO, "\r\n");
+                        dprintf(D_EMU, "\r\n");
                         i2 = 0;
                 } else {
                         i2++;
                 }
         }
-        dprintf(D_INFO, "\r\n");
+        dprintf(D_EMU, "\r\n");
+}
+
+void print_uart(void)
+{
+        dprintf(D_EMU, "UART tx buf:\r\n");
+        dprintf(D_EMU, "%s\r\n", uart_tx_buf);
 }
 
 unsigned short
@@ -275,11 +286,17 @@ void emu_exec(struct prco_op_struct *op)
                 PRINT_SPACE(D_EMU2);
                 dprintf(D_EMU2, "PORT %d\r\n", op->port);
 
-                PRINT_SPACE(D_EMU2);
-                dprintf(D_EMU,
-                        "UART <- '%c' 0x%x\r\n",
-                        core.r_regs[op->regD],
-                        core.r_regs[op->regD]);
+                switch(op->port) {
+                case UART1:
+                        PRINT_SPACE(D_EMU2);
+                        dprintf(D_EMU,
+                                "UART <- '%c' 0x%x\r\n",
+                                core.r_regs[op->regD],
+                                core.r_regs[op->regD]);
+                        uart_tx_buf[uart_tx_buf_i++] = core.r_regs[op->regD];
+                        break;
+                }
+
                 break;
         }
 }
@@ -305,6 +322,8 @@ int emu_init(struct prco_emu_core *core)
         memset(core, 0, sizeof(*core));
         core->r_regs[7] = 0xff;
 
+        memset(uart_tx_buf, 0, 0xff);
+
         // Load memory with instruction data
         emu_load_mem("verilog_memh.txt");
 }
@@ -316,7 +335,7 @@ int emu_run(struct prco_emu_core *core)
 
                 // Decode the instruction
                 core->current_op = emu_decode(core->lmem[core->pc]);
-                if(core->current_op.op == HALT) break;
+                if(core->current_op.op == HALT || core->pc > 0xf0) break;
 
                 // Execute the instruction
                 emu_exec(&core->current_op);
@@ -351,6 +370,8 @@ int main(int argc, char **argv)
         // After, print registers and memory
         print_mem();
         print_regs();
+
+        print_uart();
 
         return 0;
 }

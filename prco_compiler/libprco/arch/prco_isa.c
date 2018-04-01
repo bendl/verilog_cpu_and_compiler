@@ -38,7 +38,7 @@ assert_opcode(struct prco_op_struct *op, char print)
                 assert((op->opcode >> 11) == op->op);
                 assert(((op->opcode >> 8) & PRCO_OP_BITS_REG) == op->regD);
                 assert(((op->opcode >> 5) & PRCO_OP_BITS_REG) == op->regA);
-                dprintf(D_GEN, "%s\t%s,\t%+d(%s)\t%04x\t\t%d\t%s\r\n",
+                dprintf(D_GEN, "  %s\t%s,\t%+d(%s)\t%04x\t\t%d\t%s\r\n",
                        OP_STR[op->op],
                        REG_STR[op->regD],
                        op->simm5,

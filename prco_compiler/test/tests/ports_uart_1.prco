@@ -2,7 +2,13 @@
 def main()
 {
     int a;
-    a = 97;
 
+    a = 98;
+    UART1(a);
+    a = 101;
+    UART1(a);
+    a = 110;
+    UART1(a);
+    a = 32;
     UART1(a);
 }
