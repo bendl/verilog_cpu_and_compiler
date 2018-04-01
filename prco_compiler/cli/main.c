@@ -33,11 +33,11 @@ SOFTWARE.
 #include <libprco/parser.h>
 #include <libprco/adt/ast.h>
 #include <libprco/module.h>
+#include <include/libprco/opt.h>
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
 int main(int argc, char **argv)
 {
         // Compiler variables
@@ -49,10 +49,12 @@ int main(int argc, char **argv)
         char *out_name = "out.s";
         int parse_result = 0;
         int module_dump_output = 0;
+        int O = 0;
+        struct ast_func *function_list;
 
         // Parse command line
         int opt;
-        while ((opt = getopt(argc, argv, "i:dD:")) != -1) {
+        while ((opt = getopt(argc, argv, "i:dD:O:")) != -1) {
                 switch (opt) {
                 case 'i': src_name = optarg;
                         break;
@@ -62,6 +64,10 @@ int main(int argc, char **argv)
                 }
                         break;
                 case 'd': module_dump_output = 1;
+                        break;
+                case 'O':
+                        O = atoi(optarg);
+                        dprintf(D_INFO, "Setting Optimiser to O%d\r\n", O);
                         break;
                 default:dprintf(D_ERR, "Unknown arguments.\r\n");
                         exit(1);
@@ -95,10 +101,18 @@ int main(int argc, char **argv)
                 return parse_result;
         }
 
-        // run_passes(module);
+        if(module_dump_output) {
+                // If using optimisations, apply them
+                // to each function
+                if(O > 0) {
+                        function_list = module->functions;
+                        list_for_each(function_list) {
+                                AST_SELF_CF(function_list->body);
+                        }
+                }
 
-        if(module_dump_output)
                 module_dump(module);
+        }
 
         fclose(g_file_out);
 
