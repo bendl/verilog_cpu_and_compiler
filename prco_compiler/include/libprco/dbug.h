@@ -10,6 +10,8 @@
 #define D_WARN  0x04
 #define D_PARSE 0x08
 #define D_GEN   0x10
+#define D_EMU   0x20
+#define D_EMU2  0x40
 #define D_ALL   0xFFFF
 
 extern unsigned int g_dbug_level;
