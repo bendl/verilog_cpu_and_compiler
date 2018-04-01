@@ -30,6 +30,8 @@ extern void cg_local_decl_template      (struct ast_lvar *v);
 extern void cg_if_template              (struct ast_if *i);
 extern void cg_for_template             (struct ast_for *f);
 
+extern void cg_port_uart_template       (struct ast_expr *v);
+
 /*
 extern void cg_call_template(struct ast_call *v);
 extern void cg_dir_extern_template(ast_proto_t *p);

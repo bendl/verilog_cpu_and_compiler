@@ -45,6 +45,8 @@ typedef enum ast_type {
         AST_FUNC,
         AST_FUNC_EXIT,
         AST_RET,
+
+        AST_UART,
 } ast_type;
 
 
@@ -148,6 +150,10 @@ struct ast_item_union {
                 struct ast_var    var;
                 struct ast_param  param;
         };
+};
+
+struct ast_expr {
+        struct ast_item *val;
 };
 
 

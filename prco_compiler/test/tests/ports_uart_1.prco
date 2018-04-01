@@ -1,0 +1,8 @@
+
+def main()
+{
+    int a;
+    a = 97;
+
+    UART1(a);
+}

@@ -55,12 +55,12 @@ struct prco_emu_core {
 struct prco_emu_core core = {0};
 
 #define PRINT_SPACE(d) \
-        dprintf((d), "\t\t\t\t\t\t\t\t");
+        dprintf((d), "\t\t\t\t\t\t\t\t\t");
 
-struct prco_op_struct emu_decode(unsigned short mc);
-void emu_exec(struct prco_op_struct *op);
+struct prco_op_struct   emu_decode(unsigned short mc);
+void                    emu_exec(struct prco_op_struct *op);
 
-void dbug_print_regs(void)
+void print_regs(void)
 {
         int i;
 
@@ -71,7 +71,7 @@ void dbug_print_regs(void)
         dprintf(D_EMU, "\r\n");
 }
 
-void dbug_print_mem(void)
+void print_mem(void)
 {
         int i;
         int width = 8;
@@ -227,19 +227,19 @@ void emu_exec(struct prco_op_struct *op)
                 break;
         case ADDI:
                 core.r_regs[op->regD] += (signed char)op->imm8;
-                dbug_print_regs();
+                print_regs();
                 break;
         case SUBI:
                 core.r_regs[op->regD] -= (signed char)op->imm8;
-                dbug_print_regs();
+                print_regs();
                 break;
         case MOV:
                 core.r_regs[op->regD] = core.r_regs[op->regA];
-                dbug_print_regs();
+                print_regs();
                 break;
         case MOVI:
                 core.r_regs[op->regD] = op->imm8;
-                dbug_print_regs();
+                print_regs();
                 break;
         case SW:
                 core.lmem[core.r_regs[op->regA] + op->simm5] = core.r_regs[op->regD];
@@ -254,7 +254,7 @@ void emu_exec(struct prco_op_struct *op)
                 dprintf(D_EMU2, "LW mem[%02x], $%02x\r\n",
                         core.r_regs[op->regA + op->simm5],
                         core.r_regs[op->regD]);
-                dbug_print_regs();
+                print_regs();
                 break;
 
         case CMP:
@@ -270,6 +270,17 @@ void emu_exec(struct prco_op_struct *op)
         case SET:
                 core.r_regs[op->regD] = alu_should_set(op->imm8);
                 break;
+
+        case WRITE:
+                PRINT_SPACE(D_EMU2);
+                dprintf(D_EMU2, "PORT %d\r\n", op->port);
+
+                PRINT_SPACE(D_EMU2);
+                dprintf(D_EMU,
+                        "UART <- '%c' 0x%x\r\n",
+                        core.r_regs[op->regD],
+                        core.r_regs[op->regD]);
+                break;
         }
 }
 
@@ -281,6 +292,7 @@ struct prco_op_struct emu_decode(unsigned short mc)
         dec.regA = (mc >> 5) & 0b111;
         dec.imm8 = (mc >> 0) & 0xff;
         dec.simm5 = (mc & 0b11111);
+        dec.port = (mc & 0xff);
         dec.opcode = mc;
 
         assert_opcode(&dec, 0);
@@ -330,15 +342,15 @@ int main(int argc, char **argv)
         emu_init(&core);
 
         // Print default registers and memory
-        dbug_print_mem();
-        dbug_print_regs();
+        print_mem();
+        print_regs();
 
         // Run the emulator
         emu_run(&core);
 
         // After, print registers and memory
-        dbug_print_mem();
-        dbug_print_regs();
+        print_mem();
+        print_regs();
 
         return 0;
 }

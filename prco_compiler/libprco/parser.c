@@ -966,7 +966,24 @@ parse_for_expr(void)
         lexer_match_next(TOK_RCBRACE);
 
         return new_expr(new_for(start, cond, step, body), AST_FOR);
+}
 
+struct ast_item *
+parse_port_uart1(void)
+{
+        // UART <expr>
+        struct ast_item *val;
+        struct ast_expr *uart_ast;
+
+        lexer_match_next(TOK_PORT_UART1);
+        lexer_match_next(TOK_LBRACE);
+        val = parse_expr();
+        lexer_match_next(TOK_RBRACE);
+
+        uart_ast = calloc(1, sizeof(*uart_ast));
+        uart_ast->val = val;
+
+        return new_expr(uart_ast, AST_UART);
 }
 
 struct ast_item *
@@ -979,6 +996,9 @@ parse_expr(void)
 
         if (lexer_match(TOK_FOR))
                 return parse_for_expr();
+
+        if(lexer_match(TOK_PORT_UART1))
+                return parse_port_uart1();
 
 
         lhs = parse_primary();

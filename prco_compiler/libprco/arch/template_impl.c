@@ -319,6 +319,10 @@ cg_expr_template(struct ast_item *e)
                 case AST_ASSIGNMENT:
                         cg_assignment_template(e->expr);
                         break;
+
+                case AST_UART:
+                        cg_port_uart_template(e->expr);
+                        break;
                 default:
                         dprintf(D_ERR, "Unknown cg routine for %d\r\n",
                                 e->type);
@@ -666,4 +670,11 @@ cg_number_template(struct ast_num *n)
 {
         asm_push(opcode_mov_ri(Ax, n->val));
         asm_comment("NUMBER");
+}
+
+
+void cg_port_uart_template(struct ast_expr *v)
+{
+        cg_expr_template(v->val);
+        asm_push(opcode_write(Ax, UART1));
 }
