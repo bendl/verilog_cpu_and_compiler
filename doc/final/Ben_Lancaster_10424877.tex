@@ -314,12 +314,12 @@ ben
  
 \subsection*{Word Count}
 \begin{minted}{text}
-Words in text: 3785
-Words in headers: 95
+Words in text: 4519
+Words in headers: 116
 Words outside text (captions, etc.): 213
-Number of headers: 49
+Number of headers: 60
 Number of floats/tables/figures: 19
-Number of math inlines: 1
+Number of math inlines: 0
 Number of math displayed: 0
 \end{minted}
 
@@ -934,12 +934,14 @@ This format is not enforced by the processor core and it's up to the compiler to
 Due to time constraints, the assembler introduces many constraints to the output program that are not explicitly identified in the high-level code.
 
 The most prominent limitation is that the assembler can only address 255 words of memory. This is because the assembler only builds up instruction addresses using a single MOVI instruction, which is limited to an 8-bit immediate. This is easily fixable as the assembler could insert additional instructions to build up 16-bit addresses to use. For example, to build a 16-bit address, \textit{0xFECA}, the following instructions could be used:
+%TC:ignore
 \begin{minted}{asm}
 MOVI  $0xFE,   %Ax
 LSHF  %Ax,     $8
 ORI   %Ax,     $0xCA
 JMP   %Ax,     JE_UC (unconditional)
 \end{minted}
+%TC:endignore
 
 \section{Testing and Verification}
 Verifying the output assembly is a bit more involved as there are multiple layers of tests required. The output code generation must be tested for:
@@ -1004,6 +1006,7 @@ I believe these technologies and their implementation details should be shared a
 
 
 \newpage
+%TC:ignore
 \chapter{Appendices}
 {\hypersetup{linkcolor=black}
 \startcontents[chapters]
@@ -1042,25 +1045,186 @@ prco_core inst_core (
 \subsubsection*{Command Line Interface Arguments}
 \label{sect:compiler_cli}
 \begin{description}
-\item [Name]
+\item [Name]\hfill \\
 \verb|cli| - compile a program into executable machine code for the \scname{} processor.
 
-\item[Synopsis]
+\item[Synopsis]\hfill \\
 \verb|cli [OPTION]... -i{FILE}|
 
-\item [Description]
+\item [Description]\hfill \\
 \verb|-d| Dump output machine code to a file
 
 \verb|-D{bits}| Select debug printing level. Example of use: \verb|-D0xFF| to enable all debug bits. 
 
 \verb|-i{file}| Pass the input file to the compiler. Example of use: \verb|-i code.prco|.
 
+\verb|-O{0-1}| Enable optimisation levels. \verb|0| = no optimisations, \verb|>0| = constant folding and unreachable code elimination.
+
 \verb|-m{arch}| Pass the target architecture to the compiler. Deprecated.
 
 \end{description}
 
 
-\subsection{\scname{} Compiler Reference Guide}
+\subsection{\scname{} Emulator Reference Guide}
+\label{sect:emulator_cli}
+\begin{description}
+\item [Name]\hfill \\
+\verb|emu| - compile a program into executable machine code for the \scname{} processor.
+
+\item[Synopsis]\hfill \\
+\verb|emu [OPTION]... -i{FILE}|
+
+\item [Description]\hfill \\
+\verb|-i| Input machine code file. 1 instruction word per line. CRLF/LF accepted.
+\end{description}
+
+\subsection*{Example Output}
+\begin{minted}{text}
+Input Disassembly:
+ADDI  $-1,  Sp      4fff          0  (null)
+  SW  Bp,   +0(Sp)  16e0          0  (null)
+MOV   Bp,   Sp      1ee0          0  (null)
+SUBI  $+1,  Sp      5f01          0  (null)
+MOVI  $62,  Ax      2062          0  (null)
+  SW  Ax,   -1(Bp)  10df          0  (null)
+  LW  Ax,   -1(Bp)  08df          0  (null)
+WRITE Ax,   UART1   9800  (null)
+MOVI  $65,  Ax      2065          0  (null)
+  SW  Ax,   -1(Bp)  10df          0  (null)
+  LW  Ax,   -1(Bp)  08df          0  (null)
+WRITE Ax,   UART1   9800  (null)
+MOVI  $6e,  Ax      206e          0  (null)
+  SW  Ax,   -1(Bp)  10df          0  (null)
+  LW  Ax,   -1(Bp)  08df          0  (null)
+WRITE Ax,   UART1   9800  (null)
+MOVI  $20,  Ax      2020          0  (null)
+  SW  Ax,   -1(Bp)  10df          0  (null)
+  LW  Ax,   -1(Bp)  08df          0  (null)
+WRITE Ax,   UART1   9800  (null)
+MOV   Sp,   Bp      1fc0          0  (null)
+  LW  Bp,   +0(Sp)  0ee0          0  (null)
+ADDI  $+1,  Sp      4f01          0  (null)
+HALT                9000          0  (null)
+
+Initial Memory layout:
+00    01    02    03    04    05    06    07    08
+=====================================================================
+4fff  16e0  1ee0  5f01  2062  10df  8df   9800  2065  10df  8df   9800  206e  10df  8df
+9800  2020  10df  8df   9800  1fc0  ee0   4f01  9000  00    00    00    00    00    00
+00    00    00    00    00    00    00    00    00    00    00    00    00    00    00
+00    00    00    00    00    00    00    00    00    00    00    00    00    00    00
+00    00    00    00    00    00    00    00    00    00    00    00    00    00    00
+00    00    00    00    00    00    00    00    00    00    00    00    00    00    00
+00    00    00    00    00    00    00    00    00    00    00    00    00    00    00
+00    00    00    00    00    00    00    00    00    00    00    00    00    00    00
+00    00    00    00    00    00    00    00    00    00    00    00    00    00    00
+00    00    00    00    00    00    00    00    00    00    00    00    00    00    00
+00    00    00    00    00    00    00    00    00    00    00    00    00    00    00
+00    00    00    00    00    00    00    00    00    00    00    00    00    00    00
+00    00    00    00    00    00    00    00    00    00    00    00    00    00    00
+00    00    00    00    00    00    00    00    00    00    00    00    00    00    00
+00    00    00    00    00    00    00    00    00    00    00    00    00    00    00
+00    00    00    00    00    00    00    00    00    00    00    00    00    00    00
+00    00    00    00    00    00    00    00    00    00    00    00    00    00    00
+
+Executed Instructions:
+                                                  00 00 00 00 00 00 00 ff
+0x00 ADDI  $-1,  Sp      4fff          0  (null)
+                                                  00 00 00 00 00 00 00 fe
+0x01   SW  Bp,   +0(Sp)  16e0          0  (null)
+                                                  SW $00, mem[fe]
+0x02 MOV   Bp,   Sp      1ee0          0  (null)
+                                                  00 00 00 00 00 00 fe fe
+0x03 SUBI  $+1,  Sp      5f01          0  (null)
+                                                  00 00 00 00 00 00 fe fd
+0x04 MOVI  $62,  Ax      2062          0  (null)
+                                                  62 00 00 00 00 00 fe fd
+0x05   SW  Ax,   -1(Bp)  10df          0  (null)
+                                                  SW $62, mem[00]
+0x06   LW  Ax,   -1(Bp)  08df          0  (null)
+                                                  LW mem[00], $62
+                                                  62 00 00 00 00 00 fe fd
+0x07 WRITE Ax,   UART1   9800  (null)     
+                                                  PORT 0
+                                                  UART <- 'b' 0x62
+0x08 MOVI  $65,  Ax      2065          0  (null)
+                                                  65 00 00 00 00 00 fe fd
+0x09   SW  Ax,   -1(Bp)  10df          0  (null)
+                                                  SW $65, mem[00]
+0x0a   LW  Ax,   -1(Bp)  08df          0  (null)
+                                                  LW mem[00], $65
+                                                  65 00 00 00 00 00 fe fd
+0x0b WRITE Ax,   UART1   9800  (null)     
+                                                  PORT 0
+                                                  UART <- 'e' 0x65
+0x0c MOVI  $6e,  Ax      206e          0  (null)
+                                                  6e 00 00 00 00 00 fe fd
+0x0d   SW  Ax,   -1(Bp)  10df          0  (null)
+                                                  SW $6e, mem[00]
+0x0e   LW  Ax,   -1(Bp)  08df          0  (null)
+                                                  LW mem[00], $6e
+                                                  6e 00 00 00 00 00 fe fd
+0x0f WRITE Ax,   UART1   9800  (null)     
+                                                  PORT 0
+                                                  UART <- 'n' 0x6e
+0x10 MOVI  $20,  Ax      2020          0  (null)
+                                                  20 00 00 00 00 00 fe fd
+0x11   SW  Ax,   -1(Bp)  10df          0  (null)
+                                                  SW $20, mem[00]
+0x12   LW  Ax,   -1(Bp)  08df          0  (null)
+                                                  LW mem[00], $20
+                                                  20 00 00 00 00 00 fe fd
+0x13 WRITE Ax,   UART1   9800  (null)     
+                                                  PORT 0
+                                                  UART <- ' ' 0x20
+0x14 MOV   Sp,   Bp      1fc0          0  (null)
+                                                  20 00 00 00 00 00 fe fe
+0x15   LW  Bp,   +0(Sp)  0ee0          0  (null)
+                                                  LW mem[fe], $00
+                                                  20 00 00 00 00 00 00 fe
+0x16 ADDI  $+1,  Sp      4f01          0  (null)
+                                                  20 00 00 00 00 00 00 ff
+0x17 HALT                9000          0  (null)  
+
+End memory contents:
+00      01      02      03      04      05      06      07      08
+=======================================================================================
+4fff    16e0    1ee0    5f01    2062    10df    8df     9800    2065
+10df    8df     9800    206e    10df    8df     9800    2020    10df
+8df     9800    1fc0    ee0     4f01    9000    00      00      00
+00      00      00      00      00      00      00      00      00
+00      00      00      00      00      00      00      00      00
+00      00      00      00      00      00      00      00      00
+00      00      00      00      00      00      00      00      00
+00      00      00      00      00      00      00      00      00
+00      00      00      00      00      00      00      00      00
+00      00      00      00      00      00      00      00      00
+00      00      00      00      00      00      00      00      00
+00      00      00      00      00      00      00      00      00
+00      00      00      00      00      00      00      00      00
+00      00      00      00      00      00      00      00      00
+00      00      00      00      00      00      00      00      00
+00      00      00      00      00      00      00      00      00
+00      00      00      00      00      00      00      00      00
+00      00      00      00      00      00      00      00      00
+00      00      00      00      00      00      00      00      00
+00      00      00      00      00      00      00      00      00
+00      00      00      00      00      00      00      00      00
+00      00      00      00      00      00      00      00      00
+00      00      00      00      00      00      00      00      00
+00      00      00      00      00      00      00      00      00
+00      00      00      00      00      00      00      00      00
+00      00      00      00      00      00      00      00      00
+00      00      00      00      00      00      00      00      00
+00      00      00      00      00      00      00      00      00
+00      20      00
+
+Final Registers:
+20 00 00 00 00 00 00 ff
+
+UART tx buf:
+ben
+\end{minted}
 
 \newpage
 \section{Appendix B. Project Management Artefacts}
@@ -1091,6 +1255,7 @@ prco_core inst_core (
 \caption{UML sequence diagram for the \scname{} compiler.}
 \label{fig:hld}
 \end{figure}
+%TC:endignore
 
 
 \end{document}
