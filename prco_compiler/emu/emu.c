@@ -123,10 +123,10 @@ alu_cmp(struct prco_emu_core *core,
         if(tmp == 0) ret |= 1;
 
         // Signed flag
-        ret |= ((tmp & 0x8000) >> 15);
+        ret |= ((tmp & 0x8000) >> 14);
 
         // Overflow flag
-        switch((tmp & 0xC000) >> 14) {
+        switch((tmp & 0xC000) >> 13) {
         case 0b01:
         case 0b10:
                 ret |= (1 >> 2);
@@ -183,6 +183,7 @@ alu_should_jmp(unsigned char imm8)
 unsigned short
 alu_should_set(unsigned char imm8)
 {
+        dprintf(D_EMU2, "SR REG: %02x\r\n", core.r_sr);
         switch(imm8) {
         case JMP_JE:
                 return (core.r_sr & 0b1) == 1;
@@ -231,10 +232,18 @@ void emu_load_mem(char *fpath)
 void emu_exec(struct prco_op_struct *op)
 {
         switch(op->op) {
+        default:
+                dprintf(D_EMU,
+                        "UKNOWN OP: %s %x\r\n", OP_STR[op->op],
+                        op->op);
+                break;
         case NOP:
                 break;
         case ADD:
                 core.r_regs[op->regD] += core.r_regs[op->regA];
+                break;
+        case SUB:
+                core.r_regs[op->regD] -= core.r_regs[op->regA];
                 break;
         case ADDI:
                 core.r_regs[op->regD] += (signed char)op->imm8;
@@ -273,6 +282,7 @@ void emu_exec(struct prco_op_struct *op)
                         &core,
                         core.r_regs[op->regD],
                         core.r_regs[op->regA]);
+                dprintf(D_EMU2, "SR REG: %02x\r\n", core.r_sr);
                 break;
         case JMP:
                 core.should_branch = alu_should_jmp(op->imm8);
@@ -280,6 +290,7 @@ void emu_exec(struct prco_op_struct *op)
 
         case SET:
                 core.r_regs[op->regD] = alu_should_set(op->imm8);
+                print_regs();
                 break;
 
         case WRITE:
@@ -363,6 +374,8 @@ int main(int argc, char **argv)
         // Print default registers and memory
         print_mem();
         print_regs();
+
+        printf("alu: %x\r\n", alu_cmp(&core, 5, 5));
 
         // Run the emulator
         emu_run(&core);
