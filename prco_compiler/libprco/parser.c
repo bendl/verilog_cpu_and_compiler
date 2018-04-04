@@ -351,6 +351,9 @@ lexer_next(void)
         case '+':
                 lexer_fgetc();
                 return TOK_PLUS;
+        case '-':
+                lexer_fgetc();
+                return TOK_SUB;
         case '(':
                 lexer_fgetc();
                 return TOK_LBRACE;

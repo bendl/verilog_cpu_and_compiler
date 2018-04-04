@@ -718,27 +718,27 @@ cg_bin_template(struct ast_bin *b)
 
         case TOK_BOOL_L:
                 cg_pop_prco(Cx);
-                asm_push(opcode_cmp_rr(Ax, Cx));
+                asm_push(opcode_cmp_rr(Cx, Ax));
                 asm_push(opcode_set_ri(Ax, JMP_JL));
                 break;
         case TOK_BOOL_LE:
                 cg_pop_prco(Cx);
-                asm_push(opcode_cmp_rr(Ax, Cx));
+                asm_push(opcode_cmp_rr(Cx, Ax));
                 asm_push(opcode_set_ri(Ax, JMP_JLE));
                 break;
         case TOK_BOOL_G:
                 cg_pop_prco(Cx);
-                asm_push(opcode_cmp_rr(Ax, Cx));
+                asm_push(opcode_cmp_rr(Cx, Ax));
                 asm_push(opcode_set_ri(Ax, JMP_JG));
                 break;
         case TOK_BOOL_GE:
                 cg_pop_prco(Cx);
-                asm_push(opcode_cmp_rr(Ax, Cx));
+                asm_push(opcode_cmp_rr(Cx, Ax));
                 asm_push(opcode_set_ri(Ax, JMP_JGE));
                 break;
         case TOK_BOOL_EQ:
                 cg_pop_prco(Cx);
-                asm_push(opcode_cmp_rr(Ax, Cx));
+                asm_push(opcode_cmp_rr(Cx, Ax));
                 asm_push(opcode_set_ri(Ax, JMP_JE));
                 break;
 
