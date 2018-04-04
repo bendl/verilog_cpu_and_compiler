@@ -64,7 +64,8 @@ extern "C" {
     TOK(TOK_CC_CDECL) \
     TOK(TOK_CC_FASTCALL) \
     TOK(TOK_PORT_PORT1) \
-    TOK(TOK_PORT_UART1)
+    TOK(TOK_PORT_UART1) \
+    TOK(TOK_DEREF)
 
 /// lexer token types
 typedef enum token_type {

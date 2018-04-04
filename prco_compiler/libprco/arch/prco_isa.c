@@ -40,8 +40,9 @@ assert_opcode(struct prco_op_struct *op, char print)
                         break;
                 } else {
                         assert((op->op >> 11) == op->op);
-                        dprintf(D_GEN, "%s\t\t\t%04x\t\t%d\t%s\r\n",
+                        dprintf(D_GEN, "%s\t%c\t\t%04x\t\t%d\t%s\r\n",
                                 OP_STR[op->op],
+                                op->imm8,
                                 op->opcode,
                                 op->asm_flags,
                                 op->comment);

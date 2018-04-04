@@ -381,6 +381,10 @@ lexer_next(void)
                 lexer_fgetc();
                 return TOK_DQUOTE;
 
+        case '@':
+                lexer_fgetc();
+                return TOK_DEREF;
+
         case EOF:
                 return TOK_EOF;
         }
@@ -868,6 +872,18 @@ parse_cstring(void)
 }
 
 struct ast_item *
+parse_deref(void)
+{
+        struct ast_deref *deref;
+
+        lexer_match_next(TOK_DEREF);
+        deref = calloc(1, sizeof(*deref));
+        deref->item = parse_expr();
+
+        return new_expr(deref, AST_DEREF);
+}
+
+struct ast_item *
 parse_primary(void)
 {
         switch (lexer_token()) {
@@ -882,6 +898,9 @@ parse_primary(void)
 
         case TOK_DQUOTE:
                 return parse_cstring();
+
+        case TOK_DEREF:
+                return parse_deref();
 
         // TODO: Fix
         case ';':

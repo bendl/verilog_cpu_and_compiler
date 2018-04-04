@@ -15,7 +15,7 @@
 #define ASM_OFFSET_BYTES 1
 
 // https://gcc.gnu.org/bugzilla/show_bug.cgi?id=53119
-struct prco_op_struct asm_list[64] = {{0}};
+struct prco_op_struct asm_list[0xff] = {{0}};
 int asm_list_it = 0;
 
 // Unique instruction IDs
@@ -378,6 +378,9 @@ cg_expr_template(struct ast_item *e)
                         break;
                 case AST_CSTRING:
                         cg_cstring_ref(e->expr);
+                        break;
+                case AST_DEREF:
+                        cg_deref_template(e->expr);
                         break;
                 case AST_BIN:
                         cg_bin_template(e->expr);
@@ -773,7 +776,7 @@ cg_cstring_ref(struct ast_cstring *v)
         // 2. LW address of Ax
 
         // 1.
-        mov = opcode_mov_ri(Bx, 0x00);
+        mov = opcode_mov_ri(Ax, 0x00);
         mov.asm_flags = ASM_POINTER;
         mov.id = v->string_id;
         mov.comment = "POINTER";
@@ -781,4 +784,16 @@ cg_cstring_ref(struct ast_cstring *v)
 
         // 2. LW address of Ax
         //asm_push(opcode_lw(Ax, Bx, 0));
+}
+
+
+void
+cg_deref_template(struct ast_deref *v)
+{
+        // A dereference is just LW of Ax register
+        cg_expr_template(v->item);
+
+        // Ax <- RAM[Ax]
+        asm_push(opcode_lw(Ax, Ax, 0));
+        asm_comment("DEREF");
 }

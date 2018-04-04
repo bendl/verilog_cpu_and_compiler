@@ -33,6 +33,7 @@ extern void cg_for_template             (struct ast_for *f);
 extern void cg_port_uart_template       (struct ast_expr *v);
 
 extern void cg_cstring_ref              (struct ast_cstring *v);
+extern void cg_deref_template           (struct ast_deref *v);
 
 /*
 extern void cg_call_template(struct ast_call *v);

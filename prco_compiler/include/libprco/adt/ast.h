@@ -49,6 +49,8 @@ typedef enum ast_type {
         AST_UART,
 
         AST_CSTRING,
+
+        AST_DEREF,
 } ast_type;
 
 
@@ -136,6 +138,12 @@ struct ast_cstring {
 
         // List iterator
         struct ast_func  *next;
+};
+
+struct ast_deref
+{
+        struct ast_item *item;
+        int deref_id;
 };
 
 struct ast_item {
