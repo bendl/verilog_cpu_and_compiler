@@ -78,6 +78,7 @@ struct prco_op_struct {
 #define ASM_CALL_NEXT   0x040
 #define ASM_JMP_JMP     0x080
 #define ASM_JMP_DEST    0x100
+
 #define ASM_ASCII       0x200
 
 #define ASM_POINTER     0x400

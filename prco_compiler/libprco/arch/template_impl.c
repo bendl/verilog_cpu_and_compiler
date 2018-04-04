@@ -94,6 +94,27 @@ assembler_labels(void)
                 assert(op->asm_offset == offset_check);
                 offset_check += ASM_OFFSET_BYTES;
 
+                // Its pointer
+                // Find where it's pointing
+                if(op->asm_flags & ASM_POINTER) {
+                        assert(op->op == MOVI);
+
+                        // It's pointing to something with the same id
+                        for_each_asm(find, findop) {
+                                // Limit pointers to ASM_ASCII as there is a conflict
+                                // between assembler's g_asm_id and parser's g_uid
+                                // TODO: Easy fix, use a single global GUID
+                                if (findop->asm_flags & ASM_ASCII &&
+                                        op->id == findop->id)
+                                {
+                                        op->imm8 = findop->asm_offset;
+                                        op->opcode |= op->imm8;
+                                }
+                        }
+
+                        continue;
+                }
+
                 // If we need to work out the return address
                 // of a function
                 if (op->asm_flags & ASM_CALL_NEXT) {
@@ -268,7 +289,7 @@ cg_precode_template(void)
                         // (PRCO304 processor does not support byte indexing)
                         while(*(char_it)) {
                                 asm_push(opcode_byte(*char_it));
-                                if(first_it) {
+                                if(first_it == 0) {
                                         // tag the first character with it's GUID
                                         asm_tag_last(string->string_id);
                                 }
@@ -753,7 +774,7 @@ cg_cstring_ref(struct ast_cstring *v)
 
         // 1.
         mov = opcode_mov_ri(Bx, 0x00);
-        mov.asm_flags |= ASM_POINTER;
+        mov.asm_flags = ASM_POINTER;
         mov.id = v->string_id;
         mov.comment = "POINTER";
         asm_push(mov);
