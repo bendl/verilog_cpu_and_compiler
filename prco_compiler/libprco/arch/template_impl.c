@@ -123,7 +123,7 @@ assembler_labels(void)
                                         if (strcmp(caller->callee, callee->proto->name) ==
                                             0) {
                                                 op->imm8 = findop->asm_offset;
-                                                op->opcode |= op->imm8 & 0xFF;
+                                                op->opcode |= op->imm8 & 0xff;
 
                                                 // Remove the flag
                                                 op->asm_flags &= ~ASM_FUNC_CALL;
@@ -140,18 +140,28 @@ assembler_labels(void)
                         // Jump operation start with a MOVI to
                         // put address of destination into a register
                         assert(op->op == MOVI);
+
                         // Find findop with same <id>
                         for_each_asm(find, findop) {
                                 if (it == find) continue;
 
-                                if ((findop->asm_flags & ASM_JMP_DEST) &&
-                                    (findop->id == op->id)) {
-                                        op->imm8 = findop->asm_offset;
-                                        op->opcode |= op->imm8 & 0xFF;
-                                        // Remove the flag
-                                        //op->asm_flags &= ~ASM_JMP_JMP;
+                                if(op->ast) {
+                                        if(findop->asm_flags & ASM_FUNC_START &&
+                                                findop->ast == op->ast) {
+                                                op->imm8 = findop->asm_offset;
+                                                op->opcode |= op->imm8 & 0xff;
+                                        }
+                                } else {
+                                        if ((findop->asm_flags & ASM_JMP_DEST) &&
+                                            (findop->id == op->id)) {
+                                                op->imm8 = findop->asm_offset;
+                                                op->opcode |= op->imm8 & 0xff;
+                                                // Remove the flag
+                                                //op->asm_flags &= ~ASM_JMP_JMP;
+                                        }
                                 }
                         }
+
                 }
         }
 }
@@ -192,6 +202,7 @@ void
 cg_precode_template(void)
 {
         int it;
+        struct prco_op_struct init_jmp;
 
         dprintf(D_GEN, ".precode\r\n");
         for (it = NOP; it < __prco_op_MAX; it++) {
@@ -222,6 +233,19 @@ cg_precode_template(void)
         opcode_mov_ri(Bx, 0x00);
         opcode_jmp_r(Bx);
         */
+
+        // First words in memory must jmp to main() function
+        // Make sure it exists
+        assert(get_g_module()->entry);
+        // Create the jmp
+        init_jmp = opcode_mov_ri(Bx, 0);
+        init_jmp.asm_flags |= ASM_JMP_JMP;
+        init_jmp.ast = get_g_module()->entry;
+        init_jmp.comment = "ENTRY JMP MAIN";
+        asm_push(init_jmp);
+        asm_push(opcode_jmp_r(Bx));
+        
+        // Now emit global variables
 
         dprintf(D_GEN, "\r\n\r\n");
 }
