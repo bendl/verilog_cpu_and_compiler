@@ -1,0 +1,227 @@
+
+\subsubsection*{NOP}\label{isa_nop}
+\begin{description}[align=right,labelwidth=4cm]
+\item [Description] The NOP instruction performs no action for 1 instruction cycle (see section  \ref{sect:isa_timings}).
+\item [Assembly] NOP
+\item [Pseudocode]
+\item [Registers altered]
+\item [Clock cycles] 2 (FETCH, DECODE)
+\end{description}
+
+\begin{table}[h]
+\def\arraystretch{1.5}%  1 is the default, change whatever you need
+    \begin{tabularx}{\textwidth}{|p{4cm}|X|}
+    \hline
+    15:11 & 10:0 \\
+	\specialrule{2pt}{-2pt}{0pt}
+	00000 & X
+	\\ \hline
+    \end{tabularx}
+\end{table}
+
+
+\subsubsection*{LW - Load Word}\label{isa_lw}
+\begin{description}[align=right,labelwidth=4cm]
+\item [Description] Copies a 16-bit word from RAM to a register.
+\item [Assembly] LW Rd, +4(Ra)
+\item [Pseudocode] Rd $<=$ RAM[Ra + Simm5]
+\item [Registers altered] Rd
+\item [Clock cycles] 6 (FETCH, DECODE, READ, EXECUTE, RAM, WRITE)
+\end{description}
+
+\begin{table}[H]
+\def\arraystretch{1.5}%  1 is the default, change whatever you need
+    \begin{tabularx}{\textwidth}{|p{4cm}|p{2cm}|p{2cm}|X|}
+    \hline
+    15:11 & 10:8 & 7:5 & 4:0 \\
+	\specialrule{2pt}{-2pt}{0pt}
+	00001 & Rd & Ra & Simm5
+	\\ \hline
+    \end{tabularx}
+\end{table}
+
+
+\subsubsection*{SW - Store Word}\label{isa_sw}
+\begin{description}[align=right,labelwidth=4cm]
+\item [Description] Copies a 16-bit from a register to RAM.
+\item [Assembly] SW Rd, +4(Ra)
+\item [Pseudocode] RAM[Ra+Simm5] $<=$ Rd
+\item [Registers altered] None
+\item [Clock cycles] 6 (FETCH, DECODE, READ, EXECUTE, RAM, WRITE)
+\end{description}
+
+\begin{table}[H]
+\def\arraystretch{1.5}%  1 is the default, change whatever you need
+    \begin{tabularx}{\textwidth}{|p{4cm}|p{2cm}|p{2cm}|X|}
+    \hline
+    15:11 & 10:8 & 7:5 & 4:0 \\
+	\specialrule{2pt}{-2pt}{0pt}
+	00001 & Rd & Ra & Simm5
+	\\ \hline
+    \end{tabularx}
+\end{table}
+
+\subsubsection*{MOVR}
+\begin{description}[align=right,labelwidth=4cm]
+\item [Description] The MOVR instruction copies a 16-bit register value to another register.
+\item [Assembly] MOVR \%Ra, \%Rd 
+\item [Pseudocode] Rd $<=$ Ra
+\item [Registers altered] Rd
+\item [Clock cycles] 5 (FETCH, DECODE, READ, EXECUTE, WRITE)
+\end{description}
+
+\begin{table}[H]
+\def\arraystretch{1.5}%  1 is the default, change whatever you need
+    \begin{tabularx}{\textwidth}{|p{4cm}|p{2cm}|p{2cm}|X|}
+    \hline
+    15:11 & 10:8 & 7:5 & 4:0 \\
+	\specialrule{2pt}{-2pt}{0pt}
+	00011 & Rd & Ra & X
+	\\ \hline
+    \end{tabularx}
+\end{table}
+
+\subsubsection*{MOVI}\label{isa_movi}
+\begin{description}[align=right,labelwidth=4cm]
+\item [Description] The MOVR instruction copies a 16-bit register value to another register.
+\item [Assembly] MOVR \%Ra, \%Rd 
+\item [Pseudocode] Rd $<=$ Ra
+\item [Registers altered] Rd
+\item [Clock cycles] 5 (FETCH, DECODE, READ, EXECUTE, WRITE)
+\end{description}
+
+\begin{table}[H]
+\def\arraystretch{1.5}%  1 is the default, change whatever you need
+    \begin{tabularx}{\textwidth}{|p{4cm}|p{3cm}|X|}
+    \hline
+    15:11 & 10:8 & 7:0 \\
+	\specialrule{2pt}{-2pt}{0pt}
+	00100 & Rd & Imm8
+	\\ \hline
+    \end{tabularx}
+\end{table}
+
+
+\subsubsection*{ADD}
+\begin{description}[align=right,labelwidth=4cm]
+\item [Description] The ADD instruction adds an immediate value to a destination register, Rd.
+\item [Assembly] ADDI \$255, \%Rd
+\item [Pseudocode]Rd $<=$ Rd + Imm8
+\item [Registers altered] Rd
+\item [Clock cycles] 5 (FETCH, DECODE, READ, EXEC, WRITE)
+\end{description}
+
+\begin{table}[H]
+\def\arraystretch{1.5}%  1 is the default, change whatever you need
+    \begin{tabularx}{\textwidth}{|p{4cm}|p{2cm}|p{2cm}|X|}
+    \hline
+    15:11 & 10:8 & 7:5 & 4:0 \\
+	\specialrule{2pt}{-2pt}{0pt}
+	01000 & Rd & Ra & X
+	\\ \hline
+    \end{tabularx}
+\end{table}
+
+\subsubsection*{ADDI}
+\begin{description}[align=right,labelwidth=4cm]
+\item [Description] The ADD instruction adds an immediate value to a destination register, Rd.
+\item [Assembly] ADDI \$255, \%Rd
+\item [Pseudocode]Rd $<=$ Rd + Imm8
+\item [Registers altered] Rd
+\item [Clock cycles] 5 (FETCH, DECODE, READ, EXEC, WRITE)
+\end{description}
+
+\begin{table}[H]
+\def\arraystretch{1.5}%  1 is the default, change whatever you need
+    \begin{tabularx}{\textwidth}{|p{4cm}|p{3cm}|X|}
+    \hline
+    15:11 & 10:8 & 7:0 \\
+	\specialrule{2pt}{-2pt}{0pt}
+	01001 & Rd & Imm8
+	\\ \hline
+    \end{tabularx}
+\end{table}
+
+
+\subsubsection*{SUBI}
+\begin{description}[align=right,labelwidth=4cm]
+\item [Description] The SUB instruction subtracts an immediate value from a destination register, Rd.
+\item [Assembly] SUBI \$255, \%Rd
+\item [Pseudocode]Rd $<=$ Rd - Imm8
+\item [Registers altered] Rd
+\item [Clock cycles] 5 (FETCH, DECODE, READ, EXEC, WRITE)
+\end{description}
+
+\begin{table}[H]
+\def\arraystretch{1.5}%  1 is the default, change whatever you need
+    \begin{tabularx}{\textwidth}{|p{4cm}|p{3cm}|X|}
+    \hline
+    15:11 & 10:8 & 7:0 \\
+	\specialrule{2pt}{-2pt}{0pt}
+	01001 & Rd & Imm8
+	\\ \hline
+    \end{tabularx}
+\end{table}
+
+
+\subsubsection*{CMP}
+\begin{description}[align=right,labelwidth=4cm]
+\item [Description] Sets register, Rd, to the value of Ra - Rb.
+\item [Assembly] CMP Rd, Ra, Rb
+\item [Pseudocode]Rd $<=$ CMP(Ra, Rb)
+\item [Registers altered] Rd
+\item [Clock cycles] 5 (FETCH, DECODE, READ, EXEC, WRITE)
+\item [Note] Rd should be set to SR ({\nameref{sect:sr}}) as the {\nameref{isa_jmp}} instruction operates on the SR register.
+\end{description}
+
+\begin{table}[H]
+\def\arraystretch{1.5}%  1 is the default, change whatever you need
+    \begin{tabularx}{\textwidth}{|p{4cm}|p{2cm}|p{2cm}|p{2cm}|X|}
+    \hline
+    15:12 & 11:9 & 8:6 & 5:3 & 2:0 \\
+	\specialrule{2pt}{-2pt}{0pt}
+	0003 & Rd & Ra & Rb & X
+	\\ \hline
+    \end{tabularx}
+\end{table}
+
+\newpage
+\subsubsection*{JMP}\label{isa_jmp}
+\begin{description}[align=right,labelwidth=4cm]
+\item [Description] Jumps the {\nameref{sect:pc}} if the condition is met within the {\nameref{sect:sr}} register.
+\item [Assembly] JMP Rd, Imm8
+\item [Pseudocode] {\nameref{sect:pc}} $<=$ Rd if ({\nameref{sect:sr}} \& Imm8).
+\item [Registers altered] None
+\item [Clock cycles] 5 (FETCH, DECODE, READ, EXEC, BRANCH)
+\end{description}
+
+\begin{table}[H]
+\def\arraystretch{1.5}%  1 is the default, change whatever you need
+    \begin{tabularx}{\textwidth}{|p{4cm}|p{3cm}|X|}
+    \hline
+    15:11 & 10:8 & 7:0 \\
+	\specialrule{2pt}{-2pt}{0pt}
+	01100 & Rd & Imm8
+	\\ \hline
+    \end{tabularx}
+\end{table}
+An 8 bit immediate (7-0) can be set in the JMP instruction to create conditional jumps.
+
+\begin{table}[h]
+	\def\arraystretch{1.5}%  1 is the default, change whatever you need
+    \begin{tabularx}{\textwidth}{|c|c|c|c|c|X|X|}
+    \hline
+    & 15-11 & 10-8 & \multicolumn{2}{c|}{7-0} & Semantics & Status Register \\
+    \specialrule{2pt}{-2pt}{0pt}
+    JMP		& 01100 & Rd & \multicolumn{2}{c|}{0000 0000} & Unconditional Jump & Any\\ \hline
+    JE		& 01100 & Rd & \multicolumn{2}{c|}{0000 0001} & Jump Equal & ZF=1\\ \hline
+    JNE		& 01100 & Rd & \multicolumn{2}{c|}{0000 0010} & Jump Not Equal & ZF=0\\ \hline
+    JG	& 01100 & Rd & \multicolumn{2}{c|}{0000 0011} & Jump Greater Than & ZF=0 and SF=OF\\ \hline
+    JGE		& 01100 & Rd & \multicolumn{2}{c|}{0000 0100} & Jump Greater Than or Equal & SF=OF\\ \hline
+    JL		& 01100 & Rd & \multicolumn{2}{c|}{0000 0101} & Jump Less Than & SF$<>$OF\\ \hline
+    JLE		& 01100 & Rd & \multicolumn{2}{c|}{0000 0110} & Jump Less Than or Equal & ZF=1 or SF$<>$OF\\ \hline
+    JS		& 01100 & Rd & \multicolumn{2}{c|}{0000 0111} & Jump Signed & SF=1\\ \hline
+    JNS		& 01100 & Rd & \multicolumn{2}{c|}{0000 1000} & Jump Not Signed & SF=0 \\ \hline
+    \end{tabularx}
+    \caption{Conditional jump immediate bits}
+\end{table}
