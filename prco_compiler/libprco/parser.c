@@ -19,6 +19,10 @@
 #include <string.h>
 #include <ctype.h>
 
+static int g_uid = 0;
+#define NEW_GUID() \
+        (++g_uid)
+
 /// Lexer current token
 int g_cur_token;
 
@@ -372,6 +376,10 @@ lexer_next(void)
         case '>':
                 lexer_fgetc();
                 return TOK_BOOL_G;
+
+        case '"':
+                lexer_fgetc();
+                return TOK_DQUOTE;
 
         case EOF:
                 return TOK_EOF;
@@ -798,23 +806,26 @@ parse_paren(void)
 struct ast_item *
 parse_var(void)
 {
-        char *ident = NULL;
+        char            *ident = NULL;
         struct ast_lvar *v = NULL;
         struct ast_item *nvar = NULL;
 
-        dprintf(D_INFO, "Parseing variable\r\n");
+        dprintf(D_INFO, "Parsing variable\r\n");
 
         lexer_match_next(TOK_VARIABLE);
         lexer_match(TOK_ID);
         ident = ident_str;
         lexer_match_next(TOK_ID);
 
+        // If variable not found, create new local decl
         if ((v = get_var(ident)) == NULL) {
                 v = new_ldecl(new_var(ident, dtINT));
                 nvar = new_expr(v, AST_LOCAL_VAR);
                 g_locals = add_var_to_scope(g_locals, nvar->expr);
         }
 
+        // If there is an assignment after it,
+        // Its not a decl so its an assignment
         if (lexer_match(TOK_ASSIGNMENT)) {
                 if (nvar) {
                         nvar->next = parse_assignment(v->var->name);
@@ -826,11 +837,34 @@ parse_var(void)
                 }
         }
 
+        // If no new_var created, its just a reference
         if (nvar == NULL) {
                 nvar = new_expr(v, AST_VAR_REF);
         }
 
         return nvar;
+}
+
+struct ast_item *
+parse_cstring(void)
+{
+        struct ast_cstring *string;
+
+        lexer_match_next(TOK_DQUOTE);
+        g_cur_token = lexer_next();
+        lexer_match_next(TOK_ID);
+        string = calloc(1, sizeof(*string));
+        string->string = ident_str;
+        string->string_id = NEW_GUID();
+        lexer_match_next(TOK_DQUOTE);
+
+        dprintf(D_INFO, "Found CSTRING: '%s'\r\n", string->string);
+
+        // Add string to global string list
+        get_g_module()->strings =
+                append_ll_item_head(get_g_module()->strings, string);
+
+        return new_expr(string, AST_CSTRING);
 }
 
 struct ast_item *
@@ -845,7 +879,11 @@ parse_primary(void)
                 return parse_num();
         case TOK_LBRACE:
                 return parse_paren();
-                // TODO: Fix
+
+        case TOK_DQUOTE:
+                return parse_cstring();
+
+        // TODO: Fix
         case ';':
                 g_cur_token = lexer_next();
                 return parse_primary();

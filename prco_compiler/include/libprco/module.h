@@ -8,11 +8,12 @@
 #include "parser.h"
 
 struct module {
-        struct ast_proto *prototypes;
-        struct ast_func  *functions;
-        struct ast_func  *entry;
-        struct ast_item  *top_levels;
-        struct ast_item  *top_levels_last;
+        struct ast_proto        *prototypes;
+        struct ast_func         *functions;
+        struct ast_func         *entry;
+        struct list_item        *strings;
+        struct ast_item         *top_levels;
+        struct ast_item         *top_levels_last;
 };
 
 extern struct module *g_module;

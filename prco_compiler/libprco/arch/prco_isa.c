@@ -25,13 +25,28 @@ assert_opcode(struct prco_op_struct *op, char print)
                 break;
 
         case NOP:
-                assert((op->op >> 11) == op->op);
-                dprintf(D_GEN, "%s\t\t\t%04x\t\t%d\t%s\r\n",
-                       OP_STR[op->op],
-                       op->opcode,
-                       op->asm_flags,
-                       op->comment);
-                break;
+                // It might not have an OP assigned,
+                // link raw bytes
+                if(op->asm_flags & ASM_ASCII) {
+                        assert((op->op >> 11) == op->op);
+                        assert(((op->opcode >> 0) & PRCO_OP_BITS_IMM8) == op->imm8);
+                        dprintf(D_GEN, "%s\t%c\t\t%04x\t\t%d\t%s\r\n",
+                                "ASCII",
+                                op->imm8,
+                                op->opcode,
+                                op->asm_flags,
+                                op->comment);
+                        break;
+                } else {
+                        assert((op->op >> 11) == op->op);
+                        dprintf(D_GEN, "%s\t\t\t%04x\t\t%d\t%s\r\n",
+                                OP_STR[op->op],
+                                op->opcode,
+                                op->asm_flags,
+                                op->comment);
+                        break;
+                }
+
 
         case LW:
         case SW:
@@ -462,6 +477,21 @@ opcode_set_ri(enum prco_reg rd, unsigned char imm8)
         op.imm8 = imm8;
         op.opcode |= op.op << 11;
         op.opcode |= op.regD << 8;
+        op.opcode |= op.imm8 << 0;
+
+        assert_opcode(&op, 0);
+        return op;
+}
+
+struct prco_op_struct
+opcode_byte(unsigned char low)
+{
+        struct prco_op_struct op = {0};
+        op.asm_flags |= ASM_ASCII;
+
+        op.op = 0;
+        op.imm8 = low;
+
         op.opcode |= op.imm8 << 0;
 
         assert_opcode(&op, 0);

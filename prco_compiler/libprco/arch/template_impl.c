@@ -73,6 +73,9 @@ asm_push(struct prco_op_struct op)
 #define asm_comment(s)                                                        \
         asm_list[(asm_list_it - 1) < 0 ? 0 : (asm_list_it-1)].comment = (s);
 
+#define asm_tag_last(GUID)                                                        \
+        asm_list[(asm_list_it - 1) < 0 ? 0 : (asm_list_it-1)].id = (GUID);
+
 #define for_each_asm(it, asm_p)                                               \
         for ((it) = 0, (asm_p) = &asm_list[(it)];                             \
                 (it) < asm_list_it;                                           \
@@ -235,17 +238,48 @@ cg_precode_template(void)
         */
 
         // First words in memory must jmp to main() function
-        // Make sure it exists
-        assert(get_g_module()->entry);
-        // Create the jmp
-        init_jmp = opcode_mov_ri(Bx, 0);
-        init_jmp.asm_flags |= ASM_JMP_JMP;
-        init_jmp.ast = get_g_module()->entry;
-        init_jmp.comment = "ENTRY JMP MAIN";
-        asm_push(init_jmp);
-        asm_push(opcode_jmp_r(Bx));
-        
+        {
+                // Make sure it exists
+                assert(get_g_module()->entry);
+                // Create the jmp
+                init_jmp = opcode_mov_ri(Bx, 0);
+                init_jmp.asm_flags |= ASM_JMP_JMP;
+                init_jmp.ast = get_g_module()->entry;
+                init_jmp.comment = "ENTRY JMP MAIN";
+                asm_push(init_jmp);
+                asm_push(opcode_jmp_r(Bx));
+        }
+
         // Now emit global variables
+        {
+                struct list_item        *string_it;
+                struct ast_cstring      *string;
+                char                    *char_it;
+                int                     first_it = 0;
+                string_it = get_g_module()->strings;
+
+                list_for_each(string_it) {
+                        first_it = 0;
+                        // We'll use ASCII encoding as its easy
+                        // and widely used
+                        string = (struct ast_cstring*)string_it->value;
+                        char_it = string->string;
+                        // Output a 16-bit word for each ASCII value
+                        // (PRCO304 processor does not support byte indexing)
+                        while(*(char_it)) {
+                                asm_push(opcode_byte(*char_it));
+                                if(first_it) {
+                                        // tag the first character with it's GUID
+                                        asm_tag_last(string->string_id);
+                                }
+
+                                char_it++;
+                                first_it++;
+                        }
+                        // Output null terminator
+                        asm_push(opcode_byte(0));
+                }
+        }
 
         dprintf(D_GEN, "\r\n\r\n");
 }
@@ -319,7 +353,10 @@ cg_expr_template(struct ast_item *e)
         list_for_each(e) {
                 switch (e->type) {
                 case AST_NUM:
-                        cg_number_template((struct ast_num *) e->expr);
+                        cg_number_template(e->expr);
+                        break;
+                case AST_CSTRING:
+                        cg_cstring_ref(e->expr);
                         break;
                 case AST_BIN:
                         cg_bin_template(e->expr);
@@ -701,4 +738,26 @@ void cg_port_uart_template(struct ast_expr *v)
 {
         cg_expr_template(v->val);
         asm_push(opcode_write(Ax, UART1));
+}
+
+void
+cg_cstring_ref(struct ast_cstring *v)
+{
+        struct prco_op_struct mov;
+
+        dprintf(D_GEN, "CSTRING REF: %d %s\r\n",
+                v->string_id, v->string);
+
+        // 1. Move address of cstring into Ax
+        // 2. LW address of Ax
+
+        // 1.
+        mov = opcode_mov_ri(Bx, 0x00);
+        mov.asm_flags |= ASM_POINTER;
+        mov.id = v->string_id;
+        mov.comment = "POINTER";
+        asm_push(mov);
+
+        // 2. LW address of Ax
+        //asm_push(opcode_lw(Ax, Bx, 0));
 }

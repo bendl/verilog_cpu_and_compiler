@@ -78,6 +78,9 @@ struct prco_op_struct {
 #define ASM_CALL_NEXT   0x040
 #define ASM_JMP_JMP     0x080
 #define ASM_JMP_DEST    0x100
+#define ASM_ASCII       0x200
+
+#define ASM_POINTER     0x400
 
 #define FOREACH_REG(REG) \
     REG(Ax) \
@@ -190,6 +193,9 @@ struct prco_op_struct opcode_read(enum prco_reg rd, enum prco_port port);
 struct prco_op_struct opcode_write(enum prco_reg rd, enum prco_port port);
 
 struct prco_op_struct opcode_set_ri(enum prco_reg rd, unsigned char imm8);
+
+struct prco_op_struct opcode_byte(unsigned char low);
+struct prco_op_struct opcode_word(unsigned char high, unsigned char low);
 
 #ifdef __cplusplus
 }

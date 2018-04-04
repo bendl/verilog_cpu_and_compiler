@@ -47,6 +47,8 @@ typedef enum ast_type {
         AST_RET,
 
         AST_UART,
+
+        AST_CSTRING,
 } ast_type;
 
 
@@ -124,6 +126,16 @@ struct ast_for {
         struct ast_item *cond;
         struct ast_item *step;
         struct ast_item *body;
+};
+
+struct ast_cstring {
+        char *string;
+        struct ast_lvar *var;
+        // quick string compare
+        int string_id;
+
+        // List iterator
+        struct ast_func  *next;
 };
 
 struct ast_item {
