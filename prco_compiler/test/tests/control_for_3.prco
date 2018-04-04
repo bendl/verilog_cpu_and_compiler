@@ -1,0 +1,13 @@
+
+def main()
+{
+    int a = 0;
+    int b = "BEN";
+    int apoch = "x";
+
+    UART1(@apoch);
+    for(int a = 0; a < 3; a = a + 1) {
+        UART1(@(b+a));
+    }
+    UART1(@apoch);
+}

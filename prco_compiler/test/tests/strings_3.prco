@@ -1,0 +1,14 @@
+
+
+def main()
+{
+    int a = "ben";
+    int b = "foo";
+
+    UART1(@a+0);
+    UART1(@a+1);
+    UART1(@a+2);
+    UART1(@b+0);
+    UART1(@b+1);
+    UART1(@b+2);
+}
