@@ -88,6 +88,7 @@ struct text_parser {
         int parse_result;       //< Integer parse result, 1 = ok
         char *lexer_str;
         int lexer_char;
+        int lexer_current_token;
 };
 
 /// Reserved word structure

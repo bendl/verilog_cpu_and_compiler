@@ -73,7 +73,7 @@ asm_push(struct prco_op_struct op)
 #define asm_comment(s)                                                        \
         asm_list[(asm_list_it - 1) < 0 ? 0 : (asm_list_it-1)].comment = (s);
 
-#define asm_tag_last(GUID)                                                        \
+#define asm_tag_last(GUID)                                                    \
         asm_list[(asm_list_it - 1) < 0 ? 0 : (asm_list_it-1)].id = (GUID);
 
 #define for_each_asm(it, asm_p)                                               \
