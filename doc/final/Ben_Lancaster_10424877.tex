@@ -848,9 +848,10 @@ This code generation stage is named intermediatary because absolute addresses of
 
 \subsection{Variables}
 \label{sect:compiler_cg_vars}
-The \scname{} compiler supports three types of variables in the high-level code: global variables (variables \textbf{declared} outside of functions); local variables (variables declared at the start of function bodies); and as function arguments.
-\begin{itemize}
-\item{Similar to C89, all local variables must be declared at the start of the function before any logic, such as function calling. This is because the compiler will not rearrange the AST tree to move variable declarations to the first child of the function AST tree.
+An initial requirement for the \scname{} compiler was to support three types of variables: global, local, and parameter variables. Due to time constraints and unforeseen \textit{"sleeper"} bugs only local variables have been implemented as of compiler version 2.40 (05/04/2018). Global variable allocation has been implemented in the assembler but declaring or referencing global variables has not been implemented.
+
+\subsubsection*{Local Variables}
+Similar to C89, all local variables must be declared at the start of the function before any logic, such as function calling. This is because the compiler will not rearrange the AST tree to move variable declarations to the first child of the function AST tree.
 
 When a local variable is declared, stack space is immediately allocated for the variable by subtracting the data type size (1 word) from the Base Pointer variable. Although the code generator knows how many local variables are in a function, due to time constraints, it will not reduce/fold multiple stack allocations into a single SUBI instruction. The output machine code looks similar to Figure \ref{fig:compiler_cg_vars} below.
 
@@ -887,10 +888,46 @@ def main() {
 \end{figure}
 
 Variables are then accessed using the \verb|LW| instruction and passing a 5-bit signed immediate constant as seen above.
-}
 
-\item{TODO}
-\end{itemize}
+\subsubsection*{String Variables}
+Strings are an extended deliverable for the \scname{} compiler but was added to better demonstrate the capabilities of the compiler and processor. Strings in modern OS executable file formats, such as ELF and Windows' PE formats, store explicitly declared strings as null-terminated ASCII strings in the String Table or \verb|.text| section of the executable file.
+
+
+\begin{figure}[!h]
+    \begin{minipage}{0.5\textwidth}
+        \centering
+\begin{minted}{text}
+0x00 MOVI   $6,  Bx  2106 (ENTRY)
+0x01 JMP    Bx,  JUC 6100 
+0x02 ASCII  b    1   0062 
+0x03 ASCII  e    0   0065 
+0x04 ASCII  n    0   006e 
+0x05 ASCII       0   0000 
+0x06 ADDI   $-1, Sp  4fff (FUNC)
+\end{minted}
+        \captionof{figure}{Disassembly of the output machine code for the high-level code. Local variable declaration '\textit{a}' is assigned the value \textit{0x02} which is the address of the first byte of the ASCIZ string.}
+        \label{fig:compiler_cg_vars_asm}
+    \end{minipage}
+    \begin{minipage}{0.5\textwidth}
+        \centering
+\begin{minted}{C}
+
+def main() 
+{
+    int a = "ben";
+    
+    ...
+}
+\end{minted}
+        \captionof{figure}{Input high-level code showing a string variable declaration.}
+        \label{fig:compiler_cg_vars_high}
+    \end{minipage}
+    \captionof{figure}{Example machine code generation for local variables.}
+    \label{fig:compiler_cg_vars}
+\end{figure}
+
+\subsubsection*{Pointers and Value Dereferencing}
+With the implementation of string variables, the concepts of pointers and dereferencing is implicitly introduced. 
 
 \subsection{PUSH and POP}
 \label{sect:compiler_cg_push_pop}
