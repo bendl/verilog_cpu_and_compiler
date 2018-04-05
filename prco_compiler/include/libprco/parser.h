@@ -70,30 +70,32 @@ extern "C" {
 
 /// lexer token types
 typedef enum token_type {
-    FOREACH_TOK(GENERATE_ENUM)
+        FOREACH_TOK(GENERATE_ENUM)
 } token_type;
 
-static const char *TOK_STR[] = { FOREACH_TOK(GENERATE_STR) };
+static const char *TOK_STR[] = {FOREACH_TOK(GENERATE_STR)};
 
 
 /// Parser context
 ///
 /// Contains FILE reference, file paths, and current parser state variables
 struct text_parser {
-    char *lpstr_input_fp;   //< Full path to the file
-    char *lpstr_input_dir;  //< Full path to the directory of the file
-    FILE *file_input;       //< FILE handle
-    int   i_file_line;      //< Lexer line number
-    int   i_file_col;       //< Lexer line column
-    int   parse_result;   //< Integer parse result, 1 = ok
+        char *lpstr_input_fp;   //< Full path to the file
+        char *lpstr_input_dir;  //< Full path to the directory of the file
+        FILE *file_input;       //< FILE handle
+        int i_file_line;        //< Lexer line number
+        int i_file_col;         //< Lexer line column
+        int parse_result;       //< Integer parse result, 1 = ok
+        char *lexer_str;
+        int lexer_char;
 };
 
 /// Reserved word structure
 ///
 struct resv_word {
-    char *     lpstr_name;
-    int        dt_size;
-    token_type tok;
+        char *lpstr_name;
+        int dt_size;
+        token_type tok;
 };
 
 /// Lexer current token
@@ -103,7 +105,7 @@ extern int g_cur_token;
 extern int g_num_val;
 
 /// Lexer current ident string
-extern char *ident_str;
+extern char *g_lexer_str;
 
 /// Lexer input file
 extern FILE *g_file_input;
@@ -111,13 +113,18 @@ extern char *g_file_input_str;
 
 // Parser stack
 extern struct text_parser *g_parser_stack[];
-extern int                 g_cur_parser_index;
+extern int g_cur_parser_index;
 
 /// Set global token to next
-extern void lexer_eat(void);
+extern void
+lexer_eat(void);
+
 /// get next lexer token
-extern enum token_type lexer_next(void);
-extern int lexer_match(enum token_type t);
+extern enum token_type
+lexer_next(void);
+
+extern int
+lexer_match(enum token_type t);
 
 
 /// Attempts to open a file handle given a relative or full path.
@@ -130,21 +137,31 @@ extern int lexer_match(enum token_type t);
 /// Precendence: (higher number = higher precedence)
 /// 0. LIBPRCO include directory. \see COMPILER_INCLUDE_ENV_VAR
 /// 1. Directory of file being parsed
-extern struct text_parser*
+extern struct text_parser *
 parser_fopen(_in_ const char *fname,
-              _out_ int *size,
-              _in_ struct text_parser *parser);
+             _out_ int *size,
+             _in_ struct text_parser *parser);
 
 /// Parser entry method
 // extern int parser_run(FILE *file_in, char *fname);
-extern int parser_run(_in_ struct text_parser *parser);
+extern int
+parser_run(_in_ struct text_parser *parser);
 
 // Text parser functions
-extern struct ast_item      *parse_expr(void);
-extern struct ast_item      *parse_block(void);
-extern struct ast_proto     *parse_proto(enum token_type t);
-extern struct ast_func      *parse_def(void);
-extern struct ast_item      *parse_call(char *ident);
+extern struct ast_item *
+parse_expr(void);
+
+extern struct ast_item *
+parse_block(void);
+
+extern struct ast_proto *
+parse_proto(enum token_type t);
+
+extern struct ast_func *
+parse_def(void);
+
+extern struct ast_item *
+parse_call(char *ident);
 
 #ifdef __cplusplus
 }

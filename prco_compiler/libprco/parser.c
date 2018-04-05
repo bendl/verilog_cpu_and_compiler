@@ -38,9 +38,6 @@ struct text_parser *g_parser_stack[PARSER_MAX_STACK];
 int g_cur_parser_index = -1;
 #define g_cur_parser() g_parser_stack[g_cur_parser_index]
 
-/// Lexer current ident string
-char *ident_str;
-static int g_ch = ' ';
 
 struct list_item *g_locals;     //< Linked list of current local decls
 struct list_item *g_params;     //< Linked list of current prototype params
@@ -86,7 +83,7 @@ parser_popp()
 
         // Trigger lexer on the previous parser
         if (g_cur_parser_index >= 0) {
-                g_ch = ' ';
+                g_cur_parser()->lexer_char = ' ';
                 g_cur_token = ' ';
                 g_cur_token = lexer_next();
         }
@@ -236,16 +233,18 @@ parser_add_resv(char *pstr_name, int dt_size, token_type tok)
 static char
 lexer_fgetc()
 {
-        g_ch = fgetc(g_cur_parser()->file_input);
-        if (g_ch == '\r' || g_ch == '\n') {
+        g_cur_parser()->lexer_char = fgetc(g_cur_parser()->file_input);
+
+        if (g_cur_parser()->lexer_char == '\r' ||
+                g_cur_parser()->lexer_char == '\n') {
                 dprintf(D_INFO, "Parsed line: %s\r\n", line_buf);
                 line_buf[0] = 0;
                 line_buf_pos = 0;
         } else {
-                line_buf[line_buf_pos++] = (char)g_ch;
+                line_buf[line_buf_pos++] = (char)g_cur_parser()->lexer_char;
                 line_buf[line_buf_pos + 1] = 0;
         }
-        return (char)g_ch;
+        return (char)g_cur_parser()->lexer_char;
 }
 
 int
@@ -285,7 +284,8 @@ exit_top_level:
 void
 lexer_init()
 {
-        g_ch = ' ';
+        g_cur_parser()->lexer_char = ' ';
+        g_cur_parser()->lexer_str  = NULL;
         // Eat the space to get next token
         lexer_eat();
 }
@@ -403,13 +403,63 @@ lexer_check_single(int c, token_type* tok)
         return 0;
 }
 
+int
+lexer_digit(char *buf)
+{
+        int buf_i = 0;
+        do {
+                buf[buf_i++] = (char)g_cur_parser()->lexer_char;
+                lexer_fgetc();
+        } while (isdigit(g_cur_parser()->lexer_char));
+
+        // Null terminate the string number buffer
+        buf[buf_i] = 0;
+
+        return atoi(buf);
+}
+
+void
+lexer_string(char *buf)
+{
+        int buf_i = 0;
+        do {
+                buf[buf_i++] = (char)g_cur_parser()->lexer_char;
+                lexer_fgetc();
+        } while (isalnum(g_cur_parser()->lexer_char));
+
+        // Null terminate the string buffer
+        buf[buf_i] = 0;
+}
+
+struct resv_word *
+string_is_resv(char *buf)
+{
+        struct list_item *resv_it;
+        struct resv_word *w;
+
+        resv_it = g_resv_words;
+        list_for_each(resv_it) {
+                w = (struct resv_word *) resv_it->value;
+                dprintf(D_PARSE, "Comparing '%s' to resv '%s'\r\n",
+                        buf, w->lpstr_name);
+
+                if (strcmp(buf, w->lpstr_name) == 0) {
+                        dprintf(D_PARSE, "Resv word found! %s\r\n",
+                                w->lpstr_name);
+                        g_cur_token = w->tok;
+                        return w;
+                }
+        }
+
+        return NULL;
+}
+
 token_type
 lexer_next(void)
 {
-        struct list_item *resv_it;
         char buf[32];
-        int i = 0;
         token_type single_tok;
+        struct resv_word *resv;
 
         // If we don't have a current parser,
         // or file input, theres a bug, so just crash
@@ -419,62 +469,45 @@ lexer_next(void)
         dprintf(D_INFO, "Lexing: %s\r\n", g_cur_parser()->lpstr_input_fp);
 
         // Skip whitespace
-        while (isspace(g_ch)) lexer_fgetc();
+        while (isspace(g_cur_parser()->lexer_char)) lexer_fgetc();
 
         // Switch Single character operators
-        if(lexer_check_single(g_ch, &single_tok)) {
+        if(lexer_check_single(g_cur_parser()->lexer_char, &single_tok)) {
                 return single_tok;
         }
 
         // It could be a string, so loop over until non alpha character reach
-        if (isalpha(g_ch)) {
-                i = 0;
-                do {
-                        buf[i++] = (char)g_ch;
-                        lexer_fgetc();
-                } while (isalnum(g_ch));
-                // Null terminate the string buffer
-                buf[i] = 0;
+        if (isalpha(g_cur_parser()->lexer_char))
+        {
+                lexer_string(buf);
 
                 // Compare buf with reserved words
-                resv_it = g_resv_words;
-                list_for_each(resv_it) {
-                        struct resv_word *w = (struct resv_word *) resv_it->value;
-                        dprintf(D_PARSE, "Comparing '%s' to resv '%s'\r\n",
-                                buf, w->lpstr_name);
-
-                        if (strcmp(buf, w->lpstr_name) == 0) {
-                                dprintf(D_PARSE, "Resv word found! %s\r\n",
-                                        w->lpstr_name);
-                                g_cur_token = w->tok;
-                                return w->tok;
-                        }
-                }
+                resv = string_is_resv(buf);
+                if(resv) return resv->tok;
 
                 // It's not a resv word so id must be an ident
-                ident_str = calloc(strlen(buf + 1), sizeof(char));
-                strcpy(ident_str, buf);
+                g_cur_parser()->lexer_str
+                        = calloc(strlen(buf + 1), sizeof(*g_cur_parser()->lexer_str));
+                // Copy the ident string to the new ident allocation
+                strcpy(g_cur_parser()->lexer_str, buf);
+                // Return we've found an ident
                 return TOK_ID;
         }
                 // Not an string, so try number
-        else if (isdigit(g_ch)) {
-                i = 0;
-                do {
-                        buf[i++] = (char)g_ch;
-                        lexer_fgetc();
-                } while (isdigit(g_ch));
-                // Null terminate the string number buffer
-                buf[i] = 0;
-
-                g_num_val = atoi(buf);
+        else if (isdigit(g_cur_parser()->lexer_char))
+        {
+                g_num_val = lexer_digit(buf);
                 return TOK_NUM;
         }
                 // If its an semi-colon, ignore id
-        else if (g_ch == ';') {
+        else if (g_cur_parser()->lexer_char == ';')
+        {
                 lexer_fgetc();
                 return lexer_next();
         } else {
-                dprintf(D_ERR, "Unknown character: %d %c\r\n", g_ch, g_ch);
+                dprintf(D_ERR, "Unknown character: %d %c\r\n",
+                        g_cur_parser()->lexer_char,
+                        g_cur_parser()->lexer_char);
                 return TOK_ERROR;
         }
 }
@@ -549,7 +582,7 @@ parse_proto(enum token_type t)
         // def ident (
         lexer_match_opt(TOK_DEF);
         lexer_match_req(TOK_ID);
-        fn_name = ident_str;
+        fn_name = g_cur_parser()->lexer_str;
         lexer_match_next(TOK_ID);
         lexer_match_next(TOK_LBRACE);
 
@@ -557,7 +590,7 @@ parse_proto(enum token_type t)
         lexer_match_opt(TOK_VARIABLE);
         while (lexer_match(TOK_ID) || lexer_match(TOK_VARIABLE)) {
                 lexer_match_opt(TOK_VARIABLE);
-                lvarg = new_lvar(new_var(ident_str, dtINT));
+                lvarg = new_lvar(new_var(g_cur_parser()->lexer_str, dtINT));
                 append_ll_item(args, lvarg);
                 argc++;
 
@@ -794,7 +827,7 @@ struct ast_item *
 parse_ident(void)
 {
         struct ast_lvar *v;
-        char *ident = ident_str;
+        char *ident = g_cur_parser()->lexer_str;
 
         lexer_match_next(TOK_ID);
 
@@ -860,7 +893,7 @@ parse_var(void)
 
         lexer_match_next(TOK_VARIABLE);
         lexer_match(TOK_ID);
-        ident = ident_str;
+        ident = g_cur_parser()->lexer_str;
         lexer_match_next(TOK_ID);
 
         // If variable not found, create new local decl
@@ -900,7 +933,7 @@ parse_cstring(void)
         lexer_eat();
         lexer_match_next(TOK_ID);
         string = zalloc(string);
-        string->string = ident_str;
+        string->string = g_cur_parser()->lexer_str;
         string->string_id = NEW_GUID();
         lexer_match_next(TOK_DQUOTE);
 
