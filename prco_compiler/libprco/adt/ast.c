@@ -23,6 +23,7 @@ SOFTWARE.
 */
 
 #include "adt/ast.h"
+#include "types.h"
 #include <stdlib.h>
 
 void

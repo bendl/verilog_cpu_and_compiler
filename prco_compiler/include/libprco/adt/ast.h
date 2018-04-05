@@ -29,11 +29,10 @@ SOFTWARE.
 #include "list.h"
 
 /// Identifier for nodes
-typedef enum ast_type {
+enum ast_type {
         AST_NUM,
-        AST_VAR,
         AST_BIN,
-        AST_CALL,
+
         AST_LOCAL_VAR,
         AST_REF_VAR,
 
@@ -45,6 +44,7 @@ typedef enum ast_type {
         AST_ASSIGNMENT,
         AST_VAR_REF,
 
+        AST_CALL,
         AST_FUNC,
         AST_FUNC_EXIT,
         AST_RET,
@@ -54,7 +54,7 @@ typedef enum ast_type {
         AST_CSTRING,
 
         AST_DEREF,
-} ast_type;
+};
 
 
 struct ast_item;
@@ -185,7 +185,7 @@ struct ast_expr {
 };
 
 
-// Instantiation functions
+// Instantiation functions helpers
 extern struct ast_item  *new_expr  (void *expr, enum ast_type type);
 extern struct ast_num   *new_num   (int num_val);
 extern struct ast_func  *new_func  (struct ast_proto *proto, struct ast_item *body);

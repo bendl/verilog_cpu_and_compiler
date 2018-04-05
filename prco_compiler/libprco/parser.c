@@ -23,9 +23,6 @@ static int g_uid = 0;
 #define NEW_GUID() \
         (++g_uid)
 
-/// Lexer current number
-int g_num_val;
-
 static char line_buf[80];
 static int line_buf_pos = 0;
 
@@ -43,6 +40,9 @@ int g_cur_parser_index = -1;
 
 #define LEXER_GET_TOK() \
         g_cur_parser()->lexer_current_token
+
+#define LEXER_GET_NUM() \
+        g_cur_parser()->lexer_current_number
 
 
 struct list_item *g_locals;     //< Linked list of current local decls
@@ -502,7 +502,7 @@ lexer_next(void)
                 // Not an string, so try number
         else if (isdigit(LEXER_GET_CHAR()))
         {
-                g_num_val = lexer_digit(buf);
+                LEXER_GET_NUM() = lexer_digit(buf);
                 return TOK_NUM;
         }
                 // If its an semi-colon, ignore id
@@ -859,9 +859,7 @@ parse_ident(void)
                 dprintf(D_ERR,
                         "Variable '%s' is not in the current scope!\r\n",
                         ident);
-                abort();
                 return NULL;
-                // TODO: fix
         }
 
         return new_expr(v, AST_VAR_REF);
@@ -870,7 +868,8 @@ parse_ident(void)
 struct ast_item *
 parse_num(void)
 {
-        struct ast_num *ret = new_num(g_num_val);
+        struct ast_num *ret;
+        ret = new_num(LEXER_GET_NUM());
         lexer_eat();
         return new_expr(ret, AST_NUM);
 }
@@ -900,9 +899,9 @@ parse_paren(void)
 struct ast_item *
 parse_var(void)
 {
-        char            *ident = NULL;
-        struct ast_lvar *v = NULL;
-        struct ast_item *nvar = NULL;
+        char            *ident  = NULL;
+        struct ast_lvar *v      = NULL;
+        struct ast_item *nvar   = NULL;
 
         dprintf(D_INFO, "Parsing variable\r\n");
 
@@ -946,9 +945,14 @@ parse_cstring(void)
 
         lexer_match_next(TOK_DQUOTE);
         lexer_eat();
+
+        // TODO: Dont match TOK_ID
+        // Use custom character reader to
+        // read all values
         lexer_match_next(TOK_ID);
+
         string = zalloc(string);
-        string->string = LEXER_GET_STR();
+        string->string    = LEXER_GET_STR();
         string->string_id = NEW_GUID();
         lexer_match_next(TOK_DQUOTE);
 
