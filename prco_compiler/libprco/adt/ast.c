@@ -25,7 +25,161 @@ SOFTWARE.
 #include "adt/ast.h"
 #include <stdlib.h>
 
-enum ast_type test_func(void)
+void
+ast_free(_inout_ struct ast_item *node)
 {
-    return AST_NUM;
+        if (node->next != NULL)
+                ast_free(node->next);
+
+        switch (node->type) {
+        case AST_NUM:
+                // Gets freed at bottom of ast_free
+                break;
+
+        case AST_IF: {
+                struct ast_if *i = node->expr;
+                ast_free(i->cond);
+                ast_free(i->then);
+                ast_free(i->els);
+        }
+                break;
+
+        case AST_BIN: {
+                struct ast_bin *b = node->expr;
+                ast_free(b->lhs);
+                ast_free(b->rhs);
+        }
+                break;
+
+        case AST_CALL: {
+                struct ast_call *c = node->expr;
+                ast_free(c->args);
+                // ast_free(c->proto); AST_FUNC will free AST_PROTO
+                ast_free(c->func);
+        }
+                break;
+
+        case AST_FUNC: {
+                struct ast_func *f = node->expr;
+                ast_free(f->next); // This might cause a segfault
+                ast_free(f->body);
+                ast_free(f->exit);
+                ast_free(f->proto);
+        }
+                break;
+
+        } // End switch
+
+        free(node->expr);
+        free(node);
+}
+
+
+struct ast_var *
+new_var(char *name, int dt)
+{
+        struct ast_var *ret = zalloc(ret);
+        ret->name = name;
+        ret->dt = dt;
+        return ret;
+}
+
+struct ast_lvar *
+new_lvar(struct ast_var *var)
+{
+        struct ast_lvar *ret = zalloc(ret);
+        ret->var = var;
+        ret->bp_offset = 0;
+        return ret;
+}
+
+struct ast_proto *
+new_proto(char *name, struct list_item *args, int argc)
+{
+        struct ast_proto *ret = zalloc(ret);
+        ret->name = name;
+        ret->args = args;
+        ret->argc = argc;
+        return ret;
+}
+
+struct ast_item *
+new_expr(void *expr, enum ast_type type)
+{
+        struct ast_item *ret = zalloc(ret);
+        ret->expr = expr;
+        ret->type = type;
+        return ret;
+}
+
+struct ast_bin *
+new_bin(char op, struct ast_item *lhs, struct ast_item *rhs)
+{
+        struct ast_bin *ret = zalloc(ret);
+        ret->op = op;
+        ret->lhs = lhs;
+        ret->rhs = rhs;
+        return ret;
+}
+
+struct ast_func *
+new_func(struct ast_proto *proto, struct ast_item *body)
+{
+        struct ast_func *ret = zalloc(ret);
+        ret->proto = proto;
+        ret->body = body;
+        ret->num_local_vars = 0;
+        ret->exit = NULL;
+        return ret;
+}
+
+struct ast_num *
+new_num(int num_val)
+{
+        struct ast_num *ret = zalloc(ret);
+        ret->val = num_val;
+        return ret;
+}
+
+struct ast_call *
+new_call(char *callee, struct list_item *args, int argc)
+{
+        struct ast_call *ret = zalloc(ret);
+        ret->callee = callee;
+        ret->args = args;
+        ret->argc = argc;
+        return ret;
+}
+
+struct ast_if *
+new_if(struct ast_item *cond, struct ast_item *then, struct ast_item *els)
+{
+        struct ast_if *ret = zalloc(ret);
+        ret->cond = cond;
+        ret->then = then;
+        ret->els = els;
+        return ret;
+}
+
+struct ast_for *
+new_for(struct ast_item *start,
+        struct ast_item *cond,
+        struct ast_item *step,
+        struct ast_item *body)
+{
+        struct ast_for *ret = zalloc(ret);
+        ret->start = start;
+        ret->cond = cond;
+        ret->step = step;
+        ret->body = body;
+        return ret;
+}
+
+struct ast_lvar *
+new_ldecl(struct ast_var *var)
+{
+        struct ast_lvar *ret = zalloc(ret);
+        ret->bp_offset = 0;
+        ret->var = var;
+        return ret;
 }

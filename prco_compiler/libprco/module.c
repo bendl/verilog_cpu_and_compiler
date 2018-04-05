@@ -7,6 +7,7 @@
 
 #include "dbug.h"
 #include "module.h"
+#include "types.h"
 #include "gen.h"
 
 struct module *g_module;
@@ -21,7 +22,7 @@ struct module *new_module(void)
                 return NULL;
         }
 
-        ret = calloc(1, sizeof(*ret));
+        ret = zalloc(ret);
         g_module = ret;
         return ret;
 }
@@ -35,5 +36,15 @@ struct module *get_g_module(void)
 void module_dump(struct module *m)
 {
         cg_dump(m, target_template);
+}
+
+void
+module_free(struct module *m)
+{
+        struct ast_func *func_it = m->functions;
+
+        list_for_each(func_it) {
+                ast_free(func_it);
+        }
 }
 

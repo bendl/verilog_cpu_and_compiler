@@ -10,7 +10,7 @@
 void cg_dump(struct module *m,
              enum target_arch arch)
 {
-        struct ast_func  *f = m->functions;
+        struct ast_func *f = m->functions;
 
         // Initialise the target code generator
         init_target(arch);

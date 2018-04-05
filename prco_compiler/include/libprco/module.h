@@ -26,4 +26,6 @@ extern struct module *new_module(void);
 
 extern void module_dump(struct module *m);
 
+extern void module_free(struct module *m);
+
 #endif //LIBPRCO_TOP_MODULE_H

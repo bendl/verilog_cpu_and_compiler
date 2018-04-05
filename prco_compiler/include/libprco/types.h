@@ -33,4 +33,7 @@ typedef char *pstr;
 
 #define STATIC_ASSERT(COND,MSG) typedef char static_assertion_##MSG[(COND)?1:-1]
 
+#define zalloc(t) \
+        calloc(1, sizeof(*t))
+
 #endif //LIBPRCO_TYPES_H

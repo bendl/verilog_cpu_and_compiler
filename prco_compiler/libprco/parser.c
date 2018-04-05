@@ -111,7 +111,7 @@ parser_fopen(_in_ const char *fname,
 
         dprintf(D_INFO, "parser_fopen: %s\r\n", fname);
 
-        new_parser = calloc(1, sizeof(struct text_parser));
+        new_parser = zalloc(new_parser);
         new_parser->lpstr_input_fp = malloc(MAX_PATH);
         new_parser->lpstr_input_dir = malloc(MAX_PATH);
 
@@ -199,8 +199,7 @@ parser_fopen(_in_ const char *fname,
 
         dprintf(D_INFO, "New path exists: %s\r\n", new_parser->lpstr_input_fp);
 
-// fname exists
-        l_fname_exists:
+l_fname_exists:
         new_parser->file_input = fopen(new_parser->lpstr_input_fp, "r");
         if (!new_parser->file_input) {
                 dprintf(D_ERR,
@@ -224,8 +223,8 @@ parser_add_resv(char *pstr_name, int dt_size, token_type tok)
         struct resv_word *w;
         struct list_item *ll;
 
-        ll = calloc(1, sizeof(*ll));
-        w = calloc(1, sizeof(*w));
+        ll = zalloc(ll);
+        w = zalloc(w);
         w->lpstr_name = pstr_name;
         w->dt_size = dt_size;
         w->tok = tok;
@@ -243,17 +242,52 @@ lexer_fgetc()
                 line_buf[0] = 0;
                 line_buf_pos = 0;
         } else {
-                line_buf[line_buf_pos++] = g_ch;
+                line_buf[line_buf_pos++] = (char)g_ch;
                 line_buf[line_buf_pos + 1] = 0;
         }
-        return g_ch;
+        return (char)g_ch;
 }
 
 int
 parse_top_level(void)
 {
-        assert("Unimplemented" && 0);
-        return 1;
+        int parse_result = 0;
+
+        while (1) {
+                switch (g_cur_token) {
+                case TOK_DEF:
+                case TOK_CC_CDECL:
+                case TOK_CC_STDCALL:
+                case TOK_CC_FASTCALL:
+                        parse_result = !parse_def();
+                        break;
+
+                case TOK_EOF:
+                        goto exit_top_level;
+
+                default:
+                        dprintf(D_ERR, "Illegal top level expr!\r\n");
+                        parse_result = 1;
+                        break;
+                } // end switch
+
+                if (parse_result != 0) {
+                        goto exit_top_level;
+                }
+        }
+
+exit_top_level:
+        // Set current parsers result
+        g_cur_parser()->parse_result = parse_result;
+        return parse_result;
+}
+
+void
+lexer_init()
+{
+        g_ch = ' ';
+        // Eat the space to get next token
+        lexer_eat();
 }
 
 int
@@ -288,48 +322,85 @@ parser_run(_in_ struct text_parser *parser)
         // Push new parser to stack
         parse_result = parser_pushp(parser);
         if (parse_result != R_OK) {
-                dprintf(D_ERR, "ERROR: Parser stack limit (%d) reached!\r\n",
+                dprintf(D_ERR,
+                        "ERROR: Parser stack limit (%d) reached!\r\n",
                         PARSER_MAX_STACK);
-                return parse_result;
+                goto parser_run_cleanup;
         }
 
         // Initialize lexer
-        g_ch = ' ';
-        g_cur_token = lexer_next();
+        lexer_init();
 
         // lexer loop
-        while (1) {
-                switch (g_cur_token) {
-                case TOK_EOF:
-                        g_cur_parser()->parse_result = 0;
-                        parse_result = g_cur_parser()->parse_result;
-                        goto parser_run_cleanup;
-                        break;
+        parse_result = parse_top_level();
 
-                case TOK_DEF:
-                case TOK_CC_CDECL:
-                case TOK_CC_STDCALL:
-                case TOK_CC_FASTCALL:
-                        g_cur_parser()->parse_result = !parse_def();
-                        break;
-
-                default:
-                        g_cur_parser()->parse_result = parse_top_level();
-                        break;
-                } // end switch
-
-                if (g_cur_parser() == 0 && g_cur_token == TOK_EOF) {
-                        // TODO: Fix ^^^^ this!
-                        return 0;
-                }
-                if (g_cur_parser()->parse_result != 0) {
-                        return g_cur_parser()->parse_result;
-                }
-        }
-
-        parser_run_cleanup:
+parser_run_cleanup:
         parser_popp();
         return parse_result;
+}
+
+int
+lexer_check_single(int c, token_type* tok)
+{
+        switch(c) {
+        case '+':
+                lexer_fgetc();
+                *tok =  TOK_PLUS;
+                return 1;
+        case '-':
+                lexer_fgetc();
+                *tok = TOK_SUB;
+                return 1;
+        case '(':
+                lexer_fgetc();
+                *tok = TOK_LBRACE;
+                return 1;
+        case ')':
+                lexer_fgetc();
+                *tok = TOK_RBRACE;
+                return 1;
+        case ',':
+                lexer_fgetc();
+                *tok = TOK_COMMA;
+                return 1;
+        case '{':
+                lexer_fgetc();
+                *tok = TOK_LCBRACE;
+                return 1;
+        case '}':
+                lexer_fgetc();
+                *tok = TOK_RCBRACE;
+                return 1;
+        case '=':
+                lexer_fgetc();
+                *tok = TOK_ASSIGNMENT;
+                return 1;
+
+        case '<':
+                lexer_fgetc();
+                *tok = TOK_BOOL_L;
+                return 1;
+        case '>':
+                lexer_fgetc();
+                *tok = TOK_BOOL_G;
+                return 1;
+
+        case '"':
+                lexer_fgetc();
+                *tok = TOK_DQUOTE;
+                return 1;
+
+        case '@':
+                lexer_fgetc();
+                *tok = TOK_DEREF;
+                return 1;
+
+        case EOF:
+                *tok = TOK_EOF;
+                return 1;
+        }
+
+        return 0;
 }
 
 token_type
@@ -338,66 +409,28 @@ lexer_next(void)
         struct list_item *resv_it;
         char buf[32];
         int i = 0;
+        token_type single_tok;
 
+        // If we don't have a current parser,
+        // or file input, theres a bug, so just crash
         assert(g_cur_parser());
         assert(g_cur_parser()->file_input);
+
         dprintf(D_INFO, "Lexing: %s\r\n", g_cur_parser()->lpstr_input_fp);
 
         // Skip whitespace
         while (isspace(g_ch)) lexer_fgetc();
-        dprintf(D_INFO, "C: %c %d\r\n", g_ch, g_ch);
 
         // Switch Single character operators
-        switch (g_ch) {
-        case '+':
-                lexer_fgetc();
-                return TOK_PLUS;
-        case '-':
-                lexer_fgetc();
-                return TOK_SUB;
-        case '(':
-                lexer_fgetc();
-                return TOK_LBRACE;
-        case ')':
-                lexer_fgetc();
-                return TOK_RBRACE;
-        case ',':
-                lexer_fgetc();
-                return TOK_COMMA;
-        case '{':
-                lexer_fgetc();
-                return TOK_LCBRACE;
-        case '}':
-                lexer_fgetc();
-                return TOK_RCBRACE;
-        case '=':
-                lexer_fgetc();
-                return TOK_ASSIGNMENT;
-
-        case '<':
-                lexer_fgetc();
-                return TOK_BOOL_L;
-        case '>':
-                lexer_fgetc();
-                return TOK_BOOL_G;
-
-        case '"':
-                lexer_fgetc();
-                return TOK_DQUOTE;
-
-        case '@':
-                lexer_fgetc();
-                return TOK_DEREF;
-
-        case EOF:
-                return TOK_EOF;
+        if(lexer_check_single(g_ch, &single_tok)) {
+                return single_tok;
         }
 
         // It could be a string, so loop over until non alpha character reach
         if (isalpha(g_ch)) {
                 i = 0;
                 do {
-                        buf[i++] = g_ch;
+                        buf[i++] = (char)g_ch;
                         lexer_fgetc();
                 } while (isalnum(g_ch));
                 // Null terminate the string buffer
@@ -427,7 +460,7 @@ lexer_next(void)
         else if (isdigit(g_ch)) {
                 i = 0;
                 do {
-                        buf[i++] = g_ch;
+                        buf[i++] = (char)g_ch;
                         lexer_fgetc();
                 } while (isdigit(g_ch));
                 // Null terminate the string number buffer
@@ -444,6 +477,12 @@ lexer_next(void)
                 dprintf(D_ERR, "Unknown character: %d %c\r\n", g_ch, g_ch);
                 return TOK_ERROR;
         }
+}
+
+void
+lexer_eat(void)
+{
+        g_cur_token = lexer_next();
 }
 
 enum token_type
@@ -466,7 +505,7 @@ enum token_type
 lexer_match_opt(enum token_type t)
 {
         if (lexer_match(t)) {
-                g_cur_token = lexer_next();
+                lexer_eat();
         }
 
         return (enum token_type) g_cur_token;
@@ -505,7 +544,7 @@ parse_proto(enum token_type t)
         int argc = 0;
         int pargc = 0;
 
-        args = calloc(1, sizeof(*args));
+        args = zalloc(args);
 
         // def ident (
         lexer_match_opt(TOK_DEF);
@@ -522,8 +561,7 @@ parse_proto(enum token_type t)
                 append_ll_item(args, lvarg);
                 argc++;
 
-                // TODO: make lexer_next() set g_cur_token
-                g_cur_token = lexer_next();
+                lexer_eat();
                 lexer_match_opt(TOK_COMMA);
         }
 
@@ -620,14 +658,14 @@ add_var_to_scope(struct list_item *scope, struct ast_lvar *v)
 {
         struct list_item *old_scope;
         if (scope == NULL) {
-                scope = calloc(1, sizeof(*scope));
+                scope = zalloc(scope);
         }
 
         if (scope->value == NULL) {
                 scope->value = v;
         } else {
                 old_scope = scope;
-                scope = calloc(1, sizeof(*scope));
+                scope = zalloc(scope);
                 scope->value = v;
                 scope->next = old_scope;
         }
@@ -694,7 +732,7 @@ parse_call(char *ident)
         struct ast_call *call;
         struct ast_item *arg_expr;
 
-        args = calloc(1, sizeof(*args));
+        args = zalloc(args);
 
         lexer_match_next(TOK_LBRACE);
         if (!lexer_match(TOK_RBRACE)) {
@@ -745,7 +783,7 @@ parse_assignment(char *ident)
         val = parse_expr();
         if (!val) return NULL;
 
-        a = calloc(1, sizeof(*a));
+        a = zalloc(a);
         a->var = v;
         a->val = val;
 
@@ -786,7 +824,7 @@ struct ast_item *
 parse_num(void)
 {
         struct ast_num *ret = new_num(g_num_val);
-        g_cur_token = lexer_next();
+        lexer_eat();
         return new_expr(ret, AST_NUM);
 }
 
@@ -796,7 +834,7 @@ parse_paren(void)
         struct ast_item *result;
 
         // TODO: check lexer_token == (
-        g_cur_token = lexer_next();
+        lexer_eat();
 
         // Parse inside the (...)
         result = parse_expr();
@@ -806,7 +844,7 @@ parse_paren(void)
                 return NULL;
         }
 
-        g_cur_token = lexer_next();
+        lexer_eat();
         return result;
 
 }
@@ -859,9 +897,9 @@ parse_cstring(void)
         struct ast_cstring *string;
 
         lexer_match_next(TOK_DQUOTE);
-        g_cur_token = lexer_next();
+        lexer_eat();
         lexer_match_next(TOK_ID);
-        string = calloc(1, sizeof(*string));
+        string = zalloc(string);
         string->string = ident_str;
         string->string_id = NEW_GUID();
         lexer_match_next(TOK_DQUOTE);
@@ -881,7 +919,7 @@ parse_deref(void)
         struct ast_deref *deref;
 
         lexer_match_next(TOK_DEREF);
-        deref = calloc(1, sizeof(*deref));
+        deref = zalloc(deref);
         deref->item = parse_expr();
 
         return new_expr(deref, AST_DEREF);
@@ -908,7 +946,7 @@ parse_primary(void)
 
         // TODO: Fix
         case ';':
-                g_cur_token = lexer_next();
+                lexer_eat();
                 return parse_primary();
         default:
                 dprintf(D_ERR, "Unknown primary token: %d %c\r\n",
@@ -964,7 +1002,7 @@ parse_bin_rhs(int min_prec, struct ast_item *lhs)
                 if (cur_tok_prec < min_prec) return lhs;
                 bin_op = lexer_token();
                 // eat bin op
-                g_cur_token = lexer_next();
+                lexer_eat();
                 rhs = parse_primary();
                 if (!rhs) return NULL;
 
@@ -973,7 +1011,7 @@ parse_bin_rhs(int min_prec, struct ast_item *lhs)
                         rhs = parse_bin_rhs(cur_tok_prec + 1, rhs);
                         if (!rhs) return NULL;
                 }
-                lhs = new_expr(new_bin(bin_op, lhs, rhs), AST_BIN);
+                lhs = new_expr(new_bin((char)bin_op, lhs, rhs), AST_BIN);
         }
 }
 
@@ -1041,7 +1079,7 @@ parse_port_uart1(void)
         val = parse_expr();
         lexer_match_next(TOK_RBRACE);
 
-        uart_ast = calloc(1, sizeof(*uart_ast));
+        uart_ast = zalloc(uart_ast);
         uart_ast->val = val;
 
         return new_expr(uart_ast, AST_UART);
@@ -1063,7 +1101,7 @@ parse_while_expr(void)
         body = parse_block();
         lexer_match_next(TOK_RCBRACE);
 
-        w = calloc(1, sizeof(*w));
+        w = zalloc(w);
         w->cond = cond;
         w->body = body;
 
@@ -1118,114 +1156,4 @@ parse_block(void)
         }
 
         return start;
-}
-
-
-struct ast_var *
-new_var(char *name, int dt)
-{
-        struct ast_var *ret = calloc(1, sizeof(*ret));
-        ret->name = name;
-        ret->dt = dt;
-        return ret;
-}
-
-struct ast_lvar *
-new_lvar(struct ast_var *var)
-{
-        struct ast_lvar *ret = calloc(1, sizeof(*ret));
-        ret->var = var;
-        ret->bp_offset = 0;
-        return ret;
-}
-
-struct ast_proto *
-new_proto(char *name, struct list_item *args, int argc)
-{
-        struct ast_proto *ret = calloc(1, sizeof(*ret));
-        ret->name = name;
-        ret->args = args;
-        ret->argc = argc;
-        return ret;
-}
-
-struct ast_item *
-new_expr(void *expr, enum ast_type type)
-{
-        struct ast_item *ret = calloc(1, sizeof(*ret));
-        ret->expr = expr;
-        ret->type = type;
-        return ret;
-}
-
-struct ast_bin *
-new_bin(char op, struct ast_item *lhs, struct ast_item *rhs)
-{
-        struct ast_bin *ret = calloc(1, sizeof(*ret));
-        ret->op = op;
-        ret->lhs = lhs;
-        ret->rhs = rhs;
-        return ret;
-}
-
-struct ast_func *
-new_func(struct ast_proto *proto, struct ast_item *body)
-{
-        struct ast_func *ret = calloc(1, sizeof(*ret));
-        ret->proto = proto;
-        ret->body = body;
-        ret->num_local_vars = 0;
-        ret->exit = NULL;
-        return ret;
-}
-
-struct ast_num *
-new_num(int num_val)
-{
-        struct ast_num *ret = calloc(1, sizeof(*ret));
-        ret->val = num_val;
-        return ret;
-}
-
-struct ast_call *
-new_call(char *callee, struct list_item *args, int argc)
-{
-        struct ast_call *ret = calloc(1, sizeof(*ret));
-        ret->callee = callee;
-        ret->args = args;
-        ret->argc = argc;
-        return ret;
-}
-
-struct ast_if *
-new_if(struct ast_item *cond, struct ast_item *then, struct ast_item *els)
-{
-        struct ast_if *ret = calloc(1, sizeof(*ret));
-        ret->cond = cond;
-        ret->then = then;
-        ret->els = els;
-        return ret;
-}
-
-struct ast_for *
-new_for(struct ast_item *start,
-        struct ast_item *cond,
-        struct ast_item *step,
-        struct ast_item *body)
-{
-        struct ast_for *ret = calloc(1, sizeof(*ret));
-        ret->start = start;
-        ret->cond = cond;
-        ret->step = step;
-        ret->body = body;
-        return ret;
-}
-
-struct ast_lvar *
-new_ldecl(struct ast_var *var)
-{
-        struct ast_lvar *ret = calloc(1, sizeof(*ret));
-        ret->bp_offset = 0;
-        ret->var = var;
-        return ret;
 }

@@ -69,14 +69,16 @@ int main(int argc, char **argv)
                         O = atoi(optarg);
                         dprintf(D_INFO, "Setting Optimiser to O%d\r\n", O);
                         break;
-                default:dprintf(D_ERR, "Unknown arguments.\r\n");
+                default:
+                        dprintf(D_ERR, "Unknown arguments.\r\n");
                         exit(1);
                 }
         }
 
         if (!src_name) {
                 dprintf(D_ERR, "-i parameter missing.\r\n");
-                return 2;
+                parse_result = 2;
+                goto main_exit;
         }
 
         // Create output file for writing
@@ -90,7 +92,8 @@ int main(int argc, char **argv)
         parser = parser_fopen(src_name, &src_size, NULL);
         if (!parser) {
                 dprintf(D_ERR, "parser_fopen failed!\r\n");
-                return 3;
+                parse_result = 3;
+                goto main_exit;
         }
         dprintf(D_INFO, "File size: %d\r\n", src_size);
 
@@ -98,7 +101,7 @@ int main(int argc, char **argv)
         parse_result = parser_run(parser);
         if (parse_result != 0) {
                 dprintf(D_ERR, "parser_run error %d\r\n", parse_result);
-                return parse_result;
+                goto main_exit;
         }
 
         if(module_dump_output) {
@@ -114,8 +117,9 @@ int main(int argc, char **argv)
                 module_dump(module);
         }
 
+main_exit:
+        // Free the module
+        module_free(module);
         fclose(g_file_out);
-
-
-        return 0;
+        return parse_result;
 }

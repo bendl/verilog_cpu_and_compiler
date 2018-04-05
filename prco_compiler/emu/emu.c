@@ -397,5 +397,6 @@ int main(int argc, char **argv)
 
         print_uart();
 
-        return 0;
+        // Return Ax register for testing
+        return core.r_regs[0];
 }

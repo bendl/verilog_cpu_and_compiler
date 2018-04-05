@@ -201,5 +201,6 @@ extern struct ast_for   *new_for(struct ast_item *start,
                                  struct ast_item *body);
 extern struct ast_lvar  *new_ldecl  (struct ast_var *var);
 
+void ast_free(_inout_ struct ast_item *node);
 
 #endif

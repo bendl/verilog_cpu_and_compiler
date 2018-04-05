@@ -113,8 +113,10 @@ extern char *g_file_input_str;
 extern struct text_parser *g_parser_stack[];
 extern int                 g_cur_parser_index;
 
+/// Set global token to next
+extern void lexer_eat(void);
 /// get next lexer token
-extern token_type lexer_next(void);
+extern enum token_type lexer_next(void);
 extern int lexer_match(enum token_type t);
 
 
