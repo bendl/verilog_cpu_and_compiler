@@ -980,7 +980,7 @@ During the later stages of the project, it was decided to build a software emula
 
 If extra time was allowed, the emulator could be integrated with the unit tests. This would allow for the dynamic compilation of high-level code test programs and analysing their behaviour during emulation against expected values. This would greatly speed up compiler code generation development times.
 
-
+\newpage
 \section{Sub-project Review}
 \subsection{Core Deliverables}
 \begin{table}[H]
@@ -996,17 +996,13 @@ AST Intermediate Representation & Yes & 1.00 &  \\
 \hline 
 Basic arithmetic Operators & Yes & 1.10 &  \\ 
 \hline 
-IF statements & Yes & 1.30 & \\ \hline 
-IF ELSE statements & Yes & 1.30 & \\ \hline 
-FOR statements & Yes & 1.30 & \\ 
-\hline 
-Functions & Yes & 1.20 & \\ 
-\hline 
-Variables & Limited & 1.50 & Only local variables. No global or parameter variables.\\ 
-\hline 
-Code generation & Yes & 1.30 & \\
-\hline
-Assembling & Yes & 1.40 & Basic offset calculation and re-encoding.\\ 
+IF statements 	& Yes & 1.30 & \verb|if ( <expr> ) { ... }| \\ \hline 
+IF ELSE statements & Yes & 1.30 & \verb|if ( <expr> ) { ... } else { ... }|\\ \hline 
+FOR statements 	& Yes & 1.30 & \\ \hline 
+Functions	 	& Yes & 1.20 & \verb|| \\ \hline 
+Variables 		& Limited & 1.50 & Only local variables. No global or parameter variables.\\ \hline 
+Code generation & Yes & 1.30 & \\ \hline
+Assembling 		& Yes & 1.40 & Basic offset calculation and re-encoding.\\ 
 \hline 
 \end{tabularx} 
 \end{table}
@@ -1018,14 +1014,16 @@ Assembling & Yes & 1.40 & Basic offset calculation and re-encoding.\\
 \caption{Compiler Extended Deliverables Review}
 \begin{tabularx}{\textwidth}{|p{4cm}|c|c|X|}
 \hline 
-Assembly text parsing & No & X & Only the CFG text parser for the grammar described in section \ref{sect:compiler_grammar} is present. This would be a desirable feature.
+Deliverable & Implemented & Version & Comment \\ 
+\specialrule{2pt}{-2pt}{0pt}
+Assembly text parsing & No & X & Only the CFG text parser for the grammar described in section \ref{sect:compiler_grammar} is present. This would be a desirable feature for implementing features the compiler is not able to.
 \\ \hline 
 Optimisation: Constant Folding & Yes & 2.00 & Limited to compile time constants. 
 See \verb|prco_compiler/libprco/opt.c:9|. \\ \hline 
 Optimisation: Unreachable-code elimination & Yes & 2.00 & Limited to IF statement constants. 
 See \verb|prco_compiler/libprco/opt.c:33|. \\ \hline
-String variables & Limited & 2.10 & All strings are placed in low memory, not on stack. Limited to alphanumeric identities (easily fixable).\\ \hline 
-Dereferencing & Yes & 2.10 & Uses low precedence \verb|@| symbol. Unsafe like C's \verb|*| dereferencing functionality. See \verb|prco_compiler/test/tests/control_for_3.prco|. \\ \hline 
+String variables      & Limited & 2.10 & All strings are placed in low memory, not on stack. Limited to alphanumeric identities (easily fixable).\\ \hline 
+Dereferencing         & Yes & 2.10 & Uses low precedence \verb|@| symbol. Unsafe like C's \verb|*| dereferencing functionality. See \verb|prco_compiler/test/tests/control_for_3.prco|. \\ \hline 
 \textit{Pointer} arithmetic & Yes & 2.10 & Inferred by dereferencing implementation. 
 E.g. \verb|@(a+1)| returns contents of memory address at value \verb|a+1|. 
 \\ \hline 
