@@ -36,8 +36,11 @@ typedef enum ast_type {
         AST_CALL,
         AST_LOCAL_VAR,
         AST_REF_VAR,
+
         AST_IF,
         AST_FOR,
+        AST_WHILE,
+
         AST_BOOL,
         AST_ASSIGNMENT,
         AST_VAR_REF,
@@ -127,6 +130,11 @@ struct ast_for {
         struct ast_item *start;
         struct ast_item *cond;
         struct ast_item *step;
+        struct ast_item *body;
+};
+
+struct ast_while {
+        struct ast_item *cond;
         struct ast_item *body;
 };
 

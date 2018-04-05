@@ -1,0 +1,13 @@
+
+def main()
+{
+    int str = "testing";
+    int length = 0;
+
+    while( @(str + length) )
+    {
+        length = length + 1;
+    }
+
+    UART1(length + 48);
+}

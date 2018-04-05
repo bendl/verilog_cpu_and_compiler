@@ -1,0 +1,16 @@
+
+def main()
+{
+    int a = "ben";
+    int start = a;
+    int length = 0;
+
+    while(@a) {
+        UART1(@a);
+        a = a + 1;
+    }
+
+    length = start - a;
+
+    UART1(length + 48);
+}
