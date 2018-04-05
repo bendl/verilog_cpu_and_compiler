@@ -981,6 +981,59 @@ During the later stages of the project, it was decided to build a software emula
 If extra time was allowed, the emulator could be integrated with the unit tests. This would allow for the dynamic compilation of high-level code test programs and analysing their behaviour during emulation against expected values. This would greatly speed up compiler code generation development times.
 
 
+\section{Sub-project Review}
+\subsection{Core Deliverables}
+\begin{table}[H]
+\def\arraystretch{1.5}
+\caption{Compiler Core Deliverables Review}
+\begin{tabularx}{\textwidth}{|p{4cm}|c|c|X|}
+\hline 
+Deliverable & Implemented & Version & Comment \\ 
+\specialrule{2pt}{-2pt}{0pt}
+CFG Text Parser & Yes & 1.00 & Recursive descent parser.\\ 
+\hline 
+AST Intermediate Representation & Yes & 1.00 &  \\ 
+\hline 
+Basic arithmetic Operators & Yes & 1.10 &  \\ 
+\hline 
+IF statements & Yes & 1.30 & \\ \hline 
+IF ELSE statements & Yes & 1.30 & \\ \hline 
+FOR statements & Yes & 1.30 & \\ 
+\hline 
+Functions & Yes & 1.20 & \\ 
+\hline 
+Variables & Limited & 1.50 & Only local variables. No global or parameter variables.\\ 
+\hline 
+Code generation & Yes & 1.30 & \\
+\hline
+Assembling & Yes & 1.40 & Basic offset calculation and re-encoding.\\ 
+\hline 
+\end{tabularx} 
+\end{table}
+
+
+\subsection{Extended Deliverables}
+\begin{table}[H]
+\def\arraystretch{1.5}
+\caption{Compiler Extended Deliverables Review}
+\begin{tabularx}{\textwidth}{|p{4cm}|c|c|X|}
+\hline 
+Assembly text parsing & No & X & Only the CFG text parser for the grammar described in section \ref{sect:compiler_grammar} is present. This would be a desirable feature.
+\\ \hline 
+Optimisation: Constant Folding & Yes & 2.00 & Limited to compile time constants. 
+See \verb|prco_compiler/libprco/opt.c:9|. \\ \hline 
+Optimisation: Unreachable-code elimination & Yes & 2.00 & Limited to IF statement constants. 
+See \verb|prco_compiler/libprco/opt.c:33|. \\ \hline
+String variables & Limited & 2.10 & All strings are placed in low memory, not on stack. Limited to alphanumeric identities (easily fixable).\\ \hline 
+Dereferencing & Yes & 2.10 & Uses low precedence \verb|@| symbol. Unsafe like C's \verb|*| dereferencing functionality. See \verb|prco_compiler/test/tests/control_for_3.prco|. \\ \hline 
+\textit{Pointer} arithmetic & Yes & 2.10 & Inferred by dereferencing implementation. 
+E.g. \verb|@(a+1)| returns contents of memory address at value \verb|a+1|. 
+\\ \hline 
+Assembler memory layout & Limited & 2.10 & First instructions (low memory) jump into \textit{middle} memory where \verb|main| function is located. Low memory consists of \textit{global values} (like strings and global variables). High memory is reserved for stack management. 
+\\ \hline 
+\end{tabularx} 
+\end{table}
+
 \chapter{Post-Project}
 {\hypersetup{linkcolor=black}
 \startcontents[chapters]
