@@ -167,11 +167,10 @@
 \subsubsection*{CMP}
 \begin{description}[align=right,labelwidth=4cm]
 \item [Description] Sets register, Rd, to the value of Ra - Rb.
-\item [Assembly] CMP Rd, Ra, Rb
-\item [Pseudocode]Rd $<=$ CMP(Ra, Rb)
+\item [Assembly] CMP Rd, Ra
+\item [Pseudocode]{\nameref{sect:core_regs_sr}} $<=$ CMP(Ra, Rb)
 \item [Registers altered] Rd
 \item [Clock cycles] 5 (FETCH, DECODE, READ, EXEC, WRITE)
-\item [Note] Rd should be set to SR ({\nameref{sect:sr}}) as the {\nameref{isa_jmp}} instruction operates on the SR register.
 \end{description}
 
 \begin{table}[H]

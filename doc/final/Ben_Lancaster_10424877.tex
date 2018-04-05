@@ -50,7 +50,10 @@
 %}
 %s\lstset{language=C,keywordstyle={\bfseries \color{blue}}}
 \usepackage[outputdir=build]{minted}
-\usemintedstyle{vs}
+%https://www.sharelatex.com/learn/Code_Highlighting_with_minted#Reference_guide
+%\usemintedstyle{vs} % HAS ERROR BOXES!
+\usemintedstyle{pastie}
+%\usemintedstyle{manni}
 
 %% https://en.wikibooks.org/wiki/LaTeX/List_Structures
 \usepackage{scrextend}
@@ -858,7 +861,7 @@ When a local variable is declared, stack space is immediately allocated for the 
 \begin{figure}[!h]
     \begin{minipage}{0.5\textwidth}
         \centering
-\begin{minted}{asm}
+\begin{minted}[linenos]{text}
 MOV   %Bp, %Sp     1ee0 (STACK FRAME)
 SUBI  %Sp, $1      5f01 (ALLOC a -3)
 SUBI  %Sp, $1      5f01 (ALLOC b -2)
@@ -870,9 +873,10 @@ LW    %Ax, -1(%Bp) 08df (REF c -1)
         \captionof{figure}{Disassembly of the output machine code for the high-level code (\ref{fig:compiler_cg_vars_high}).}
         \label{fig:compiler_cg_vars_asm}
     \end{minipage}
+    \begin{minipage}{0.05\textwidth}\hfill\end{minipage}
     \begin{minipage}{0.5\textwidth}
         \centering
-\begin{minted}{C}
+\begin{minted}[linenos]{python}
 def main() {
     int a; int b; 
     int c;
@@ -890,13 +894,15 @@ def main() {
 Variables are then accessed using the \verb|LW| instruction and passing a 5-bit signed immediate constant as seen above.
 
 \subsubsection*{String Variables}
-Strings are an extended deliverable for the \scname{} compiler but was added to better demonstrate the capabilities of the compiler and processor. Strings in modern OS executable file formats, such as ELF and Windows' PE formats, store explicitly declared strings as null-terminated ASCII strings in the String Table or \verb|.text| section of the executable file.
+Strings are an extended deliverable for the \scname{} compiler but was added to better demonstrate the capabilities of the compiler and processor. Strings in modern OS executable file formats, such as ELF \citep{elf_standard} and Windows' PE \citep {winpe_standard} formats, store explicitly declared strings as null-terminated ASCII (ASCIZ) strings in the String Table or \verb|.text| section of the executable file.
+
+The \scname{} processor places strings and global values at the start of low memory. As the processor starts executing instructions at address \verb|0x00|, the compiler must insert a jump instruction to the address of the \verb|main| function.
 
 
 \begin{figure}[!h]
     \begin{minipage}{0.5\textwidth}
         \centering
-\begin{minted}{text}
+\begin{minted}[linenos]{text}
 0x00 MOVI   $6,  Bx  2106 (ENTRY)
 0x01 JMP    Bx,  JUC 6100 
 0x02 ASCII  b    1   0062 
@@ -908,9 +914,10 @@ Strings are an extended deliverable for the \scname{} compiler but was added to 
         \captionof{figure}{Disassembly of the output machine code for the high-level code. Local variable declaration '\textit{a}' is assigned the value \textit{0x02} which is the address of the first byte of the ASCIZ string.}
         \label{fig:compiler_cg_vars_asm}
     \end{minipage}
+    \begin{minipage}{0.05\textwidth}\hfill\end{minipage}
     \begin{minipage}{0.5\textwidth}
         \centering
-\begin{minted}{C}
+\begin{minted}[linenos]{python}
 
 def main() 
 {
@@ -922,12 +929,53 @@ def main()
         \captionof{figure}{Input high-level code showing a string variable declaration.}
         \label{fig:compiler_cg_vars_high}
     \end{minipage}
-    \captionof{figure}{Example machine code generation for local variables.}
+    \captionof{figure}{Example machine code generation for string variables.}
     \label{fig:compiler_cg_vars}
 \end{figure}
 
 \subsubsection*{Pointers and Value Dereferencing}
 With the implementation of string variables, the concepts of pointers and dereferencing is implicitly introduced. 
+\begin{figure}[!h]
+    \begin{minipage}{0.5\textwidth}
+        \centering
+\begin{minted}[linenos]{c}
+void strlen() {
+    char *str = "testing";
+    int length = 0;
+    
+    while( *(str + length) ) {
+        length++;
+    }
+    
+    printf("%d", length);
+}
+\end{minted}
+        \captionof{figure}{C function to calculate the length of a string and print to console.}
+        \label{fig:compiler_cg_vars_asm}
+    \end{minipage}
+    \begin{minipage}{0.05\textwidth}\hfill\end{minipage}
+    \begin{minipage}{0.5\textwidth}
+        \centering
+\begin{minted}[linenos]{python}
+def strlen() {
+    int str = "testing";
+    int length = 0;
+
+    while( @(str + length) ) {
+        length = length + 1;
+    }
+
+    UART1(length + 48);
+}
+\end{minted}
+        \captionof{figure}{Equivalent function to print the length of a string to UART in the \scname{} programming language.}
+        \label{fig:compiler_cg_vars_high}
+    \end{minipage}
+    \captionof{figure}{Example machine code generation for value dereferencing.}
+    \label{fig:compiler_cg_vars}
+\end{figure}
+
+
 
 \subsection{PUSH and POP}
 \label{sect:compiler_cg_push_pop}
@@ -1034,7 +1082,7 @@ AST Intermediate Representation & Yes & 1.00 &  \\
 Basic arithmetic Operators & Yes & 1.10 &  \\ 
 \hline 
 IF statements 	& Yes & 1.30 & \verb|if ( <expr> ) { ... }| \\ \hline 
-IF ELSE statements & Yes & 1.30 & \verb|if ( <expr> ) { ... } else { ... }|\\ \hline 
+IF ELSE statements & Yes & 1.30 & \verb|if ( <expr> ) { ... } else { ... }|. Else must be followed by an opening bracket character so no \verb|else if| statements, although you can nest them instead. \\ \hline 
 FOR statements 	& Yes & 1.30 & \\ \hline 
 Functions	 	& Yes & 1.20 & \verb|| \\ \hline 
 Variables 		& Limited & 1.50 & Only local variables. No global or parameter variables.\\ \hline 
@@ -1064,7 +1112,7 @@ Dereferencing         & Yes & 2.10 & Uses low precedence \verb|@| symbol. Unsafe
 \textit{Pointer} arithmetic & Yes & 2.10 & Inferred by dereferencing implementation. 
 E.g. \verb|@(a+1)| returns contents of memory address at value \verb|a+1|. 
 \\ \hline 
-Assembler memory layout & Limited & 2.10 & First instructions (low memory) jump into \textit{middle} memory where \verb|main| function is located. Low memory consists of \textit{global values} (like strings and global variables). High memory is reserved for stack management. 
+Assembler memory layout & Yes & 2.10 & First instructions (low memory) jump into \textit{middle} memory where \verb|main| function is located. Low memory consists of \textit{global values} (like strings and global variables). High memory is reserved for stack management. 
 \\ \hline 
 \end{tabularx} 
 \end{table}

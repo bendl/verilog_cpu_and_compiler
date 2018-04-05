@@ -494,8 +494,10 @@ lexer_next(void)
                 // It's not a resv word so id must be an ident
                 LEXER_GET_STR()
                         = calloc(strlen(buf + 1), sizeof(*LEXER_GET_STR()));
+
                 // Copy the ident string to the new ident allocation
                 strcpy(LEXER_GET_STR(), buf);
+
                 // Return we've found an ident
                 return TOK_ID;
         }
@@ -510,7 +512,9 @@ lexer_next(void)
         {
                 lexer_fgetc();
                 return lexer_next();
-        } else {
+        }
+        else
+        {
                 dprintf(D_ERR, "Unknown character: %d %c\r\n",
                         LEXER_GET_CHAR(),
                         LEXER_GET_CHAR());
@@ -534,7 +538,8 @@ enum token_type
 lexer_match_next(enum token_type t)
 {
         if (lexer_token() != t) {
-                dprintf(D_ERR, "Unexpected token! %d %c\r\n", LEXER_GET_TOK());
+                dprintf(D_ERR, "Unexpected token! %d %c\r\n",
+                        LEXER_GET_TOK());
                 return TOK_ERROR;
         }
 
