@@ -270,6 +270,7 @@ parser_run(_in_ struct text_parser *parser)
         parser_add_resv("ext", 0, TOK_EXT);
         parser_add_resv("if", 0, TOK_IF);
         parser_add_resv("for", 0, TOK_FOR);
+        parser_add_resv("while", 0, TOK_WHILE);
         parser_add_resv("else", 0, TOK_ELSE);
         parser_add_resv("ret", 0, TOK_RET);
         parser_add_resv("call", 0, TOK_CALL);
@@ -1047,6 +1048,29 @@ parse_port_uart1(void)
 }
 
 struct ast_item *
+parse_while_expr(void)
+{
+        struct ast_item *cond;
+        struct ast_item *body;
+        struct ast_while *w;
+
+        lexer_match_next(TOK_WHILE);
+        lexer_match_next(TOK_LBRACE);
+        cond = parse_expr();
+        lexer_match_next(TOK_RBRACE);
+
+        lexer_match_next(TOK_LCBRACE);
+        body = parse_block();
+        lexer_match_next(TOK_RCBRACE);
+
+        w = calloc(1, sizeof(*w));
+        w->cond = cond;
+        w->body = body;
+
+        return new_expr(w, AST_WHILE);
+}
+
+struct ast_item *
 parse_expr(void)
 {
         struct ast_item *lhs;
@@ -1056,6 +1080,9 @@ parse_expr(void)
 
         if (lexer_match(TOK_FOR))
                 return parse_for_expr();
+
+        if(lexer_match(TOK_WHILE))
+                return parse_while_expr();
 
         if(lexer_match(TOK_PORT_UART1))
                 return parse_port_uart1();

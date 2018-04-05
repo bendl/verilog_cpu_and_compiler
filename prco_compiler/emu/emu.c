@@ -53,6 +53,9 @@ struct prco_emu_core {
         struct prco_op_struct current_op;
 
         int should_branch;
+
+        // stats
+        int exec_count;
 };
 
 struct prco_emu_core core = {0};
@@ -310,6 +313,8 @@ void emu_exec(struct prco_op_struct *op)
 
                 break;
         }
+
+        core.exec_count++;
 }
 
 struct prco_op_struct emu_decode(unsigned short mc)
@@ -381,6 +386,8 @@ int main(int argc, char **argv)
         emu_run(&core);
 
         // After, print registers and memory
+        dprintf(D_EMU, "\r\nCore HALTED after %d executions.\r\n",
+                core.exec_count);
         print_mem();
         print_regs();
 

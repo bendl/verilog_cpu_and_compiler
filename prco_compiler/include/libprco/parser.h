@@ -51,6 +51,7 @@ extern "C" {
     TOK(TOK_BOOL_OR) \
     TOK(TOK_BIT_OR) \
     TOK(TOK_FOR) \
+    TOK(TOK_WHILE) \
     TOK(TOK_DQUOTE) \
     TOK(TOK_QUOTE) \
     TOK(TOK_RET) \

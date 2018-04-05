@@ -388,11 +388,15 @@ cg_expr_template(struct ast_item *e)
                 case AST_CALL:
                         cg_call_template(e->expr);
                         break;
+
                 case AST_IF:
                         cg_if_template(e->expr);
                         break;
                 case AST_FOR:
                         cg_for_template(e->expr);
+                        break;
+                case AST_WHILE:
+                        cg_while_template(e->expr);
                         break;
 
                 case AST_LOCAL_VAR:
@@ -498,7 +502,56 @@ cg_for_template(struct ast_for *a)
         for_after_dest.id = for_after_id;
         for_after_dest.comment = "FOR LOOP AFTER";
         asm_push(for_after_dest);
+}
 
+void cg_while_template(struct ast_while *v)
+{
+        struct prco_op_struct cond_start;
+        struct prco_op_struct while_jmp_to_cond;
+        struct prco_op_struct while_jmp_to_after;
+        struct prco_op_struct while_after;
+
+        int guid_cond_start  = NEW_ASM_ID();
+        int guid_while_after = NEW_ASM_ID();
+
+        cond_start = opcode_nop();
+        cond_start.id = guid_cond_start;
+        cond_start.asm_flags |= ASM_JMP_DEST;
+        cond_start.comment = "WHILE COND DEST";
+        asm_push(cond_start);
+
+        // cg for condition
+        cg_expr_template(v->cond);
+
+        // CMP the condition
+        asm_push(opcode_mov_ri(Bx, 0));
+        asm_push(opcode_cmp_rr(Ax, Bx));
+
+        // Jmp to after if false
+        while_jmp_to_after = opcode_mov_ri(Bx, 0x00);
+        while_jmp_to_after.id = guid_while_after;
+        while_jmp_to_after.asm_flags |= ASM_JMP_JMP;
+        while_jmp_to_after.comment = "WHILE AFTER JMP";
+        asm_push(while_jmp_to_after);
+        asm_push(opcode_jmp_rc(Bx, JMP_JE));
+
+        // cg the while loop body
+        cg_expr_template(v->body);
+
+        // Jump back to condition check
+        while_jmp_to_cond = opcode_mov_ri(Bx, 0x00);
+        while_jmp_to_cond.id = guid_cond_start;
+        while_jmp_to_cond.comment = "WHILE COND JMP";
+        while_jmp_to_cond.asm_flags |= ASM_JMP_JMP;
+        asm_push(while_jmp_to_cond);
+        asm_push(opcode_jmp_r(Bx));
+
+        // Emit the jump after destination
+        while_after = opcode_nop();
+        while_after.asm_flags |= ASM_JMP_DEST;
+        while_after.id = guid_while_after;
+        while_after.comment = "WHILE AFTER DEST";
+        asm_push(while_after);
 }
 
 void
