@@ -36,6 +36,7 @@ module prco_alu (
         
         begin
             tmp = data - datb;
+            $display("ALU_CMP: %02x %02x", data, datb);
             $display(`BINP17, `BIN17(tmp));
 
             // Zero flag (or Equal)

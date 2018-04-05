@@ -159,6 +159,8 @@ module prco_core(
                         q_debug_instr_clk <= 1;
                         pc <= pc + 1;
                         
+                        $display("PC 0x%x", pc);
+                        
                         // We have acted upon the data and
                         // are ready to pass to next module
                         q_ce <= 1;
