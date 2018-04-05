@@ -39,8 +39,8 @@ module prco_core(
     wire [15:0] r_dec_imm8;
     wire [4:0]  r_dec_simm5;
 
-    wire [15:0] r_reg_doutd;
-    wire [15:0] r_reg_douta;
+    wire [15:0] r_reg_q_data;
+    wire [15:0] r_reg_q_datb;
     reg         r_reg_en = 1;
     reg [15:0]  r_reg_dina;
 
@@ -200,7 +200,7 @@ module prco_core(
         
         .i_mem_we(r_lmem_we), 
         .i_mem_addr(r_mem_addr), 
-        .i_mem_dina(r_reg_doutd), 
+        .i_mem_dina(r_reg_q_data), 
         .q_mem_douta(r_mem_douta)
     );
 
@@ -247,8 +247,8 @@ module prco_core(
         .i_sela(r_dec_seld), 
         .i_selb(r_dec_sela), 
 
-        .q_data(r_reg_doutd), 
-        .q_datb(r_reg_douta), 
+        .q_data(r_reg_q_data), 
+        .q_datb(r_reg_q_datb), 
 
         .i_we(r_reg_we), 
         .i_seld(r_dec_seld), 
@@ -266,8 +266,8 @@ module prco_core(
 
         .i_op(r_dec_op), 
 
-        .i_data(r_reg_douta), 
-        .i_datb(r_reg_doutd), 
+        .i_data(r_reg_q_data), 
+        .i_datb(r_reg_q_datb), 
 
         .i_imm8(r_dec_imm8), 
         .i_simm5(r_dec_simm5), 

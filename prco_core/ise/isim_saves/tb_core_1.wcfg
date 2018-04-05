@@ -10,7 +10,7 @@
          </top_modules>
       </db_ref>
    </db_ref_list>
-   <WVObjectSize size="32" />
+   <WVObjectSize size="35" />
    <wvobject fp_name="/tb_prco_core/uut/i_clk" type="logic" db_ref_id="1">
       <obj_property name="ElementShortName">i_clk</obj_property>
       <obj_property name="ObjectShortName">i_clk</obj_property>
@@ -61,6 +61,10 @@
       <obj_property name="ElementShortName">i_reset</obj_property>
       <obj_property name="ObjectShortName">i_reset</obj_property>
    </wvobject>
+   <wvobject fp_name="/tb_prco_core/uut/inst_lmem/i_ce_alu" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">i_ce_alu</obj_property>
+      <obj_property name="ObjectShortName">i_ce_alu</obj_property>
+   </wvobject>
    <wvobject fp_name="/tb_prco_core/uut/inst_lmem/i_ce_fetch" type="logic" db_ref_id="1">
       <obj_property name="ElementShortName">i_ce_fetch</obj_property>
       <obj_property name="ObjectShortName">i_ce_fetch</obj_property>
@@ -93,39 +97,47 @@
       <obj_property name="BkColor">128 128 255</obj_property>
       <obj_property name="TextColor">230 230 230</obj_property>
    </wvobject>
+   <wvobject fp_name="/tb_prco_core/uut/inst_regs/i_ce_dec" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">i_ce_dec</obj_property>
+      <obj_property name="ObjectShortName">i_ce_dec</obj_property>
+   </wvobject>
    <wvobject fp_name="/tb_prco_core/uut/inst_regs/i_sela" type="array" db_ref_id="1">
       <obj_property name="ElementShortName">i_sela[2:0]</obj_property>
       <obj_property name="ObjectShortName">i_sela[2:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_prco_core/uut/inst_regs/q_datb" type="array" db_ref_id="1">
-      <obj_property name="ElementShortName">q_datb[15:0]</obj_property>
-      <obj_property name="ObjectShortName">q_datb[15:0]</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_prco_core/uut/inst_regs/i_selb" type="array" db_ref_id="1">
       <obj_property name="ElementShortName">i_selb[2:0]</obj_property>
       <obj_property name="ObjectShortName">i_selb[2:0]</obj_property>
    </wvobject>
-   <wvobject fp_name="/tb_prco_core/uut/inst_regs/q_datb" type="array" db_ref_id="1">
-      <obj_property name="ElementShortName">q_datb[15:0]</obj_property>
-      <obj_property name="ObjectShortName">q_datb[15:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_prco_core/uut/inst_regs/i_ce_alu" type="logic" db_ref_id="1">
-      <obj_property name="ElementShortName">i_ce_alu</obj_property>
-      <obj_property name="ObjectShortName">i_ce_alu</obj_property>
-   </wvobject>
    <wvobject fp_name="/tb_prco_core/uut/inst_regs/i_seld" type="array" db_ref_id="1">
       <obj_property name="ElementShortName">i_seld[2:0]</obj_property>
       <obj_property name="ObjectShortName">i_seld[2:0]</obj_property>
    </wvobject>
+   <wvobject fp_name="/tb_prco_core/uut/inst_regs/q_data" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">q_data[15:0]</obj_property>
+      <obj_property name="ObjectShortName">q_data[15:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_prco_core/uut/inst_regs/q_datb" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">q_datb[15:0]</obj_property>
+      <obj_property name="ObjectShortName">q_datb[15:0]</obj_property>
+   </wvobject>
    <wvobject fp_name="/tb_prco_core/uut/inst_regs/i_datd" type="array" db_ref_id="1">
       <obj_property name="ElementShortName">i_datd[15:0]</obj_property>
       <obj_property name="ObjectShortName">i_datd[15:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_prco_core/uut/inst_regs/i_ce_alu" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">i_ce_alu</obj_property>
+      <obj_property name="ObjectShortName">i_ce_alu</obj_property>
    </wvobject>
    <wvobject fp_name="divider32" type="divider">
       <obj_property name="label">ALU</obj_property>
       <obj_property name="DisplayName">label</obj_property>
       <obj_property name="BkColor">128 128 255</obj_property>
       <obj_property name="TextColor">230 230 230</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_prco_core/uut/inst_alu/i_ce" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">i_ce</obj_property>
+      <obj_property name="ObjectShortName">i_ce</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_prco_core/uut/inst_alu/i_data" type="array" db_ref_id="1">
       <obj_property name="ElementShortName">i_data[15:0]</obj_property>

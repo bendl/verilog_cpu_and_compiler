@@ -82,7 +82,7 @@ void print_mem(void)
 
         dprintf(D_EMU, "\r\n\r\n");
 
-        for (i = 0; i <= width; i++) {
+        for (i = 0; i < width; i++) {
                 dprintf(D_EMU, "%02x\t", i);
         }
 
@@ -94,7 +94,7 @@ void print_mem(void)
 
         for (i = 0; i < 0xff; i++) {
                 dprintf(D_EMU, "%02x\t", core.lmem[i]);
-                if(i2 == width) {
+                if(i2 == width-1) {
                         dprintf(D_EMU, "\r\n");
                         i2 = 0;
                 } else {
@@ -114,10 +114,13 @@ unsigned short
 alu_cmp(struct prco_emu_core *core,
         unsigned short a, unsigned short b)
 {
-        unsigned short tmp = 0;
+        unsigned long tmp = 0;
         unsigned short ret = 0;
 
         tmp = a - b;
+        PRINT_SPACE(D_EMU2);
+        dprintf(D_EMU2, "ALU_TMP(%d bits): %x\r\n",
+                sizeof(tmp)*8, tmp);
 
         // Zero flag
         if(tmp == 0) ret |= 1;
@@ -136,7 +139,8 @@ alu_cmp(struct prco_emu_core *core,
         }
 
         PRINT_SPACE(D_EMU2);
-        dprintf(D_EMU2, "ALU_CMP: %02x %02x = %02x\r\n", a, b, ret);
+        dprintf(D_EMU2, "ALU_CMP: %02x %02x = %02x\r\n",
+                a, b, ret);
 
         return ret;
 }

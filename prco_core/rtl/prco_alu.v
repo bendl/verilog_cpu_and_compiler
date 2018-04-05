@@ -149,7 +149,7 @@ module prco_alu (
                 $display("ALU_PRCO_OP_S/LW");
                 // Sign extend the signed 5 bit immediate
                 sign_extended_imm = { {11{i_simm5[4]}}, i_simm5[4:0] };
-                q_result <= i_data + sign_extended_imm;
+                q_result <= i_datb + sign_extended_imm;
                 q_should_branch <= 0;
             end
 
@@ -163,14 +163,18 @@ module prco_alu (
 
         `PRCO_OP_JMP: begin
             // ALU result is the PC in address
-            // datb = register to jump to
-            // data = SR register
-            q_result <= i_datb;
+            // data = register to jump to
+            q_result <= i_data;
             q_should_branch <= func_alu_should_jmp(i_imm8, r_sr);
             end
 
         `PRCO_OP_SET: begin
             q_result <= func_alu_should_set(i_imm8, r_sr);
+            q_should_branch <= 0;
+            end
+
+        `PRCO_OP_MOV: begin
+            q_result <= i_datb;
             q_should_branch <= 0;
             end
 
@@ -180,23 +184,18 @@ module prco_alu (
             q_should_branch <= 0;
             end
 
-        `PRCO_OP_MOV: begin
-            q_result <= i_data;
-            q_should_branch <= 0;
-            end
-
         `PRCO_OP_ADD: begin
             q_result <= i_data + i_datb;
             q_should_branch <= 0;
             end
 
         `PRCO_OP_ADDI: begin
-            q_result <= i_datb + i_imm8;
+            q_result <= i_data + i_imm8;
             q_should_branch <= 0;
             end
             
         `PRCO_OP_SUBI: begin
-            q_result <= i_datb - i_imm8;
+            q_result <= i_data - i_imm8;
             q_should_branch <= 0;
             end
             
