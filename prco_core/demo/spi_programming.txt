@@ -1,0 +1,5 @@
+http://hamsterworks.co.nz/mediawiki/index.php/MiniSpartan6%2B_SPI_Programming
+
+xc3sprog.exe -c FTDI bscan_spi_s6lx25_ftg256.bit
+
+xc3sprog.exe -c FTDI bscan_spi_s6lx25_ftg256.bit
