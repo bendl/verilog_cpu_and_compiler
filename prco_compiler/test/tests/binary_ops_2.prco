@@ -1,9 +1,9 @@
 
-def foo() {
+__stdcall fnc foo() {
     10 + 1;
 }
 
-def main() {
+__stdcall fnc main() {
     32;
     foo();
 }

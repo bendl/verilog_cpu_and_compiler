@@ -81,12 +81,13 @@ assert_opcode(struct prco_op_struct *op, char print)
         case JMP:
                 assert((op->opcode >> 11) == op->op);
                 assert(((op->opcode >> 8) & PRCO_OP_BITS_REG) == op->regD);
-                dprintf(D_GEN, "%s\t%s,\t%s\t%04x\t\t%d\t%s\r\n", OP_STR[op->op],
-                       REG_STR[op->regD],
-                       JMP_STR[op->imm8],
-                       op->opcode,
-                       op->asm_flags,
-                       op->comment);
+                dprintf(D_GEN, "%s\t%s,\t%s\t%04x\t\t%d\t%s\r\n",
+                        OP_STR[op->op],
+                        REG_STR[op->regD],
+                        JMP_STR[op->imm8],
+                        op->opcode,
+                        op->asm_flags,
+                        op->comment);
                 break;
 
         case ADDI:

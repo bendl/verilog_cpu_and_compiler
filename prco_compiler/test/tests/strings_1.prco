@@ -1,6 +1,6 @@
 
 
-def main() {
+__stdcall fnc main() {
     int a = "ben";
     a;
 }

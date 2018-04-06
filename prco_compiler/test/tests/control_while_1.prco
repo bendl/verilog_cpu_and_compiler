@@ -1,5 +1,5 @@
 
-def main()
+__stdcall fnc main()
 {
     while(0) {
         10;

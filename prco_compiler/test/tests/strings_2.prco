@@ -1,6 +1,6 @@
 
 
-def main()
+__stdcall fnc main()
 {
     @0;
     @1;

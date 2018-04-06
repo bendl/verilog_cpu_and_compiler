@@ -1,5 +1,5 @@
 
-def main()
+__stdcall fnc main()
 {
     int str = "testing";
     int length = 0;

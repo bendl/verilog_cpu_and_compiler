@@ -239,6 +239,8 @@ void emu_load_mem(char *fpath)
                         buf_i = 0;
                 }
         }
+
+        fclose(f);
 }
 
 void emu_exec(struct prco_op_struct *op)

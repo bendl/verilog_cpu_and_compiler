@@ -307,7 +307,7 @@ parser_run(_in_ struct text_parser *parser)
         // Todo, datasizes should be target independant
         parser_add_resv("int", dtINT, TOK_VARIABLE);
         parser_add_resv("var", dtINT, TOK_VARIABLE);
-        parser_add_resv("def", 0, TOK_DEF);
+        parser_add_resv("fnc", 0, TOK_DEF);
         parser_add_resv("ext", 0, TOK_EXT);
         parser_add_resv("if", 0, TOK_IF);
         parser_add_resv("for", 0, TOK_FOR);
@@ -432,7 +432,7 @@ lexer_string(char *buf)
         do {
                 buf[buf_i++] = (char)LEXER_GET_CHAR();
                 lexer_fgetc();
-        } while (isalnum(LEXER_GET_CHAR()));
+        } while (isalnum(LEXER_GET_CHAR()) || LEXER_GET_CHAR() == '_');
 
         // Null terminate the string buffer
         buf[buf_i] = 0;
@@ -483,7 +483,7 @@ lexer_next(void)
         }
 
         // It could be a string, so loop over until non alpha character reach
-        if (isalpha(LEXER_GET_CHAR()))
+        if (isalpha(LEXER_GET_CHAR()) || LEXER_GET_CHAR() == '_')
         {
                 lexer_string(buf);
 
@@ -593,6 +593,10 @@ parse_proto(enum token_type t)
         args = zalloc(args);
 
         // def ident (
+        lexer_match_opt(TOK_CC_STDCALL);
+        lexer_match_opt(TOK_CC_CDECL);
+        lexer_match_opt(TOK_CC_FASTCALL);
+
         lexer_match_opt(TOK_DEF);
         lexer_match_req(TOK_ID);
         fn_name = LEXER_GET_STR();
