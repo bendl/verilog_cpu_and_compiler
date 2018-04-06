@@ -1105,6 +1105,7 @@ parse_if_expr(void)
         then = parse_block();
         lexer_match_next(TOK_RCBRACE);
 
+        // Else is optional, so check for it
         // else '{' <body> '}'
         if (lexer_match(TOK_ELSE)) {
                 lexer_match_next(TOK_ELSE);
@@ -1162,8 +1163,8 @@ struct ast_item *
 parse_while_expr(void)
 {
         // while ( <expr> ) { <expr> }
-        struct ast_item *cond;
-        struct ast_item *body;
+        struct ast_item  *cond;
+        struct ast_item  *body;
         struct ast_while *w;
 
         // Parse it
@@ -1215,7 +1216,7 @@ parse_block(void)
         // A block is a list of multiple <expr> with
         // in chronological order
         struct ast_item *start = NULL;
-        struct ast_item *last = NULL;
+        struct ast_item *last  = NULL;
 
         lexer_match_opt(TOK_LCBRACE);
 
@@ -1244,13 +1245,13 @@ parse_ascii(void)
 {
         char *buf;
         int buf_i = 0;
-        const int asciz_max_lengthz = 256;
+        const int ASCIZ_MAX_LENGTH = 256;
 
         lexer_match_req(TOK_DQUOTE);
-        buf = malloc(256);
+        buf = malloc(ASCIZ_MAX_LENGTH);
 
         while(LEXER_GET_CHAR() != '"') {
-                if(buf_i < asciz_max_lengthz-1) {
+                if(buf_i < ASCIZ_MAX_LENGTH-1) {
                         buf[buf_i++] = (char)LEXER_GET_CHAR();
                         lexer_fgetc();
                 }

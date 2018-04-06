@@ -77,7 +77,7 @@
 
 %% Report variables
 \newcommand{\scname}{PRCO304}
-\newcommand{\dlatestv}{2.60}
+\newcommand{\dlatestv}{2.80}
 
 \definecolor{babyblueeyes}{rgb}{0.63, 0.79, 0.95}
 \definecolor{ballblue}{rgb}{0.13, 0.67, 0.8}
@@ -211,6 +211,8 @@ PRCO304 - Final Stage Computing Project
     Date & Version & Changes \\
     \arrayrulecolor{blue9}
 	\specialrule{2pt}{-2pt}{0pt}
+	30/03/2018 & 2.80 & Add details of Argument Variables implementation. \\ \hline
+	30/03/2018 & 2.70 & Add description of compiler function requirements. \\ \hline
 	30/03/2018 & 2.60 & Add word count below TOC. \\ \hline
 	29/03/2018 & 2.50 & Add chapter table of contents. \\ \hline
 	29/03/2018 & 2.40 & Add section \ref{sect:core_test} \nameref{sect:core_test}. \\ \hline
@@ -851,7 +853,7 @@ This code generation stage is named intermediatary because absolute addresses of
 
 \subsection{Variables}
 \label{sect:compiler_cg_vars}
-An initial requirement for the \scname{} compiler was to support three types of variables: global, local, and parameter variables. Due to time constraints and unforeseen \textit{"sleeper"} bugs only local variables have been implemented as of compiler version 2.40 (05/04/2018). Global variable allocation has been implemented in the assembler but declaring or referencing global variables has not been implemented.
+An initial requirement for the \scname{} compiler was to support three types of variables: global, local, and parameter variables. Due to time constraints and unforeseen \textit{"sleeper"} bugs only local and argument variables have been implemented as of compiler version 2.50 (06/04/2018). Global variable allocation has been implemented in the assembler but declaring or referencing global variables has not been implemented.
 
 \subsubsection*{Local Variables}
 Similar to C89, all local variables must be declared at the start of the function before any logic, such as function calling. This is because the compiler will not rearrange the AST tree to move variable declarations to the first child of the function AST tree.
@@ -893,8 +895,31 @@ def main() {
 
 Variables are then accessed using the \verb|LW| instruction and passing a 5-bit signed immediate constant as seen above.
 
+\subsubsection*{Argument Variables}
+The compiler uses a modified implementation of the \verb|stdcall| calling convention \citep{callconv}. The difference is that arguments are pushed \textit{left to right} instead of \textit{right to left}. This difference is due to limited time constraints and was made worse by the use of a singly-linked list for storing arguments, which made list reversal time consuming. The compiler overcomes this difference by reversing variable offset addresses of the parameters of the function. The affect of this implementation might cause externally compiled programs to be incompatible with programs compiled with this \scname{} compiler. This is easily solvable by reversing the argument list before pushing.
+
+Figure \ref{fig:compiler_cg_vars_args} below shows the code generation routine used by the compiler to push function call arguments to the stack before jumping to the function.
+
+\begin{figure}[H]
+\centering 
+\begin{minipage}{0.4\textwidth}
+\begin{minted}[
+    linenos,
+    firstnumber=628]{c}
+args = c->args;
+list_for_each(args) {
+    cg_expr_template(args->value);
+    cg_push_prco(Ax);
+}
+\end{minted}
+\end{minipage}
+\caption{Code generation routine for pushing arguments to the stack before the function call. (\textit{arch/template\_impl.c:628})}
+\label{fig:compiler_cg_vars_args}
+\end{figure}
+
+
 \subsubsection*{String Variables}
-Strings are an extended deliverable for the \scname{} compiler but was added to better demonstrate the capabilities of the compiler and processor. Strings in modern OS executable file formats, such as ELF \citep{elf_standard} and Windows' PE \citep {winpe_standard} formats, store explicitly declared strings as null-terminated ASCII (ASCIZ) strings in the String Table or \verb|.text| section of the executable file.
+Strings are an extended deliverable for the \scname{} compiler but was added to better demonstrate the capabilities of the compiler and processor. Strings in modern OS executable file formats, such as ELF \citep{elf_standard} and Windows' PE \citep {winpe_standard}, store explicitly declared strings as null-terminated ASCII (ASCIZ) strings in the String Table or \verb|.text| section of the executable file.
 
 The \scname{} processor places strings and global values at the start of low memory. As the processor starts executing instructions at address \verb|0x00|, the compiler must insert a jump instruction to the address of the \verb|main| function.
 
@@ -1014,11 +1039,6 @@ void cg_pop_prco(enum prco_reg rd)
 
 
 \section{Assembling}
-The final stage of the compiler is the assembling stage. This stage takes the list of \mintinline{c}{struct prco_op_struct} and outputs a list of machine code instructions. The assembler accomplishes this by calculating offsets and addresses of functions, branching instructions, and global variable addresses. It may also rearrange function locations so that the main function is the first instruction to be emitted.
-
-Assembling code is found in \verb|assembler_labels()| at \verb|arch/template_impl.c:38|.
-
-\subsection{Executable Layout}
 %\begin{figure}[H]
 \begin{wrapfigure}{r}{0.3\textwidth}
 \begin{center}
@@ -1028,6 +1048,12 @@ Assembling code is found in \verb|assembler_labels()| at \verb|arch/template_imp
 \label{fig:asm_mem_layout}
 %\end{figure}
 \end{wrapfigure}
+The final stage of the compiler is the assembling stage. This stage takes the list of \mintinline{c}{struct prco_op_struct} and outputs a list of machine code instructions. The assembler accomplishes this by calculating offsets and addresses of functions, branching instructions, and global variable addresses. It may also rearrange function locations so that the main function is the first instruction to be emitted.
+
+Assembling code is found in \verb|assembler_labels()| at \verb|arch/template_impl.c:38|.
+
+\subsection{Executable Layout}
+
 
 Another role of the assembler in the \scname{} processor is to output the machine code in a format that allows the widest range of programs to be run by the processor.
 
@@ -1085,7 +1111,7 @@ IF statements 	& Yes & 1.30 & \verb|if ( <expr> ) { ... }| \\ \hline
 IF ELSE statements & Yes & 1.30 & \verb|if ( <expr> ) { ... } else { ... }|. Else must be followed by an opening bracket character so no \verb|else if| statements, although you can nest them instead. \\ \hline 
 FOR statements 	& Yes & 1.30 & \\ \hline 
 Functions	 	& Yes & 1.20 & \verb|| \\ \hline 
-Variables 		& Limited & 1.50 & Only local variables. No global or parameter variables.\\ \hline 
+Variables 		& Limited & 1.50 & Only local and argument variables. No global variables.\\ \hline 
 Code generation & Yes & 1.30 & \\ \hline
 Assembling 		& Yes & 1.40 & Basic offset calculation and re-encoding.\\ 
 \hline 

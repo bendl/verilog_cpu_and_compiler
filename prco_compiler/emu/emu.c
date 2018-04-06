@@ -40,6 +40,8 @@ SOFTWARE.
 #include <string.h>
 #include <ctype.h>
 
+#define LIBPRCO_EMU_VERSION 2.60
+
 char uart_tx_buf[0xff];
 char uart_tx_buf_i = 0;
 
@@ -395,6 +397,9 @@ int main(int argc, char **argv)
 {
         // Turn on all debug prints
         g_dbug_level = 0xff;
+
+        dprintf(D_INFO, "LIBPRCO Emulator. Version %f\r\n\r\n",
+                LIBPRCO_EMU_VERSION);
 
         // Initialise the core
         emu_init(&core);

@@ -38,7 +38,11 @@ SOFTWARE.
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-int main(int argc, char **argv)
+
+#define LIBPRCO_COMPILER_VERSION 2.60
+
+int
+main(int argc, char **argv)
 {
         // Compiler variables
         struct module           *module;
@@ -81,6 +85,10 @@ int main(int argc, char **argv)
                 goto main_exit;
         }
 
+        dprintf(D_INFO, "LIBPRCO Compiler. Version %f\r\n\r\n",
+                LIBPRCO_COMPILER_VERSION);
+
+
         // Create output file for writing
         file_output = fopen(out_name, "w");
         g_file_out  = file_output;
@@ -95,7 +103,6 @@ int main(int argc, char **argv)
                 parse_result = 3;
                 goto main_exit;
         }
-        dprintf(D_INFO, "File size: %d\r\n", src_size);
 
         // Run the parser
         parse_result = parser_run(parser);
