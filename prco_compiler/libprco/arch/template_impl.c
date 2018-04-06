@@ -612,24 +612,44 @@ cg_local_decl_template(struct ast_lvar *v)
 void
 cg_call_template(struct ast_call *c)
 {
-        struct prco_op_struct op_next, op_call;
+        struct prco_op_struct   op_next,
+                                op_call;
+
+        struct list_item *args;
+        struct ast_item *arg_item;
+        struct ast_item *args_reversed[MAX_CALL_ARGS] = {0};
+        int reversed_i = MAX_CALL_ARGS-1;
+
+        // We don't need to reverse the argument pushing as the
+        // parameter variable's bp_offsets have already been reversed
+        // So just cg the parameter, and push it in order.
+        //
+        // TODO: Push in reverse order to support stdcall and cdecl standards
+        args = c->args;
+        list_for_each(args) {
+                cg_expr_template(args->value);
+                cg_push_prco(Ax);
+                asm_comment("PUSH ARG");
+        }
+
+        // Create return address after called function returns
         op_next = opcode_mov_ri(Cx, 0x00);
         op_next.asm_flags = ASM_CALL_NEXT;
-        op_next.comment = "Create return address";
+        op_next.comment = "CALL AFTER";
+        asm_push(op_next);
 
+        // Push return address
+        cg_push_prco(Cx);
+
+        // Now, we jump to the function
         op_call = opcode_mov_ri(Cx, 0x00);
         op_call.asm_flags = ASM_FUNC_CALL;
         op_call.ast = c;
         op_call.comment = "call";
 
-        // Set address of next function (current + 2)
-        asm_push(op_next);
-        cg_push_prco(Cx);
-
-        // Set address of jmp
         asm_push(op_call);
         asm_push(opcode_jmp_r(Cx));
-        asm_comment("JMP");
+        asm_comment("JMP TO FUNC");
 }
 
 void
@@ -706,6 +726,23 @@ cg_function_template(struct ast_func *f)
         dprintf(D_GEN, "Starting cg for function: %s %d\r\n",
                 f->proto->name, f->num_local_vars);
 
+        struct list_item *arg_it = f->proto->args;
+        list_for_each(arg_it) {
+                struct ast_lvar *var = arg_it->value;
+                if(!var) continue;
+
+                dprintf(D_GEN, "PROTO ARGS: %s %d\r\n",
+                        var->var->name, var->bp_offset);
+        }
+
+        arg_it = f->locals;
+        list_for_each(arg_it) {
+                struct ast_lvar *var = arg_it->value;
+                if(!var) continue;
+
+                dprintf(D_GEN, "FUNC LOCALS: %s %d\r\n",
+                        var->var->name, var->bp_offset);
+        }
         assert(f);
         assert(f->proto);
         assert(f->body);
@@ -722,6 +759,10 @@ cg_function_template(struct ast_func *f)
         // Create the stack exit
         // if required
         cg_sf_exit();
+
+        // TODO: Decide if function is cdecl or stdcall
+        // Then clean up stack as per calling convention
+        // cg_cc_cleanup(f);
 
         // clean up
         cg_cur_function = NULL;

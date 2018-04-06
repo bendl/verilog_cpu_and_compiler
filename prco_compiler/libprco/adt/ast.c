@@ -25,6 +25,16 @@ SOFTWARE.
 #include "adt/ast.h"
 #include "types.h"
 #include <stdlib.h>
+#include <assert.h>
+
+void
+ast_func_free(_inout_ struct ast_func *f)
+{
+        assert(f);
+        assert(f->proto);
+
+        ast_free(f->body);
+}
 
 void
 ast_free(_inout_ struct ast_item *node)
@@ -42,23 +52,22 @@ ast_free(_inout_ struct ast_item *node)
                 ast_free(i->cond);
                 ast_free(i->then);
                 ast_free(i->els);
-        }
-                break;
+        } break;
 
         case AST_BIN: {
                 struct ast_bin *b = node->expr;
                 ast_free(b->lhs);
                 ast_free(b->rhs);
-        }
-                break;
+        } break;
 
         case AST_CALL: {
                 struct ast_call *c = node->expr;
-                ast_free(c->args);
-                // ast_free(c->proto); AST_FUNC will free AST_PROTO
-                ast_free(c->func);
-        }
-                break;
+                // TODO: Fix segfault
+
+                //ast_free(c->args);
+                //ast_free(c->proto); AST_FUNC will free AST_PROTO
+                //ast_func_free(c->func);
+        } break;
 
         case AST_FUNC: {
                 struct ast_func *f = node->expr;
@@ -66,8 +75,7 @@ ast_free(_inout_ struct ast_item *node)
                 ast_free(f->body);
                 ast_free(f->exit);
                 ast_free(f->proto);
-        }
-                break;
+        } break;
 
         } // End switch
 

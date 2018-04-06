@@ -165,6 +165,8 @@ parse_def(void);
 extern struct ast_item *
 parse_call(char *ident);
 
+extern char * parse_ascii(void);
+
 #ifdef __cplusplus
 }
 #endif

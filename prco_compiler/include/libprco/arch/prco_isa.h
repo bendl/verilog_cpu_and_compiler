@@ -83,6 +83,8 @@ struct prco_op_struct {
 
 #define ASM_POINTER     0x400
 
+#define MAX_CALL_ARGS (8)
+
 #define FOREACH_REG(REG) \
     REG(Ax) \
     REG(Bx) \

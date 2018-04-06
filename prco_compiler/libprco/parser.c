@@ -611,6 +611,8 @@ parse_proto(enum token_type t)
                 lexer_match_opt(TOK_COMMA);
         }
 
+        // TODO: Is it really the parsers job to do
+        // implementation specific stack management?
         pargc = argc + 1;
         arg = args;
         list_for_each(arg) {
@@ -947,17 +949,15 @@ struct ast_item *
 parse_cstring(void)
 {
         struct ast_cstring *string;
+        char *asciz = NULL;
 
-        lexer_match_next(TOK_DQUOTE);
-        lexer_eat();
+        lexer_match_req(TOK_DQUOTE);
 
-        // TODO: Dont match TOK_ID
-        // Use custom character reader to
-        // read all values
-        lexer_match_next(TOK_ID);
+        asciz = parse_ascii();
+        if(!asciz) return NULL;
 
         string = zalloc(string);
-        string->string    = LEXER_GET_STR();
+        string->string    = asciz;
         string->string_id = NEW_GUID();
         lexer_match_next(TOK_DQUOTE);
 
@@ -1228,4 +1228,29 @@ parse_block(void)
 
         // Return the start of the list
         return start;
+}
+
+char *
+parse_ascii(void)
+{
+        char *buf;
+        int buf_i = 0;
+        const int asciz_max_lengthz = 256;
+
+        lexer_match_req(TOK_DQUOTE);
+        buf = malloc(256);
+
+        while(LEXER_GET_CHAR() != '"') {
+                if(buf_i < asciz_max_lengthz-1) {
+                        buf[buf_i++] = (char)LEXER_GET_CHAR();
+                        lexer_fgetc();
+                }
+        }
+        // Null terminate the asciz string
+        buf[buf_i] = 0;
+
+        // eat the TOK_DQUOTE
+        lexer_eat();
+
+        return buf;
 }
