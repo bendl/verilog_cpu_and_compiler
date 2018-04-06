@@ -1,0 +1,14 @@
+
+__stdcall fnc foo(a, b, c)
+{
+    UART1(a);
+    UART1(b);
+    UART1(c);
+}
+
+__stdcall fnc main()
+{
+    foo(98, 101, 110);
+
+    33;
+}

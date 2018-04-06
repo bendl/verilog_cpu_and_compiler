@@ -978,11 +978,14 @@ struct ast_item *
 parse_deref(void)
 {
         struct ast_deref *deref;
+        struct ast_item  *deref_expr;
 
         lexer_match_next(TOK_DEREF);
-        deref = zalloc(deref);
-        deref->item = parse_expr();
+        deref_expr = parse_expr();
+        if(deref_expr == NULL) { return NULL; }
 
+        deref = zalloc(deref);
+        deref->item = deref_expr;
         return new_expr(deref, AST_DEREF);
 }
 
@@ -1167,10 +1170,12 @@ parse_while_expr(void)
         lexer_match_next(TOK_WHILE);
         lexer_match_next(TOK_LBRACE);
         cond = parse_expr();
+        if(!cond) { return NULL; }
         lexer_match_next(TOK_RBRACE);
 
         lexer_match_next(TOK_LCBRACE);
         body = parse_block();
+        if(!cond) { return NULL; }
         lexer_match_next(TOK_RCBRACE);
 
         // AST it

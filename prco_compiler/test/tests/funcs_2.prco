@@ -1,0 +1,27 @@
+
+__stdcall fnc delay(t)
+{
+    int i = 0;
+
+    while (i < t) {
+        i = i + 1;
+    }
+}
+
+__stdcall fnc printf(str)
+{
+    while(@str) {
+        UART1(@str);
+
+        delay(40);
+
+        str = str + 1;
+    }
+}
+
+__stdcall fnc main()
+{
+    int a = "Ben is the best!";
+
+    printf(a);
+}
