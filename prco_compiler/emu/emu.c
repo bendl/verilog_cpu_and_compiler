@@ -79,9 +79,9 @@ void print_regs(void)
 
 void print_mem(void)
 {
-        int i;
+        int i = 0;
         int width = 8;
-        int i2;
+        int i2 = 0;
 
         dprintf(D_EMU, "\r\n\r\n");
 
@@ -95,7 +95,12 @@ void print_mem(void)
                "============================="
                 "\r\n");
 
-        for (i = 0; i < 0xff; i++) {
+        for (i = 0; i <= 0xff; i++) {
+                if(i == core.r_regs[7])
+                        dprintf(D_EMU, "SP");
+                if(i == core.r_regs[6])
+                        dprintf(D_EMU, "BP");
+
                 dprintf(D_EMU, "%02x\t", core.lmem[i]);
                 if(i2 == width-1) {
                         dprintf(D_EMU, "\r\n");
@@ -248,12 +253,14 @@ void emu_exec(struct prco_op_struct *op)
                 break;
         case ADD:
                 core.r_regs[op->regD] += core.r_regs[op->regA];
-                break;
-        case SUB:
-                core.r_regs[op->regD] -= core.r_regs[op->regA];
+                print_regs();
                 break;
         case ADDI:
                 core.r_regs[op->regD] += (signed char)op->imm8;
+                print_regs();
+                break;
+        case SUB:
+                core.r_regs[op->regD] = core.r_regs[op->regD] - core.r_regs[op->regA];
                 print_regs();
                 break;
         case SUBI:
@@ -263,6 +270,12 @@ void emu_exec(struct prco_op_struct *op)
         case MOV:
                 core.r_regs[op->regD] = core.r_regs[op->regA];
                 print_regs();
+
+                // We can guess this instruction is creating
+                // a new stack frame, so print new Bp and Sp locations
+                if(op->regD == Bp && op->regA == Sp)
+                        print_mem();
+
                 break;
         case MOVI:
                 core.r_regs[op->regD] = op->imm8;
@@ -274,6 +287,7 @@ void emu_exec(struct prco_op_struct *op)
                 dprintf(D_EMU2, "SW $%02x, mem[%02x]\r\n",
                         core.r_regs[op->regD],
                         core.r_regs[op->regA + op->simm5]);
+                print_mem();
                 break;
         case LW:
                 core.r_regs[op->regD] = core.lmem[core.r_regs[op->regA] + op->simm5];
@@ -355,7 +369,10 @@ int emu_run(struct prco_emu_core *core)
 
                 // Decode the instruction
                 core->current_op = emu_decode(core->lmem[core->pc]);
-                if(core->current_op.op == HALT || core->pc > 0xf0) break;
+
+                if(core->current_op.op == HALT
+                   || core->exec_count > 20000)
+                        break;
 
                 // Execute the instruction
                 emu_exec(&core->current_op);

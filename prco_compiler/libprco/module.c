@@ -44,7 +44,7 @@ module_free(struct module *m)
         struct ast_func *func_it = m->functions;
 
         list_for_each(func_it) {
-                ast_free(func_it);
+                ast_func_free(func_it);
         }
 }
 
