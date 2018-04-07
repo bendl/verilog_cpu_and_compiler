@@ -177,6 +177,7 @@ struct ast_item_union {
                 struct ast_lvar   lvar;
                 struct ast_var    var;
                 struct ast_param  param;
+                struct ast_call   call;
         };
 };
 
@@ -186,20 +187,21 @@ struct ast_expr {
 
 
 // Instantiation functions helpers
-extern struct ast_item  *new_expr  (void *expr, enum ast_type type);
-extern struct ast_num   *new_num   (int num_val);
-extern struct ast_func  *new_func  (struct ast_proto *proto, struct ast_item *body);
-extern struct ast_bin   *new_bin   (char op, struct ast_item *lhs, struct ast_item *rhs);
-extern struct ast_proto *new_proto (char *name, struct list_item* args, int argc);
-extern struct ast_var   *new_var   (char *name, int dt);
-extern struct ast_lvar  *new_lvar  (struct ast_var *var);
-extern struct ast_call  *new_call(char *callee, struct list_item *args, int argc);
-extern struct ast_if    *new_if(struct ast_item *cond, struct ast_item *then, struct ast_item *els);
-extern struct ast_for   *new_for(struct ast_item *start,
-                                 struct ast_item *cond,
-                                 struct ast_item *step,
-                                 struct ast_item *body);
-extern struct ast_lvar  *new_ldecl  (struct ast_var *var);
+extern struct ast_item  *alloc_expr(void *expr, enum ast_type type);
+extern struct ast_num   *alloc_num(int num_val);
+extern struct ast_func  *alloc_func(struct ast_proto *proto, struct ast_item *body);
+extern struct ast_bin   *alloc_bin(char op, struct ast_item *lhs, struct ast_item *rhs);
+extern struct ast_proto *alloc_proto(char *name, struct list_item *args, int argc);
+extern struct ast_var   *alloc_var(char *name, int dt);
+extern struct ast_lvar  *alloc_lvar(struct ast_var *var);
+extern struct ast_call  *alloc_call(char *callee, struct list_item *args, int argc);
+extern struct ast_if    *alloc_if(struct ast_item *cond, struct ast_item *then,
+                                  struct ast_item *els);
+extern struct ast_for   *alloc_for(struct ast_item *start,
+                                   struct ast_item *cond,
+                                   struct ast_item *step,
+                                   struct ast_item *body);
+extern struct ast_lvar  *alloc_ldecl(struct ast_var *var);
 
 void ast_free(_inout_ struct ast_item *node);
 void ast_func_free(_inout_ struct ast_func *func);

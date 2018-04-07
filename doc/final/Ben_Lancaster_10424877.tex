@@ -51,8 +51,8 @@
 %s\lstset{language=C,keywordstyle={\bfseries \color{blue}}}
 \usepackage[outputdir=build]{minted}
 %https://www.sharelatex.com/learn/Code_Highlighting_with_minted#Reference_guide
-%\usemintedstyle{vs} % HAS ERROR BOXES!
-\usemintedstyle{pastie}
+\usemintedstyle{vs} % HAS ERROR BOXES!
+%\usemintedstyle{pastie}
 %\usemintedstyle{manni}
 
 %% https://en.wikibooks.org/wiki/LaTeX/List_Structures
@@ -717,8 +717,8 @@ cmake --build . --target install
 \label{sect:compiler_grammar}
 The input to the compiler is a generic programming language similar to C.
 
-\begin{minted}{python}
-def main() {
+\begin{minted}{c}
+fnc main() {
     int a = 0;
 }
 \end{minted}
@@ -878,8 +878,8 @@ LW    %Ax, -1(%Bp) 08df (REF c -1)
     \begin{minipage}{0.05\textwidth}\hfill\end{minipage}
     \begin{minipage}{0.5\textwidth}
         \centering
-\begin{minted}[linenos]{python}
-def main() {
+\begin{minted}[linenos]{c}
+fnc main() {
     int a; int b; 
     int c;
     a; b;
@@ -942,9 +942,9 @@ The \scname{} processor places strings and global values at the start of low mem
     \begin{minipage}{0.05\textwidth}\hfill\end{minipage}
     \begin{minipage}{0.5\textwidth}
         \centering
-\begin{minted}[linenos]{python}
+\begin{minted}[linenos]{c}
 
-def main() 
+fnc main() 
 {
     int a = "ben";
     
@@ -981,8 +981,8 @@ void strlen() {
     \begin{minipage}{0.05\textwidth}\hfill\end{minipage}
     \begin{minipage}{0.5\textwidth}
         \centering
-\begin{minted}[linenos]{python}
-def strlen() {
+\begin{minted}[linenos]{c}
+fnc strlen() {
     int str = "testing";
     int length = 0;
 
@@ -1009,7 +1009,7 @@ Due to limitations of the \scname{} processor's instruction set, high-level inst
 \begin{figure}[!h]
     \begin{minipage}{0.5\textwidth}
         \centering
-        \begin{minted}{C}
+        \begin{minted}{c}
 void cg_push_prco(enum prco_reg rd)
 {
     asm_push(opcode_add_ri(Sp, -1));
@@ -1021,7 +1021,7 @@ void cg_push_prco(enum prco_reg rd)
     \end{minipage}
     \begin{minipage}{0.5\textwidth}
         \centering
-        \begin{minted}{C}
+        \begin{minted}{c}
 void cg_pop_prco(enum prco_reg rd)
 {
     asm_push(opcode_lw(rd, Sp, 0));

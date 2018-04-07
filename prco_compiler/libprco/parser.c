@@ -607,7 +607,7 @@ parse_proto(enum token_type t)
         lexer_match_opt(TOK_VARIABLE);
         while (lexer_match(TOK_ID) || lexer_match(TOK_VARIABLE)) {
                 lexer_match_opt(TOK_VARIABLE);
-                lvarg = new_lvar(new_var(LEXER_GET_STR(), dtINT));
+                lvarg = alloc_lvar(alloc_var(LEXER_GET_STR(), dtINT));
                 append_ll_item(args, lvarg);
                 argc++;
 
@@ -648,7 +648,7 @@ parse_proto(enum token_type t)
 
         g_params = args;
 
-        proto = new_proto(fn_name, args, argc);
+        proto = alloc_proto(fn_name, args, argc);
         // Move new proto to front of the ll
         proto->next = get_g_module()->prototypes;
         get_g_module()->prototypes = proto;
@@ -677,7 +677,7 @@ parse_def(void)
 
         if (!proto || !body) return NULL;
 
-        ret = new_func(proto, body);
+        ret = alloc_func(proto, body);
         ret->next = get_g_module()->functions;
         ret->locals = g_locals;
         get_g_module()->functions = ret;
@@ -811,9 +811,9 @@ parse_call(char *ident)
         lexer_match_next(TOK_RBRACE);
 
         // Create the call ast item
-        call = new_call(ident, args, argc);
+        call = alloc_call(ident, args, argc);
         if (check_call(call)) {
-                return new_expr(call, AST_CALL);
+                return alloc_expr(call, AST_CALL);
         } else {
                 dprintf(D_ERR, "ERR: Undefined reference to: %s\r\n", ident);
                 return NULL;
@@ -843,7 +843,7 @@ parse_assignment(char *ident)
         a->var = v;
         a->val = val;
 
-        return new_expr(a, AST_ASSIGNMENT);
+        return alloc_expr(a, AST_ASSIGNMENT);
 }
 
 struct ast_item *
@@ -873,16 +873,16 @@ parse_ident(void)
                 return NULL;
         }
 
-        return new_expr(v, AST_VAR_REF);
+        return alloc_expr(v, AST_VAR_REF);
 }
 
 struct ast_item *
 parse_num(void)
 {
         struct ast_num *ret;
-        ret = new_num(LEXER_GET_NUM());
+        ret = alloc_num(LEXER_GET_NUM());
         lexer_eat();
-        return new_expr(ret, AST_NUM);
+        return alloc_expr(ret, AST_NUM);
 }
 
 struct ast_item *
@@ -923,8 +923,8 @@ parse_var(void)
 
         // If variable not found, create new local decl
         if ((v = get_var(ident)) == NULL) {
-                v = new_ldecl(new_var(ident, dtINT));
-                nvar = new_expr(v, AST_LOCAL_VAR);
+                v = alloc_ldecl(alloc_var(ident, dtINT));
+                nvar = alloc_expr(v, AST_LOCAL_VAR);
                 g_locals = add_var_to_scope(g_locals, nvar->expr);
         }
 
@@ -943,7 +943,7 @@ parse_var(void)
 
         // If no new_var created, its just a reference
         if (nvar == NULL) {
-                nvar = new_expr(v, AST_VAR_REF);
+                nvar = alloc_expr(v, AST_VAR_REF);
         }
 
         return nvar;
@@ -971,7 +971,7 @@ parse_cstring(void)
         get_g_module()->strings =
                 append_ll_item_head(get_g_module()->strings, string);
 
-        return new_expr(string, AST_CSTRING);
+        return alloc_expr(string, AST_CSTRING);
 }
 
 struct ast_item *
@@ -986,7 +986,7 @@ parse_deref(void)
 
         deref = zalloc(deref);
         deref->item = deref_expr;
-        return new_expr(deref, AST_DEREF);
+        return alloc_expr(deref, AST_DEREF);
 }
 
 struct ast_item *
@@ -1081,7 +1081,7 @@ parse_bin_rhs(int min_prec, struct ast_item *lhs)
                         if (!rhs) return NULL;
                 }
 
-                lhs = new_expr(new_bin((char)bin_op, lhs, rhs), AST_BIN);
+                lhs = alloc_expr(alloc_bin((char) bin_op, lhs, rhs), AST_BIN);
         }
 }
 
@@ -1114,7 +1114,7 @@ parse_if_expr(void)
                 lexer_match_next(TOK_RCBRACE);
         }
 
-        return new_expr(new_if(cond, then, els), AST_IF);
+        return alloc_expr(alloc_if(cond, then, els), AST_IF);
 }
 
 struct ast_item *
@@ -1137,7 +1137,7 @@ parse_for_expr(void)
         body = parse_block();
         lexer_match_next(TOK_RCBRACE);
 
-        return new_expr(new_for(start, cond, step, body), AST_FOR);
+        return alloc_expr(alloc_for(start, cond, step, body), AST_FOR);
 }
 
 struct ast_item *
@@ -1156,7 +1156,7 @@ parse_port_uart1(void)
         // AST it
         uart_ast = zalloc(uart_ast);
         uart_ast->val = val;
-        return new_expr(uart_ast, AST_UART);
+        return alloc_expr(uart_ast, AST_UART);
 }
 
 struct ast_item *
@@ -1183,7 +1183,7 @@ parse_while_expr(void)
         w = zalloc(w);
         w->cond = cond;
         w->body = body;
-        return new_expr(w, AST_WHILE);
+        return alloc_expr(w, AST_WHILE);
 }
 
 struct ast_item *
