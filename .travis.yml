@@ -7,4 +7,5 @@ compiler:
 
 script:
 - cd prco_compiler/test
+- chmod +x travis-ci.sh
 - ./travis-ci.sh
