@@ -1,0 +1,12 @@
+language: c
+
+sudo: false
+
+compiler:
+  - gcc
+
+script:
+- cd prco_compiler
+- mkdir build && cd build
+- cmake ..
+- make
