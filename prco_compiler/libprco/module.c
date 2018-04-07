@@ -18,7 +18,7 @@ struct module *new_module(void)
         struct module *ret;
 
         if(g_module) {
-                dprintf(D_ERR, "ERR: Only 1 g_module can exist!\r\n");
+                dbprintf(D_ERR, "ERR: Only 1 g_module can exist!\r\n");
                 return NULL;
         }
 

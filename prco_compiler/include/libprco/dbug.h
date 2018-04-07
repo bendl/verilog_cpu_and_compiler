@@ -15,7 +15,7 @@
 #define D_ALL   0xFFFF
 
 extern unsigned int g_dbug_level;
-extern void dprintf(unsigned int level, char *fmt, ...);
+extern void dbprintf(unsigned int level, char *fmt, ...);
 extern void set_dbug_level(unsigned int level);
 
 #endif //LIBPRCO_DBUG_H

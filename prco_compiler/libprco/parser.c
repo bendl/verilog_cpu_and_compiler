@@ -12,12 +12,19 @@
 #include "arch/target.h"
 #include "module.h"
 
+#ifdef _WIN32
+        #include <Shlwapi.h>
+        #define PLAT_MAX_PATH PLAT_MAX_PATH
+#else
+        #define PLAT_MAX_PATH 256
+#endif
+
 #include <stdio.h>
 #include <assert.h>
-#include <Shlwapi.h>
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+
 
 static int g_uid = 0;
 #define NEW_GUID() \
@@ -59,8 +66,15 @@ struct list_item *g_resv_words; //< Linked list of reserved words
 static void
 parser_free(_in_ struct text_parser *parser)
 {
+        assert(parser);
+        assert(parser->file_input);
+        assert(parser->lpstr_input_dir);
+        assert(parser->lpstr_input_fp);
+
         fclose(parser->file_input);
         free(parser->lpstr_input_dir);
+
+        dbprintf(D_INFO, "fp: %s\r\n", parser->lpstr_input_fp);
         free(parser->lpstr_input_fp);
         free(parser);
 }
@@ -99,10 +113,20 @@ parser_popp()
 static int
 file_exists(const char *fname)
 {
+#ifdef __WIN32
         // TODO: Create cross-platform implementation
         return PathFileExists(fname);
+#else
+        FILE * file;
+        file = fopen(fname, "r");
+        if (file) {
+                fclose(file);
+                return 1;
+        } else {
+                return 0;
+        }
+#endif
 }
-
 
 // TODO: Make work for linux
 struct text_parser *
@@ -112,13 +136,13 @@ parser_fopen(_in_ const char *fname,
 {
         struct text_parser *new_parser;
 
-        dprintf(D_INFO, "parser_fopen: %s\r\n", fname);
+        dbprintf(D_INFO, "parser_fopen: %s\r\n", fname);
 
         new_parser = zalloc(new_parser);
-        new_parser->lpstr_input_fp = malloc(MAX_PATH);
-        new_parser->lpstr_input_dir = malloc(MAX_PATH);
+        new_parser->lpstr_input_fp = malloc(PLAT_MAX_PATH);
+        new_parser->lpstr_input_dir = malloc(PLAT_MAX_PATH);
 
-#ifdef _WIN32
+        #ifdef _WIN32
         // Hack to replace linux directory separators / with \
         // TODO: Use cross-platform solution for handling directory filepaths
         {
@@ -129,23 +153,22 @@ parser_fopen(_in_ const char *fname,
                         c++;
                 }
         }
-#endif
 
         if (PathIsRelative(fname)) {
-                dprintf(D_INFO, "Path is relative\r\n");
+                dbprintf(D_INFO, "Path is relative\r\n");
                 // Get current dir from current parser
                 // If current parser is null, use executable pwd
                 // I.e. pwd + fname
                 if (parser == NULL) {
-                        GetCurrentDirectory(MAX_PATH, new_parser->lpstr_input_dir);
-                        dprintf(D_INFO, "dir: %s\r\n", new_parser->lpstr_input_dir);
-                        dprintf(D_INFO, "fname: %s\r\n", fname);
+                        GetCurrentDirectory(PLAT_MAX_PATH, new_parser->lpstr_input_dir);
+                        dbprintf(D_INFO, "dir: %s\r\n", new_parser->lpstr_input_dir);
+                        dbprintf(D_INFO, "fname: %s\r\n", fname);
                         PathCombine(new_parser->lpstr_input_fp,
                                     new_parser->lpstr_input_dir, fname);
                         strcpy(new_parser->lpstr_input_dir, new_parser->lpstr_input_fp);
                         PathRemoveFileSpec(new_parser->lpstr_input_dir);
-                        dprintf(D_INFO, "fp: %s\r\n", new_parser->lpstr_input_fp);
-                        dprintf(D_INFO, "Parser null\r\n");
+                        dbprintf(D_INFO, "fp: %s\r\n", new_parser->lpstr_input_fp);
+                        dbprintf(D_INFO, "Parser null\r\n");
                 } else {
                         // Copy old parser dir to new parser dir
                         strcpy(new_parser->lpstr_input_dir,
@@ -155,8 +178,8 @@ parser_fopen(_in_ const char *fname,
                                     fname);
                 }
 
-                dprintf(D_INFO, "Origin path: %s\r\n", fname);
-                dprintf(D_INFO, "New path: %s\r\n", new_parser->lpstr_input_fp);
+                dbprintf(D_INFO, "Origin path: %s\r\n", fname);
+                dbprintf(D_INFO, "New path: %s\r\n", new_parser->lpstr_input_fp);
         } else {
                 // Extract dir from fname
                 // TODO: Pass size to this function
@@ -165,6 +188,9 @@ parser_fopen(_in_ const char *fname,
                 strcpy(new_parser->lpstr_input_dir, fname);
                 PathRemoveFileSpec(new_parser->lpstr_input_dir);
         }
+        #else
+                strcpy(new_parser->lpstr_input_fp, fname);
+        #endif
 
         if (!file_exists(new_parser->lpstr_input_fp)) {
                 // File doesn't exist relative to current file
@@ -172,12 +198,14 @@ parser_fopen(_in_ const char *fname,
                 char *std_include = new_parser->lpstr_input_dir;
                 int ret;
 
-                dprintf(D_INFO, "File doesnt exist!\r\n");
+                // TODO: Add linux impl for getenv
+                /*
+                dbprintf(D_INFO, "File doesnt exist!\r\n");
 
                 ret = GetEnvironmentVariable(COMPILER_INCLUDE_ENV_VAR,
-                                             new_parser->lpstr_input_dir, MAX_PATH);
+                                             new_parser->lpstr_input_dir, PLAT_MAX_PATH);
                 if (ret == 0) {
-                        dprintf(
+                        dbprintf(
                                 D_WARN,
                                 "WARNING: " COMPILER_INCLUDE_ENV_VAR
                                         " environment variable is not set. Cannot search std include.\r\n");
@@ -189,7 +217,9 @@ parser_fopen(_in_ const char *fname,
                                 std_include = parser->lpstr_input_dir;
                         }
                 }
+                */
 
+                #ifdef __WIN32
                 // Create new path from fname and std_include path
                 // TODO: Search each directory in PATH for fname?
                 new_parser->lpstr_input_dir = std_include;
@@ -197,15 +227,16 @@ parser_fopen(_in_ const char *fname,
                         new_parser->lpstr_input_fp,
                         new_parser->lpstr_input_dir,
                         fname);
+                #endif
         }
 
 
-        dprintf(D_INFO, "New path exists: %s\r\n", new_parser->lpstr_input_fp);
+        dbprintf(D_INFO, "New path exists: %s\r\n", new_parser->lpstr_input_fp);
 
 l_fname_exists:
         new_parser->file_input = fopen(new_parser->lpstr_input_fp, "r");
         if (!new_parser->file_input) {
-                dprintf(D_ERR,
+                dbprintf(D_ERR,
                         "ERROR: parser_fopen: Cannot find file: %s!\r\n",
                         new_parser->lpstr_input_fp);
                 return NULL;
@@ -243,7 +274,7 @@ lexer_fgetc()
 
         if (g_cur_parser()->lexer_char == '\r' ||
                 g_cur_parser()->lexer_char == '\n') {
-                dprintf(D_INFO, "Parsed line: %s\r\n", line_buf);
+                dbprintf(D_INFO, "Parsed line: %s\r\n", line_buf);
                 line_buf[0] = 0;
                 line_buf_pos = 0;
         } else {
@@ -271,7 +302,7 @@ parse_top_level(void)
                         goto exit_top_level;
 
                 default:
-                        dprintf(D_ERR, "Illegal top level expr!\r\n");
+                        dbprintf(D_ERR, "Illegal top level expr!\r\n");
                         parse_result = 1;
                         break;
                 } // end switch
@@ -282,6 +313,8 @@ parse_top_level(void)
         }
 
 exit_top_level:
+        assert(g_cur_parser());
+
         // Set current parsers result
         g_cur_parser()->parse_result = parse_result;
         return parse_result;
@@ -329,7 +362,7 @@ parser_run(_in_ struct text_parser *parser)
         // Push new parser to stack
         parse_result = parser_pushp(parser);
         if (parse_result != R_OK) {
-                dprintf(D_ERR,
+                dbprintf(D_ERR,
                         "ERROR: Parser stack limit (%d) reached!\r\n",
                         PARSER_MAX_STACK);
                 goto parser_run_cleanup;
@@ -447,11 +480,11 @@ string_is_resv(char *buf)
         resv_it = g_resv_words;
         list_for_each(resv_it) {
                 w = (struct resv_word *) resv_it->value;
-                dprintf(D_PARSE, "Comparing '%s' to resv '%s'\r\n",
+                dbprintf(D_PARSE, "Comparing '%s' to resv '%s'\r\n",
                         buf, w->lpstr_name);
 
                 if (strcmp(buf, w->lpstr_name) == 0) {
-                        dprintf(D_PARSE, "Resv word found! %s\r\n",
+                        dbprintf(D_PARSE, "Resv word found! %s\r\n",
                                 w->lpstr_name);
                         return w;
                 }
@@ -472,7 +505,7 @@ lexer_next(void)
         assert(g_cur_parser());
         assert(g_cur_parser()->file_input);
 
-        dprintf(D_INFO, "Lexing: %s\r\n", g_cur_parser()->lpstr_input_fp);
+        dbprintf(D_INFO, "Lexing: %s\r\n", g_cur_parser()->lpstr_input_fp);
 
         // Skip whitespace
         while (isspace(LEXER_GET_CHAR())) lexer_fgetc();
@@ -515,7 +548,7 @@ lexer_next(void)
         }
         else
         {
-                dprintf(D_ERR, "Unknown character: %d %c\r\n",
+                dbprintf(D_ERR, "Unknown character: %d %c\r\n",
                         LEXER_GET_CHAR(),
                         LEXER_GET_CHAR());
                 return TOK_ERROR;
@@ -538,7 +571,7 @@ enum token_type
 lexer_match_next(enum token_type t)
 {
         if (lexer_token() != t) {
-                dprintf(D_ERR, "Unexpected token! %d %c\r\n",
+                dbprintf(D_ERR, "Unexpected token! %d %c\r\n",
                         LEXER_GET_TOK());
                 return TOK_ERROR;
         }
@@ -567,7 +600,7 @@ int
 lexer_match_req(enum token_type t)
 {
         if (!lexer_match(t)) {
-                dprintf(D_ERR, "Required text not found! %d %c\r\n",
+                dbprintf(D_ERR, "Required text not found! %d %c\r\n",
                         lexer_token(), lexer_token());
                 return TOK_ERROR;
         }
@@ -624,7 +657,7 @@ parse_proto(enum token_type t)
                 parg = (struct ast_lvar *) arg->value;
                 parg->bp_offset = pargc * 1;
                 pargc--;
-                dprintf(D_INFO, "Parsed proto arg: %s offset %x\r\n",
+                dbprintf(D_INFO, "Parsed proto arg: %s offset %x\r\n",
                         parg->var->name, parg->bp_offset);
         }
 
@@ -639,7 +672,7 @@ parse_proto(enum token_type t)
                         if (t == TOK_EXT) {
                                 return proto_it;
                         } else {
-                                dprintf(D_ERR, "Duplication of prototype: %s\r\n",
+                                dbprintf(D_ERR, "Duplication of prototype: %s\r\n",
                                         fn_name);
                                 return NULL;
                         }
@@ -687,7 +720,7 @@ parse_def(void)
         list_for_each(locals) {
                 locals_value = locals->value;
                 if (!locals_value) break;
-                dprintf(D_INFO, "FUNC: %s\tVAR: '%s' %d\r\n",
+                dbprintf(D_INFO, "FUNC: %s\tVAR: '%s' %d\r\n",
                         ret->proto->name,
                         locals_value->var->name,
                         locals_value->bp_offset);
@@ -697,7 +730,7 @@ parse_def(void)
         // clear global lists
         g_locals = g_params = NULL;
 
-        dprintf(D_INFO, "Parsed def: %s argc: %d\r\n",
+        dbprintf(D_INFO, "Parsed def: %s argc: %d\r\n",
                 proto->name, proto->argc);
 
         if (strcmp(proto->name, "main") == 0) {
@@ -815,7 +848,7 @@ parse_call(char *ident)
         if (check_call(call)) {
                 return alloc_expr(call, AST_CALL);
         } else {
-                dprintf(D_ERR, "ERR: Undefined reference to: %s\r\n", ident);
+                dbprintf(D_ERR, "ERR: Undefined reference to: %s\r\n", ident);
                 return NULL;
         }
 }
@@ -830,7 +863,7 @@ parse_assignment(char *ident)
         lexer_match_next(TOK_ASSIGNMENT);
         v = get_var(ident);
         if (!v) {
-                dprintf(D_ERR,
+                dbprintf(D_ERR,
                         "ERR: Var assignment ident '%s' not found in scope\r\n",
                         ident);
                 return NULL;
@@ -867,7 +900,7 @@ parse_ident(void)
         // else its a variable reference
         v = get_var(ident);
         if (!v) {
-                dprintf(D_ERR,
+                dbprintf(D_ERR,
                         "Variable '%s' is not in the current scope!\r\n",
                         ident);
                 return NULL;
@@ -897,7 +930,7 @@ parse_paren(void)
         result = parse_expr();
 
         if (!lexer_match(TOK_RBRACE)) {
-                dprintf(D_ERR,
+                dbprintf(D_ERR,
                         "ERR: Missing closing ) paren in expr\r\n");
                 return NULL;
         }
@@ -914,7 +947,7 @@ parse_var(void)
         struct ast_lvar *v      = NULL;
         struct ast_item *nvar   = NULL;
 
-        dprintf(D_INFO, "Parsing variable\r\n");
+        dbprintf(D_INFO, "Parsing variable\r\n");
 
         lexer_match_next(TOK_VARIABLE);
         lexer_match(TOK_ID);
@@ -965,7 +998,7 @@ parse_cstring(void)
         string->string_id = NEW_GUID();
         lexer_match_next(TOK_DQUOTE);
 
-        dprintf(D_INFO, "Found CSTRING: '%s'\r\n", string->string);
+        dbprintf(D_INFO, "Found CSTRING: '%s'\r\n", string->string);
 
         // Add string to global string list
         get_g_module()->strings =
@@ -1015,7 +1048,7 @@ parse_primary(void)
                 // and return the next primary
                 return parse_primary();
         default:
-                dprintf(D_ERR, "Unknown primary token: %d %c\r\n",
+                dbprintf(D_ERR, "Unknown primary token: %d %c\r\n",
                         lexer_token(), lexer_token());
                 return NULL;
         }
@@ -1026,7 +1059,7 @@ get_tok_prec(void)
 {
         switch (lexer_token()) {
         default:
-                dprintf(D_ERR, "No token precedence for '%d'\r\n",
+                dbprintf(D_ERR, "No token precedence for '%d'\r\n",
                         lexer_token());
                 return -1;
 

@@ -71,21 +71,21 @@ main(int argc, char **argv)
                         break;
                 case 'O':
                         O = atoi(optarg);
-                        dprintf(D_INFO, "Setting Optimiser to O%d\r\n", O);
+                        dbprintf(D_INFO, "Setting Optimiser to O%d\r\n", O);
                         break;
                 default:
-                        dprintf(D_ERR, "Unknown arguments.\r\n");
+                        dbprintf(D_ERR, "Unknown arguments.\r\n");
                         exit(1);
                 }
         }
 
         if (!src_name) {
-                dprintf(D_ERR, "-i parameter missing.\r\n");
+                dbprintf(D_ERR, "-i parameter missing.\r\n");
                 parse_result = 2;
                 goto main_exit;
         }
 
-        dprintf(D_INFO, "LIBPRCO Compiler. Version %f\r\n\r\n",
+        dbprintf(D_INFO, "LIBPRCO Compiler. Version %f\r\n\r\n",
                 LIBPRCO_COMPILER_VERSION);
 
 
@@ -99,7 +99,7 @@ main(int argc, char **argv)
         // Create top level parser
         parser = parser_fopen(src_name, &src_size, NULL);
         if (!parser) {
-                dprintf(D_ERR, "parser_fopen failed!\r\n");
+                dbprintf(D_ERR, "parser_fopen failed!\r\n");
                 parse_result = 3;
                 goto main_exit;
         }
@@ -107,7 +107,7 @@ main(int argc, char **argv)
         // Run the parser
         parse_result = parser_run(parser);
         if (parse_result != 0) {
-                dprintf(D_ERR, "parser_run error %d\r\n", parse_result);
+                dbprintf(D_ERR, "parser_run error %d\r\n", parse_result);
                 goto main_exit;
         }
 

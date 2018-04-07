@@ -31,7 +31,7 @@ int asm_tag_id = 0;
 void
 cg_target_template_init(struct target_delegate *dt)
 {
-        dprintf(D_INFO, "cg: %s\r\n", __FUNCTION__);
+        dbprintf(D_INFO, "cg: %s\r\n", __FUNCTION__);
 
         // Initialise function pointers to codegen routines
         dt->cg_postcode = cg_postcode_template;
@@ -60,7 +60,7 @@ asm_push(struct prco_op_struct op)
 
         // Depraced, using NOPs for now
         if (0 && asm_tag_stack > 0) {
-                dprintf(D_GEN, "GEN: asm_tag_next: %d\r\n", asm_tag_next);
+                dbprintf(D_GEN, "GEN: asm_tag_next: %d\r\n", asm_tag_next);
                 asm_list[asm_list_it].asm_flags |= asm_tag_next;
                 asm_list[asm_list_it].id = asm_tag_id;
                 asm_tag_stack--;
@@ -88,7 +88,7 @@ assembler_labels(void)
         int offset_check = 0x00;
         struct prco_op_struct *op, *findop;
 
-        dprintf(D_GEN, "assembler_labels:\r\n");
+        dbprintf(D_GEN, "assembler_labels:\r\n");
 
         for_each_asm(it, op) {
                 assert(op->asm_offset == offset_check);
@@ -203,11 +203,11 @@ create_verilog_memh_file(void)
         int it;
         struct prco_op_struct *op;
 
-        dprintf(D_GEN, "\r\ncreate_verilgo_memh_file...\r\n");
+        dbprintf(D_GEN, "\r\ncreate_verilgo_memh_file...\r\n");
 
         fcoe = fopen("verilog_memh.txt", "w");
         if (!fcoe) {
-                dprintf(D_ERR, "Unable to open uvm_coe.coe!\r\n");
+                dbprintf(D_ERR, "Unable to open uvm_coe.coe!\r\n");
                 return;
         }
 
@@ -228,14 +228,14 @@ cg_precode_template(void)
         int it;
         struct prco_op_struct init_jmp;
 
-        dprintf(D_GEN, ".precode\r\n");
+        dbprintf(D_GEN, ".precode\r\n");
         for (it = NOP; it < __prco_op_MAX; it++) {
-                dprintf(D_GEN, "`define PRCO_OP_%s\t5'b"BINP5"\n",
+                dbprintf(D_GEN, "`define PRCO_OP_%s\t5'b"BINP5"\n",
                         OP_STR[it], BIN5(it));
         }
 
         for (it = UART1; it < __prco_port_MAX; it++) {
-                dprintf(D_GEN, "`define PRCO_PORT_%s\t\t8'b"BINP5"\n",
+                dbprintf(D_GEN, "`define PRCO_PORT_%s\t\t8'b"BINP5"\n",
                         PORT_STR[it], BIN5(it));
         }
 
@@ -302,7 +302,7 @@ cg_precode_template(void)
                 }
         }
 
-        dprintf(D_GEN, "\r\n\r\n");
+        dbprintf(D_GEN, "\r\n\r\n");
 }
 
 void
@@ -311,15 +311,15 @@ cg_postcode_template(void)
         int it;
         struct prco_op_struct *op;
 
-        dprintf(D_INFO, "\r\n\r\nPostcode:\r\n");
+        dbprintf(D_INFO, "\r\n\r\nPostcode:\r\n");
 
         // Print each instruction in human readable format
         for_each_asm(it, op) {
-                dprintf(D_GEN, "0x%02X\t", op->asm_offset);
+                dbprintf(D_GEN, "0x%02X\t", op->asm_offset);
                 assert_opcode(op, 1);
         }
 
-        dprintf(D_GEN, "\r\n\r\n");
+        dbprintf(D_GEN, "\r\n\r\n");
         assembler_labels();
 
         // Final pass
@@ -327,7 +327,7 @@ cg_postcode_template(void)
         for_each_asm(it, op) {
                 if(op->asm_flags & ASM_JMP_JMP) {
                         if(!op->imm8) {
-                                dprintf(D_GEN,
+                                dbprintf(D_GEN,
                                         "GEN: ERR: [0x%02x] Jump address error\r\n",
                                         it);
                                 assert(op->imm8);
@@ -337,14 +337,14 @@ cg_postcode_template(void)
 
         // Print each instruction in human readable format
         for_each_asm(it, op) {
-                dprintf(D_GEN, "0x%02X\t", op->asm_offset);
+                dbprintf(D_GEN, "0x%02X\t", op->asm_offset);
                 assert_opcode(op, 1);
         }
 
         // Debug
         // Inline verilog prco_lmem.v memory
         for_each_asm(it, op) {
-                dprintf(D_GEN, "r_lmem[%d] = 16'h%04x;\n", it, op->opcode);
+                dbprintf(D_GEN, "r_lmem[%d] = 16'h%04x;\n", it, op->opcode);
         }
 
 
@@ -413,7 +413,7 @@ cg_expr_template(struct ast_item *e)
                         cg_port_uart_template(e->expr);
                         break;
                 default:
-                        dprintf(D_ERR, "Unknown cg routine for %d\r\n",
+                        dbprintf(D_ERR, "Unknown cg routine for %d\r\n",
                                 e->type);
                         assert("Unknown cg routine for %d\r\n" && 0);
                 }
@@ -425,7 +425,7 @@ cg_sf_start(struct ast_func *f)
 {
         struct prco_op_struct op;
 
-        dprintf(D_GEN, "SF START for %s\r\n", f->proto->name);
+        dbprintf(D_GEN, "SF START for %s\r\n", f->proto->name);
 
         op = opcode_add_ri(Sp, -1);
         op.ast = f;
@@ -557,7 +557,7 @@ void cg_while_template(struct ast_while *v)
 void
 cg_assignment_template(struct ast_assign *a)
 {
-        dprintf(D_GEN, "cg_assignment_template %s\r\n",
+        dbprintf(D_GEN, "cg_assignment_template %s\r\n",
                 a->var->var->name);
 
         // codegen the value
@@ -584,7 +584,7 @@ cg_local_decl_template(struct ast_lvar *v)
         struct prco_op_struct op_stack_alloc;
         int offset = -1;
 
-        dprintf(D_INFO, "cg_local_decl_template\r\n");
+        dbprintf(D_INFO, "cg_local_decl_template\r\n");
 
         item_it = cg_cur_function->locals;
         list_for_each(item_it) {
@@ -592,7 +592,7 @@ cg_local_decl_template(struct ast_lvar *v)
                 sv->bp_offset = offset;
 
                 if (strcmp(v->var->name, sv->var->name) == 0) {
-                        dprintf(D_INFO, "Found var: %s %+d\r\n",
+                        dbprintf(D_INFO, "Found var: %s %+d\r\n",
                                 sv->var->name,
                                 sv->bp_offset);
                         break;
@@ -723,7 +723,7 @@ cg_if_template(struct ast_if *v)
 void
 cg_function_template(struct ast_func *f)
 {
-        dprintf(D_GEN, "Starting cg for function: %s %d\r\n",
+        dbprintf(D_GEN, "Starting cg for function: %s %d\r\n",
                 f->proto->name, f->num_local_vars);
 
         struct list_item *arg_it = f->proto->args;
@@ -731,7 +731,7 @@ cg_function_template(struct ast_func *f)
                 struct ast_lvar *var = arg_it->value;
                 if(!var) continue;
 
-                dprintf(D_GEN, "PROTO ARGS: %s %d\r\n",
+                dbprintf(D_GEN, "PROTO ARGS: %s %d\r\n",
                         var->var->name, var->bp_offset);
         }
 
@@ -740,7 +740,7 @@ cg_function_template(struct ast_func *f)
                 struct ast_lvar *var = arg_it->value;
                 if(!var) continue;
 
-                dprintf(D_GEN, "FUNC LOCALS: %s %d\r\n",
+                dbprintf(D_GEN, "FUNC LOCALS: %s %d\r\n",
                         var->var->name, var->bp_offset);
         }
         assert(f);
@@ -767,7 +767,7 @@ cg_function_template(struct ast_func *f)
         // clean up
         cg_cur_function = NULL;
 
-        dprintf(D_GEN, "End function");
+        dbprintf(D_GEN, "End function");
 
         if (is_entry_func(f->proto)) {
                 asm_push(opcode_t1(HALT, 0, 0, 0));
@@ -778,13 +778,13 @@ cg_function_template(struct ast_func *f)
                 asm_comment(
                         "FUNC RETURN to CALL\r\n------------------------------");
         }
-        dprintf(D_GEN, "\r\n");
+        dbprintf(D_GEN, "\r\n");
 }
 
 void
 cg_bin_template(struct ast_bin *b)
 {
-        dprintf(D_GEN, "Starting cg for bin\r\n");
+        dbprintf(D_GEN, "Starting cg for bin\r\n");
 
         cg_expr_template(b->lhs);
 
@@ -837,7 +837,7 @@ cg_bin_template(struct ast_bin *b)
                 break;
 
         default:
-                dprintf(D_ERR, "Unimplemented cg_bin_template b->op %d\r\n",
+                dbprintf(D_ERR, "Unimplemented cg_bin_template b->op %d\r\n",
                         b->op);
                 assert("Unimplemented cg_bin_template b->op!" && 0);
                 break;
@@ -863,7 +863,7 @@ cg_cstring_ref(struct ast_cstring *v)
 {
         struct prco_op_struct mov;
 
-        dprintf(D_GEN, "CSTRING REF: %d %s\r\n",
+        dbprintf(D_GEN, "CSTRING REF: %d %s\r\n",
                 v->string_id, v->string);
 
         // 1. Move address of cstring into Ax

@@ -88,7 +88,7 @@ opt_cf(struct ast_item *node)
                                 new_num->val = tmp_bin_lhs->val > tmp_bin_rhs->val;
                                 break;
                         default:
-                                dprintf(D_ERR, "OPT: CF: No CF OP for token: %c\r\n",
+                                dbprintf(D_ERR, "OPT: CF: No CF OP for token: %c\r\n",
                                         tmp_bin->op);
                                 break;
                         }

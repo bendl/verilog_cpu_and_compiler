@@ -32,6 +32,6 @@ void eprintf(char *fmt, ...)
         va_end(args);
 
         va_start(args, fmt);
-        dprintf(D_GEN, fmt, args);
+        dbprintf(D_GEN, fmt, args);
         va_end(args);
 }
