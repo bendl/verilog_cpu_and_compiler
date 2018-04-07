@@ -116,8 +116,8 @@ void print_mem(void)
 
 void print_uart(void)
 {
-        dbprintf(D_EMU, "UART tx buf:\r\n");
-        dbprintf(D_EMU, "%s\r\n", uart_tx_buf);
+        dbprintf(D_EMU|D_EMU_TEST, "UART tx buf:\r\n");
+        dbprintf(D_EMU|D_EMU_TEST, "%s\r\n", uart_tx_buf);
 }
 
 unsigned short

@@ -12,6 +12,7 @@
 #define D_GEN   0x10
 #define D_EMU   0x20
 #define D_EMU2  0x40
+#define D_EMU_TEST  0x80
 #define D_ALL   0xFFFF
 
 extern unsigned int g_dbug_level;

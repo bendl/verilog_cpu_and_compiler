@@ -19,7 +19,7 @@ fnc_run_cli() {
 }
 
 fnc_run_emu() {
-    ../lbuild/emu/emu -D0x0000
+    ../lbuild/emu/emu -D0x00
 }
 
 fnc_run_test() {
@@ -70,4 +70,4 @@ fnc_run_test ./tests/strings_3.prco 1
 fnc_run_test ./tests/vars_1.prco 0
 fnc_run_test ./tests/vars_2.prco 3
 
-echo "$passed_tests/$num_tests passed."
+echo -e "\n$passed_tests/$num_tests passed."

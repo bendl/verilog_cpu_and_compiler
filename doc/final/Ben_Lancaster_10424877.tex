@@ -1087,9 +1087,14 @@ For (A), a code generation routine refers to the code generation function used t
 The \textit{best} approach to verifying output machine code is to run it directly on the \scname{} processor. However, this requires rebuilding the FPGA design with the new program code which is time consuming and not always practical. In addition, viewing of internal registers and signals is much more difficult due to the lack of a debugging interface on the processor.
  
 \subsection*{Emulation}
-During the later stages of the project, it was decided to build a software emulator for the \scname{} processor. The emulator, found at \verb|prco_compiler/emu/emu.c|, would utilise structures used in the compiler's assembling stage to rebuild instructions and their contents from raw machine code words. Due to the late development of the emulator, and it not being a deliverable, and only developed as an alternate means to test the processor, the emulator is not a full emulation of the processor. The emulator implements most features of the processor, including registers, memory, ALU operations, and most instructions. It is capable of emulating all the test programs (found in \verb|proc_compiler/tests/*.prcp|) except the \verb|control_for_*| programs.
+During the later stages of the project, it was decided to build a software emulator for the \scname{} processor. The emulator, found at \verb|prco_compiler/emu/emu.c|, would utilise structures used in the compiler's assembling stage to rebuild instructions and their contents from raw machine code words. Due to the late development of the emulator, and it not being a deliverable, and only developed as an alternate means to test the processor, the emulator is not a full emulation of the processor. The emulator implements most features of the processor, including registers, memory, ALU operations, and most instructions. It is capable of emulating all the test programs (found in \verb|proc_compiler/tests/*.prco|).
 
 If extra time was allowed, the emulator could be integrated with the unit tests. This would allow for the dynamic compilation of high-level code test programs and analysing their behaviour during emulation against expected values. This would greatly speed up compiler code generation development times.
+
+\subsection*{Continuous Integration}
+The \scname{} compiler employs continuous integration testing to show if a code commit breaks certain functionality. The continuous integration system service used is Travis CI \citep{travisci}. Every time a commit is made to the repository, Travis CI pulls the commit and runs the \verb|test/travis-ci.sh| script. This script runs the compiler and emulator on each \verb|test/*.prco| file and checks the return code. If the return code does not match the expected functionality, the test fails and the developer can investigate further by enabling more debug prints with the \verb|-D| parameter.
+
+An example output of the continuous integration test runner is located in section \ref{appendix:travisci} {\nameref{appendix:travisci}}.
 
 \newpage
 \section{Sub-project Review}
@@ -1260,6 +1265,10 @@ prco_core inst_core (
 
 \subsection*{Example Output}
 \inputminted{text}{emu_output.tex}
+
+\subsection{\scname{} Compiler Continuous Integration Tests}
+\label{appendix:travisci}
+\inputminted{text}{compiler_ci.txt}
 
 \newpage
 \subsection{\scname{} Processor Instruction Set Architecture}
