@@ -14,7 +14,7 @@ __stdcall fnc printf(str)
         UART1(@str);
 
         delay(40);
-
+        
         str = str + 1;
     }
 }
