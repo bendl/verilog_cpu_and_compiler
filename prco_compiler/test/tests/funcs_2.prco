@@ -13,8 +13,8 @@ __stdcall fnc printf(str)
     while(@str) {
         UART1(@str);
 
-        delay(20);
-
+        delay(40);
+        
         str = str + 1;
     }
 }
