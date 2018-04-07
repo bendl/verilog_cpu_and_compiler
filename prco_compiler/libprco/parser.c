@@ -1059,7 +1059,7 @@ get_tok_prec(void)
 {
         switch (lexer_token()) {
         default:
-                dbprintf(D_ERR, "No token precedence for '%d'\r\n",
+                dbprintf(D_INFO, "No token precedence for '%d'\r\n",
                         lexer_token());
                 return -1;
 

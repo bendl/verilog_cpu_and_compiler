@@ -6,7 +6,5 @@ compiler:
   - gcc
 
 script:
-- cd prco_compiler
-- mkdir build && cd build
-- cmake ..
-- make
+- cd prco_compiler/test
+- ./travis-ci.sh

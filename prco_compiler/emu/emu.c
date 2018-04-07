@@ -395,8 +395,26 @@ int emu_run(struct prco_emu_core *core)
 
 int main(int argc, char **argv)
 {
+        int opt;
+        char *src_name = NULL;
+
         // Turn on all debug prints
         g_dbug_level = 0xff;
+
+        // Parse command line
+        while ((opt = getopt(argc, argv, "i:dD:O:")) != -1) {
+                switch (opt) {
+                case 'i': src_name = optarg;
+                        break;
+                case 'D': {
+                        char *ptr;
+                        g_dbug_level = strtoul(optarg, &ptr, 16);
+                } break;
+                default:
+                        dbprintf(D_ERR, "Unknown arguments.\r\n");
+                        exit(1);
+                }
+        }
 
         dbprintf(D_INFO, "LIBPRCO Emulator. Version %f\r\n\r\n",
                 LIBPRCO_EMU_VERSION);
@@ -407,8 +425,6 @@ int main(int argc, char **argv)
         // Print default registers and memory
         print_mem();
         print_regs();
-
-        printf("alu: %x\r\n", alu_cmp(&core, 5, 5));
 
         // Run the emulator
         emu_run(&core);

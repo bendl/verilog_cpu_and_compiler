@@ -79,7 +79,6 @@ ast_free(_inout_ struct ast_item *node)
 
         } // End switch
 
-        free(node->expr);
         free(node);
 }
 

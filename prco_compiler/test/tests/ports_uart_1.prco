@@ -11,4 +11,6 @@ __stdcall fnc main()
     UART1(a);
     a = 32;
     UART1(a);
+
+    a;
 }
