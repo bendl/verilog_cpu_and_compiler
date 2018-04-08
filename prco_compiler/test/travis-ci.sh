@@ -2,6 +2,7 @@
 
 num_tests=0
 passed_tests=0
+ret=0
 
 fnc_make() {
     pushd ../
@@ -69,6 +70,15 @@ fnc_run_test ./tests/strings_2.prco 0
 fnc_run_test ./tests/strings_3.prco 111
 
 fnc_run_test ./tests/vars_1.prco 0
-fnc_run_test ./tests/vars_2.prco 3
+fnc_run_test ./tests/vars_2.prco 2
 
 echo -e "\n$passed_tests/$num_tests passed."
+
+if [ $passed_tests -eq $num_tests ]; then
+    ret=0
+else
+    ret=$(( $num_tests - $passed_tests ))
+fi
+
+echo "Exiting with exit code $ret"
+exit $ret
