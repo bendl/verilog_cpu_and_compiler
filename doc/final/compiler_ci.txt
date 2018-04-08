@@ -1,0 +1,37 @@
+-- GCC detected, adding compile flags
+-- GCC detected, adding compile flags
+-- GCC detected, adding compile flags
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /mnt/e/XilinxVM/prco304/prco_compiler/lbuild
+[ 75%] Built target libprco
+[ 87%] Built target cli
+[100%] Built target emu
+/mnt/e/XilinxVM/prco304/prco_compiler/test
+Running test    ./tests/binary_ops_1.prco...     PASSED
+Running test    ./tests/binary_ops_2.prco...     PASSED
+Running test    ./tests/control_for_1.prco...    PASSED
+Running test    ./tests/control_for_2.prco...    PASSED
+Running test    ./tests/control_for_3.prco...    FAILED          Expected 1, got 1
+Running test    ./tests/control_if_1.prco....    FAILED
+
+/travis-ci.sh: line 17:  4301 Segmentation fault      (core dumped) 
+../lbuild/cli/cli -i $1 -d -D0x0002
+
+Running test    ./tests/control_if_2.prco...     PASSED
+Running test    ./tests/control_if_2.prco...     FAILED          Expected 32, got 1
+Running test    ./tests/control_while_1.prco...  PASSED
+Running test    ./tests/control_while_2.prco...  PASSED
+Running test    ./tests/control_while_3.prco...  FAILED          Expected 5, got 1
+Running test    ./tests/control_while_4.prco...  PASSED
+Running test    ./tests/foo.prco...              PASSED
+Running test    ./tests/funcs_1.prco...          PASSED
+Running test    ./tests/funcs_2.prco...          PASSED
+Running test    ./tests/ports_uart_1.prco...     PASSED
+Running test    ./tests/strings_1.prco...        PASSED
+Running test    ./tests/strings_2.prco...        PASSED
+Running test    ./tests/strings_3.prco...        FAILED          Expected 1, got 1
+Running test    ./tests/vars_1.prco...           PASSED
+Running test    ./tests/vars_2.prco...           PASSED
+
+17/21 passed.
