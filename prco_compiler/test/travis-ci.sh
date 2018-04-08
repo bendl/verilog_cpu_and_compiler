@@ -70,7 +70,7 @@ fnc_run_test ./tests/strings_2.prco 0
 fnc_run_test ./tests/strings_3.prco 111
 
 fnc_run_test ./tests/vars_1.prco 0
-fnc_run_test ./tests/vars_2.prco 2
+fnc_run_test ./tests/vars_2.prco 3
 
 echo -e "\n$passed_tests/$num_tests passed."
 
