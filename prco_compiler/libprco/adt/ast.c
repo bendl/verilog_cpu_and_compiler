@@ -39,6 +39,10 @@ ast_func_free(_inout_ struct ast_func *f)
 void
 ast_free(_inout_ struct ast_item *node)
 {
+        if(!node) {
+                return;
+        }
+
         if (node->next != NULL)
                 ast_free(node->next);
 

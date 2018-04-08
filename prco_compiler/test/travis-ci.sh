@@ -28,12 +28,13 @@ fnc_run_test() {
 
     fnc_run_cli $1
     fnc_run_emu $1 $2
+    code=$?
 
-    if [ $? -eq $2 ]; then 
+    if [ $code -eq $2 ]; then
         echo -e "\t\tPASSED"
         passed_tests=$(($passed_tests + 1))
     else
-        echo -e "\t\tFAILED\t\tExpected $2, got $?"
+        echo -e "\t\tFAILED\t\tExpected $2, got $code"
     fi
 }
 
@@ -45,27 +46,27 @@ fnc_run_test ./tests/binary_ops_2.prco 11
 
 fnc_run_test ./tests/control_for_1.prco 5
 fnc_run_test ./tests/control_for_2.prco 1
-fnc_run_test ./tests/control_for_3.prco 1
+fnc_run_test ./tests/control_for_3.prco 3
 
 fnc_run_test ./tests/control_if_1.prco 10
 fnc_run_test ./tests/control_if_2.prco 2
-fnc_run_test ./tests/control_if_2.prco 32
+fnc_run_test ./tests/control_if_3.prco 32
 
 fnc_run_test ./tests/control_while_1.prco 5
 fnc_run_test ./tests/control_while_2.prco 5
-fnc_run_test ./tests/control_while_3.prco 5
+fnc_run_test ./tests/control_while_3.prco 7
 fnc_run_test ./tests/control_while_4.prco 8
 
 fnc_run_test ./tests/foo.prco 1
 
 fnc_run_test ./tests/funcs_1.prco 33
-fnc_run_test ./tests/funcs_2.prco 10
+fnc_run_test ./tests/funcs_2.prco 16
 
 fnc_run_test ./tests/ports_uart_1.prco 32
 
 fnc_run_test ./tests/strings_1.prco 2
 fnc_run_test ./tests/strings_2.prco 0
-fnc_run_test ./tests/strings_3.prco 1
+fnc_run_test ./tests/strings_3.prco 111
 
 fnc_run_test ./tests/vars_1.prco 0
 fnc_run_test ./tests/vars_2.prco 3

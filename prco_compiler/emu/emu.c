@@ -395,6 +395,7 @@ int emu_run(struct prco_emu_core *core)
 
 int main(int argc, char **argv)
 {
+        int return_code = 0;
         int opt;
         char *src_name = NULL;
 
@@ -437,6 +438,8 @@ int main(int argc, char **argv)
 
         print_uart();
 
+        return_code = core.r_regs[0];
+
         // Return Ax register for testing
-        return core.r_regs[0];
+        return return_code;
 }

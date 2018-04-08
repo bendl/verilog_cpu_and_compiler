@@ -735,27 +735,6 @@ parse_fnc(void)
         return fnc;
 }
 
-struct list_item *
-add_var_to_scope(struct list_item *scope, struct ast_lvar *v)
-{
-        struct list_item *old_scope;
-
-        if (scope == NULL) {
-                scope = zalloc(scope);
-        }
-
-        if (scope->value == NULL) {
-                scope->value = v;
-        } else {
-                old_scope = scope;
-                scope = zalloc(scope);
-                scope->value = v;
-                scope->next = old_scope;
-        }
-
-        return scope;
-}
-
 struct ast_lvar *
 check_str_in_scope(struct list_item *scope, char *ident)
 {
@@ -953,7 +932,7 @@ parse_var(void)
         if ((v = get_var(ident)) == NULL) {
                 v = ast_lvar_create(ast_var_create(ident, dtINT));
                 nvar = ast_expr_create(v, AST_LOCAL_VAR);
-                g_locals = add_var_to_scope(g_locals, nvar->expr);
+                g_locals = append_ll_item_head(g_locals, v);
         }
 
         // If there is an assignment after it,
@@ -1131,7 +1110,6 @@ parse_if_expr(void)
 
         // '{' <body> '}'
         then = parse_block();
-        lexer_match_next(TOK_RCBRACE);
 
         // Else is optional, so check for it
         // else '{' <body> '}'

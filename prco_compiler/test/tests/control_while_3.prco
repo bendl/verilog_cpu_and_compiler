@@ -10,4 +10,6 @@ __stdcall fnc main()
     }
 
     UART1(length + 48);
+
+    length;
 }
