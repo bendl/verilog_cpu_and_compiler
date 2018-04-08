@@ -94,7 +94,7 @@ opt_cf(struct ast_item *node)
                         }
 
                         // Replace it
-                        ret = alloc_expr(new_num, AST_NUM);
+                        ret = ast_expr_create(new_num, AST_NUM);
                         ret->next = node->next;
                         break;
                 }

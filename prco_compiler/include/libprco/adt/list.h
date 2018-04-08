@@ -36,7 +36,12 @@ struct list_item {
     struct list_item    *next;   ///< Pointer to next item in list
 };
 
-#define list_for_each(item) for (; item != NULL; item = item->next)
+#define list_to_front(i, l) \
+        (i)->next = (l); \
+        (l) = i
+
+#define list_for_each(item) \
+        for (; item != NULL; item = item->next)
 
 extern void ll_free         (struct list_item *head);
 extern void append_ll_item  (struct list_item *head, void *val);

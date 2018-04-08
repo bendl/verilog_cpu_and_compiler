@@ -19,7 +19,7 @@ fnc_run_cli() {
 }
 
 fnc_run_emu() {
-    ../lbuild/emu/emu -D0x00
+    ../lbuild/emu/emu -D0x0000
 }
 
 fnc_run_test() {
@@ -59,7 +59,7 @@ fnc_run_test ./tests/control_while_4.prco 8
 fnc_run_test ./tests/foo.prco 1
 
 fnc_run_test ./tests/funcs_1.prco 33
-fnc_run_test ./tests/funcs_2.prco 2
+fnc_run_test ./tests/funcs_2.prco 10
 
 fnc_run_test ./tests/ports_uart_1.prco 32
 
