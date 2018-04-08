@@ -12,12 +12,19 @@
 #include "arch/target.h"
 #include "module.h"
 
+#ifdef _WIN32
+        #include <Shlwapi.h>
+        #define PLAT_MAX_PATH MAX_PATH
+#else
+        #define PLAT_MAX_PATH 256
+#endif
+
 #include <stdio.h>
 #include <assert.h>
-#include <Shlwapi.h>
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+
 
 static int g_uid = 0;
 #define NEW_GUID() \
@@ -59,8 +66,15 @@ struct list_item *g_resv_words; //< Linked list of reserved words
 static void
 parser_free(_in_ struct text_parser *parser)
 {
+        assert(parser);
+        assert(parser->file_input);
+        assert(parser->lpstr_input_dir);
+        assert(parser->lpstr_input_fp);
+
         fclose(parser->file_input);
         free(parser->lpstr_input_dir);
+
+        dbprintf(D_INFO, "fp: %s\r\n", parser->lpstr_input_fp);
         free(parser->lpstr_input_fp);
         free(parser);
 }
@@ -99,10 +113,20 @@ parser_popp()
 static int
 file_exists(const char *fname)
 {
+#ifdef __WIN32
         // TODO: Create cross-platform implementation
         return PathFileExists(fname);
+#else
+        FILE * file;
+        file = fopen(fname, "r");
+        if (file) {
+                fclose(file);
+                return 1;
+        } else {
+                return 0;
+        }
+#endif
 }
-
 
 // TODO: Make work for linux
 struct text_parser *
@@ -112,13 +136,13 @@ parser_fopen(_in_ const char *fname,
 {
         struct text_parser *new_parser;
 
-        dprintf(D_INFO, "parser_fopen: %s\r\n", fname);
+        dbprintf(D_INFO, "parser_fopen: %s\r\n", fname);
 
         new_parser = zalloc(new_parser);
-        new_parser->lpstr_input_fp = malloc(MAX_PATH);
-        new_parser->lpstr_input_dir = malloc(MAX_PATH);
+        new_parser->lpstr_input_fp = malloc(PLAT_MAX_PATH);
+        new_parser->lpstr_input_dir = malloc(PLAT_MAX_PATH);
 
-#ifdef _WIN32
+        #ifdef _WIN32
         // Hack to replace linux directory separators / with \
         // TODO: Use cross-platform solution for handling directory filepaths
         {
@@ -129,23 +153,22 @@ parser_fopen(_in_ const char *fname,
                         c++;
                 }
         }
-#endif
 
         if (PathIsRelative(fname)) {
-                dprintf(D_INFO, "Path is relative\r\n");
+                dbprintf(D_INFO, "Path is relative\r\n");
                 // Get current dir from current parser
                 // If current parser is null, use executable pwd
                 // I.e. pwd + fname
                 if (parser == NULL) {
-                        GetCurrentDirectory(MAX_PATH, new_parser->lpstr_input_dir);
-                        dprintf(D_INFO, "dir: %s\r\n", new_parser->lpstr_input_dir);
-                        dprintf(D_INFO, "fname: %s\r\n", fname);
+                        GetCurrentDirectory(PLAT_MAX_PATH, new_parser->lpstr_input_dir);
+                        dbprintf(D_INFO, "dir: %s\r\n", new_parser->lpstr_input_dir);
+                        dbprintf(D_INFO, "fname: %s\r\n", fname);
                         PathCombine(new_parser->lpstr_input_fp,
                                     new_parser->lpstr_input_dir, fname);
                         strcpy(new_parser->lpstr_input_dir, new_parser->lpstr_input_fp);
                         PathRemoveFileSpec(new_parser->lpstr_input_dir);
-                        dprintf(D_INFO, "fp: %s\r\n", new_parser->lpstr_input_fp);
-                        dprintf(D_INFO, "Parser null\r\n");
+                        dbprintf(D_INFO, "fp: %s\r\n", new_parser->lpstr_input_fp);
+                        dbprintf(D_INFO, "Parser null\r\n");
                 } else {
                         // Copy old parser dir to new parser dir
                         strcpy(new_parser->lpstr_input_dir,
@@ -155,8 +178,8 @@ parser_fopen(_in_ const char *fname,
                                     fname);
                 }
 
-                dprintf(D_INFO, "Origin path: %s\r\n", fname);
-                dprintf(D_INFO, "New path: %s\r\n", new_parser->lpstr_input_fp);
+                dbprintf(D_INFO, "Origin path: %s\r\n", fname);
+                dbprintf(D_INFO, "New path: %s\r\n", new_parser->lpstr_input_fp);
         } else {
                 // Extract dir from fname
                 // TODO: Pass size to this function
@@ -165,6 +188,9 @@ parser_fopen(_in_ const char *fname,
                 strcpy(new_parser->lpstr_input_dir, fname);
                 PathRemoveFileSpec(new_parser->lpstr_input_dir);
         }
+        #else
+                strcpy(new_parser->lpstr_input_fp, fname);
+        #endif
 
         if (!file_exists(new_parser->lpstr_input_fp)) {
                 // File doesn't exist relative to current file
@@ -172,12 +198,14 @@ parser_fopen(_in_ const char *fname,
                 char *std_include = new_parser->lpstr_input_dir;
                 int ret;
 
-                dprintf(D_INFO, "File doesnt exist!\r\n");
+                // TODO: Add linux impl for getenv
+                /*
+                dbprintf(D_INFO, "File doesnt exist!\r\n");
 
                 ret = GetEnvironmentVariable(COMPILER_INCLUDE_ENV_VAR,
-                                             new_parser->lpstr_input_dir, MAX_PATH);
+                                             new_parser->lpstr_input_dir, PLAT_MAX_PATH);
                 if (ret == 0) {
-                        dprintf(
+                        dbprintf(
                                 D_WARN,
                                 "WARNING: " COMPILER_INCLUDE_ENV_VAR
                                         " environment variable is not set. Cannot search std include.\r\n");
@@ -189,7 +217,9 @@ parser_fopen(_in_ const char *fname,
                                 std_include = parser->lpstr_input_dir;
                         }
                 }
+                */
 
+                #ifdef __WIN32
                 // Create new path from fname and std_include path
                 // TODO: Search each directory in PATH for fname?
                 new_parser->lpstr_input_dir = std_include;
@@ -197,15 +227,16 @@ parser_fopen(_in_ const char *fname,
                         new_parser->lpstr_input_fp,
                         new_parser->lpstr_input_dir,
                         fname);
+                #endif
         }
 
 
-        dprintf(D_INFO, "New path exists: %s\r\n", new_parser->lpstr_input_fp);
+        dbprintf(D_INFO, "New path exists: %s\r\n", new_parser->lpstr_input_fp);
 
 l_fname_exists:
         new_parser->file_input = fopen(new_parser->lpstr_input_fp, "r");
         if (!new_parser->file_input) {
-                dprintf(D_ERR,
+                dbprintf(D_ERR,
                         "ERROR: parser_fopen: Cannot find file: %s!\r\n",
                         new_parser->lpstr_input_fp);
                 return NULL;
@@ -243,7 +274,7 @@ lexer_fgetc()
 
         if (g_cur_parser()->lexer_char == '\r' ||
                 g_cur_parser()->lexer_char == '\n') {
-                dprintf(D_INFO, "Parsed line: %s\r\n", line_buf);
+                dbprintf(D_INFO, "Parsed line: %s\r\n", line_buf);
                 line_buf[0] = 0;
                 line_buf_pos = 0;
         } else {
@@ -260,18 +291,18 @@ parse_top_level(void)
 
         while (1) {
                 switch (LEXER_GET_TOK()) {
-                case TOK_DEF:
+                case TOK_FNC:
                 case TOK_CC_CDECL:
                 case TOK_CC_STDCALL:
                 case TOK_CC_FASTCALL:
-                        parse_result = !parse_def();
+                        parse_result = !parse_fnc();
                         break;
 
                 case TOK_EOF:
                         goto exit_top_level;
 
                 default:
-                        dprintf(D_ERR, "Illegal top level expr!\r\n");
+                        dbprintf(D_ERR, "Illegal top level expr!\r\n");
                         parse_result = 1;
                         break;
                 } // end switch
@@ -282,6 +313,8 @@ parse_top_level(void)
         }
 
 exit_top_level:
+        assert(g_cur_parser());
+
         // Set current parsers result
         g_cur_parser()->parse_result = parse_result;
         return parse_result;
@@ -307,7 +340,7 @@ parser_run(_in_ struct text_parser *parser)
         // Todo, datasizes should be target independant
         parser_add_resv("int", dtINT, TOK_VARIABLE);
         parser_add_resv("var", dtINT, TOK_VARIABLE);
-        parser_add_resv("fnc", 0, TOK_DEF);
+        parser_add_resv("fnc", 0, TOK_FNC);
         parser_add_resv("ext", 0, TOK_EXT);
         parser_add_resv("if", 0, TOK_IF);
         parser_add_resv("for", 0, TOK_FOR);
@@ -329,7 +362,7 @@ parser_run(_in_ struct text_parser *parser)
         // Push new parser to stack
         parse_result = parser_pushp(parser);
         if (parse_result != R_OK) {
-                dprintf(D_ERR,
+                dbprintf(D_ERR,
                         "ERROR: Parser stack limit (%d) reached!\r\n",
                         PARSER_MAX_STACK);
                 goto parser_run_cleanup;
@@ -447,11 +480,11 @@ string_is_resv(char *buf)
         resv_it = g_resv_words;
         list_for_each(resv_it) {
                 w = (struct resv_word *) resv_it->value;
-                dprintf(D_PARSE, "Comparing '%s' to resv '%s'\r\n",
+                dbprintf(D_PARSE, "Comparing '%s' to resv '%s'\r\n",
                         buf, w->lpstr_name);
 
                 if (strcmp(buf, w->lpstr_name) == 0) {
-                        dprintf(D_PARSE, "Resv word found! %s\r\n",
+                        dbprintf(D_PARSE, "Resv word found! %s\r\n",
                                 w->lpstr_name);
                         return w;
                 }
@@ -472,7 +505,7 @@ lexer_next(void)
         assert(g_cur_parser());
         assert(g_cur_parser()->file_input);
 
-        dprintf(D_INFO, "Lexing: %s\r\n", g_cur_parser()->lpstr_input_fp);
+        dbprintf(D_INFO, "Lexing: %s\r\n", g_cur_parser()->lpstr_input_fp);
 
         // Skip whitespace
         while (isspace(LEXER_GET_CHAR())) lexer_fgetc();
@@ -515,7 +548,7 @@ lexer_next(void)
         }
         else
         {
-                dprintf(D_ERR, "Unknown character: %d %c\r\n",
+                dbprintf(D_ERR, "Unknown character: %d %c\r\n",
                         LEXER_GET_CHAR(),
                         LEXER_GET_CHAR());
                 return TOK_ERROR;
@@ -538,7 +571,7 @@ enum token_type
 lexer_match_next(enum token_type t)
 {
         if (lexer_token() != t) {
-                dprintf(D_ERR, "Unexpected token! %d %c\r\n",
+                dbprintf(D_ERR, "Unexpected token! %d %c\r\n",
                         LEXER_GET_TOK());
                 return TOK_ERROR;
         }
@@ -567,7 +600,7 @@ int
 lexer_match_req(enum token_type t)
 {
         if (!lexer_match(t)) {
-                dprintf(D_ERR, "Required text not found! %d %c\r\n",
+                dbprintf(D_ERR, "Required text not found! %d %c\r\n",
                         lexer_token(), lexer_token());
                 return TOK_ERROR;
         }
@@ -575,6 +608,24 @@ lexer_match_req(enum token_type t)
         return R_OK;
 }
 
+
+struct ast_proto *
+proto_already_exists(enum token_type t, char *name)
+{
+        struct ast_proto *p_it = get_g_module()->prototypes;
+        list_for_each(p_it) {
+                if (strcmp(p_it->name, name) == 0) {
+                        if (t == TOK_EXT) {
+                                return p_it;
+                        } else {
+                                dbprintf(D_ERR, "Duplication of prototype: %s\r\n",
+                                         name);
+                                return NULL;
+                        }
+                }
+        }
+
+}
 
 struct ast_proto *
 parse_proto(enum token_type t)
@@ -597,7 +648,7 @@ parse_proto(enum token_type t)
         lexer_match_opt(TOK_CC_CDECL);
         lexer_match_opt(TOK_CC_FASTCALL);
 
-        lexer_match_opt(TOK_DEF);
+        lexer_match_opt(TOK_FNC);
         lexer_match_req(TOK_ID);
         fn_name = LEXER_GET_STR();
         lexer_match_next(TOK_ID);
@@ -607,7 +658,7 @@ parse_proto(enum token_type t)
         lexer_match_opt(TOK_VARIABLE);
         while (lexer_match(TOK_ID) || lexer_match(TOK_VARIABLE)) {
                 lexer_match_opt(TOK_VARIABLE);
-                lvarg = alloc_lvar(alloc_var(LEXER_GET_STR(), dtINT));
+                lvarg = ast_lvar_create(ast_var_create(LEXER_GET_STR(), dtINT));
                 append_ll_item(args, lvarg);
                 argc++;
 
@@ -624,7 +675,7 @@ parse_proto(enum token_type t)
                 parg = (struct ast_lvar *) arg->value;
                 parg->bp_offset = pargc * 1;
                 pargc--;
-                dprintf(D_INFO, "Parsed proto arg: %s offset %x\r\n",
+                dbprintf(D_INFO, "Parsed proto arg: %s offset %x\r\n",
                         parg->var->name, parg->bp_offset);
         }
 
@@ -633,99 +684,55 @@ parse_proto(enum token_type t)
 
         // Prototype finished.
         // Now check to see if we already have a matching one in the module
-        proto_it = get_g_module()->prototypes;
-        list_for_each(proto_it) {
-                if (strcmp(proto_it->name, fn_name) == 0) {
-                        if (t == TOK_EXT) {
-                                return proto_it;
-                        } else {
-                                dprintf(D_ERR, "Duplication of prototype: %s\r\n",
-                                        fn_name);
-                                return NULL;
-                        }
-                }
-        }
+        proto_it = proto_already_exists(t, fn_name);
+        if(proto_it) return proto_it;
 
         g_params = args;
 
-        proto = alloc_proto(fn_name, args, argc);
+        proto = ast_proto_create(fn_name, args, argc);
+
         // Move new proto to front of the ll
-        proto->next = get_g_module()->prototypes;
-        get_g_module()->prototypes = proto;
+        list_to_front(proto, get_g_module()->prototypes);
+
         return proto;
 }
 
-struct ast_func *
-parse_def(void)
+int
+check_is_entry_fnc(struct ast_func *fnc)
 {
-        struct ast_func *ret;
+        return strcmp(fnc->proto->name, "main") == 0;
+}
+
+struct ast_func *
+parse_fnc(void)
+{
+        struct ast_func *fnc;
         struct ast_item *body;
         struct ast_proto *proto;
 
-        struct list_item *locals;
-        struct ast_lvar *locals_value;
-
         // def ident ( args, ... )
-        proto = parse_proto(TOK_DEF);
-
-        lexer_match_next(TOK_LCBRACE);
+        proto = parse_proto(TOK_FNC);
         body = parse_block();
-        // TODO: cleanup
-        if (!body) return NULL;
-
-        lexer_match_next(TOK_RCBRACE);
-
         if (!proto || !body) return NULL;
 
-        ret = alloc_func(proto, body);
-        ret->next = get_g_module()->functions;
-        ret->locals = g_locals;
-        get_g_module()->functions = ret;
+        fnc = ast_func_create(proto, body);
+        fnc->locals = g_locals;
 
-
-        locals = ret->locals;
-        list_for_each(locals) {
-                locals_value = locals->value;
-                if (!locals_value) break;
-                dprintf(D_INFO, "FUNC: %s\tVAR: '%s' %d\r\n",
-                        ret->proto->name,
-                        locals_value->var->name,
-                        locals_value->bp_offset);
-        }
+        // Move new function to front of function ll list
+        list_to_front(fnc, get_g_module()->functions);
 
         // Finished parsing,
         // clear global lists
         g_locals = g_params = NULL;
 
-        dprintf(D_INFO, "Parsed def: %s argc: %d\r\n",
+        dbprintf(D_INFO, "Parsed def: %s argc: %d\r\n",
                 proto->name, proto->argc);
 
-        if (strcmp(proto->name, "main") == 0) {
-                get_g_module()->entry = ret;
+        if (check_is_entry_fnc(fnc)) {
+                get_g_module()->entry = fnc;
         }
 
-        return ret;
-}
-
-struct list_item *
-add_var_to_scope(struct list_item *scope, struct ast_lvar *v)
-{
-        struct list_item *old_scope;
-
-        if (scope == NULL) {
-                scope = zalloc(scope);
-        }
-
-        if (scope->value == NULL) {
-                scope->value = v;
-        } else {
-                old_scope = scope;
-                scope = zalloc(scope);
-                scope->value = v;
-                scope->next = old_scope;
-        }
-
-        return scope;
+        return fnc;
 }
 
 struct ast_lvar *
@@ -811,11 +818,11 @@ parse_call(char *ident)
         lexer_match_next(TOK_RBRACE);
 
         // Create the call ast item
-        call = alloc_call(ident, args, argc);
+        call = ast_call_create(ident, args, argc);
         if (check_call(call)) {
-                return alloc_expr(call, AST_CALL);
+                return ast_expr_create(call, AST_CALL);
         } else {
-                dprintf(D_ERR, "ERR: Undefined reference to: %s\r\n", ident);
+                dbprintf(D_ERR, "ERR: Undefined reference to: %s\r\n", ident);
                 return NULL;
         }
 }
@@ -830,7 +837,7 @@ parse_assignment(char *ident)
         lexer_match_next(TOK_ASSIGNMENT);
         v = get_var(ident);
         if (!v) {
-                dprintf(D_ERR,
+                dbprintf(D_ERR,
                         "ERR: Var assignment ident '%s' not found in scope\r\n",
                         ident);
                 return NULL;
@@ -843,7 +850,7 @@ parse_assignment(char *ident)
         a->var = v;
         a->val = val;
 
-        return alloc_expr(a, AST_ASSIGNMENT);
+        return ast_expr_create(a, AST_ASSIGNMENT);
 }
 
 struct ast_item *
@@ -867,22 +874,22 @@ parse_ident(void)
         // else its a variable reference
         v = get_var(ident);
         if (!v) {
-                dprintf(D_ERR,
+                dbprintf(D_ERR,
                         "Variable '%s' is not in the current scope!\r\n",
                         ident);
                 return NULL;
         }
 
-        return alloc_expr(v, AST_VAR_REF);
+        return ast_expr_create(v, AST_VAR_REF);
 }
 
 struct ast_item *
 parse_num(void)
 {
         struct ast_num *ret;
-        ret = alloc_num(LEXER_GET_NUM());
+        ret = ast_num_create(LEXER_GET_NUM());
         lexer_eat();
-        return alloc_expr(ret, AST_NUM);
+        return ast_expr_create(ret, AST_NUM);
 }
 
 struct ast_item *
@@ -897,7 +904,7 @@ parse_paren(void)
         result = parse_expr();
 
         if (!lexer_match(TOK_RBRACE)) {
-                dprintf(D_ERR,
+                dbprintf(D_ERR,
                         "ERR: Missing closing ) paren in expr\r\n");
                 return NULL;
         }
@@ -914,7 +921,7 @@ parse_var(void)
         struct ast_lvar *v      = NULL;
         struct ast_item *nvar   = NULL;
 
-        dprintf(D_INFO, "Parsing variable\r\n");
+        dbprintf(D_INFO, "Parsing variable\r\n");
 
         lexer_match_next(TOK_VARIABLE);
         lexer_match(TOK_ID);
@@ -923,9 +930,9 @@ parse_var(void)
 
         // If variable not found, create new local decl
         if ((v = get_var(ident)) == NULL) {
-                v = alloc_ldecl(alloc_var(ident, dtINT));
-                nvar = alloc_expr(v, AST_LOCAL_VAR);
-                g_locals = add_var_to_scope(g_locals, nvar->expr);
+                v = ast_lvar_create(ast_var_create(ident, dtINT));
+                nvar = ast_expr_create(v, AST_LOCAL_VAR);
+                g_locals = append_ll_item_head(g_locals, v);
         }
 
         // If there is an assignment after it,
@@ -943,7 +950,7 @@ parse_var(void)
 
         // If no new_var created, its just a reference
         if (nvar == NULL) {
-                nvar = alloc_expr(v, AST_VAR_REF);
+                nvar = ast_expr_create(v, AST_VAR_REF);
         }
 
         return nvar;
@@ -965,13 +972,13 @@ parse_cstring(void)
         string->string_id = NEW_GUID();
         lexer_match_next(TOK_DQUOTE);
 
-        dprintf(D_INFO, "Found CSTRING: '%s'\r\n", string->string);
+        dbprintf(D_INFO, "Found CSTRING: '%s'\r\n", string->string);
 
         // Add string to global string list
         get_g_module()->strings =
                 append_ll_item_head(get_g_module()->strings, string);
 
-        return alloc_expr(string, AST_CSTRING);
+        return ast_expr_create(string, AST_CSTRING);
 }
 
 struct ast_item *
@@ -986,7 +993,7 @@ parse_deref(void)
 
         deref = zalloc(deref);
         deref->item = deref_expr;
-        return alloc_expr(deref, AST_DEREF);
+        return ast_expr_create(deref, AST_DEREF);
 }
 
 struct ast_item *
@@ -1015,7 +1022,7 @@ parse_primary(void)
                 // and return the next primary
                 return parse_primary();
         default:
-                dprintf(D_ERR, "Unknown primary token: %d %c\r\n",
+                dbprintf(D_ERR, "Unknown primary token: %d %c\r\n",
                         lexer_token(), lexer_token());
                 return NULL;
         }
@@ -1026,7 +1033,7 @@ get_tok_prec(void)
 {
         switch (lexer_token()) {
         default:
-                dprintf(D_ERR, "No token precedence for '%d'\r\n",
+                dbprintf(D_INFO, "No token precedence for '%d'\r\n",
                         lexer_token());
                 return -1;
 
@@ -1081,7 +1088,7 @@ parse_bin_rhs(int min_prec, struct ast_item *lhs)
                         if (!rhs) return NULL;
                 }
 
-                lhs = alloc_expr(alloc_bin((char) bin_op, lhs, rhs), AST_BIN);
+                lhs = ast_expr_create(ast_bin_create((char) bin_op, lhs, rhs), AST_BIN);
         }
 }
 
@@ -1103,7 +1110,6 @@ parse_if_expr(void)
 
         // '{' <body> '}'
         then = parse_block();
-        lexer_match_next(TOK_RCBRACE);
 
         // Else is optional, so check for it
         // else '{' <body> '}'
@@ -1114,7 +1120,7 @@ parse_if_expr(void)
                 lexer_match_next(TOK_RCBRACE);
         }
 
-        return alloc_expr(alloc_if(cond, then, els), AST_IF);
+        return ast_expr_create(ast_if_create(cond, then, els), AST_IF);
 }
 
 struct ast_item *
@@ -1137,7 +1143,7 @@ parse_for_expr(void)
         body = parse_block();
         lexer_match_next(TOK_RCBRACE);
 
-        return alloc_expr(alloc_for(start, cond, step, body), AST_FOR);
+        return ast_expr_create(ast_for_create(start, cond, step, body), AST_FOR);
 }
 
 struct ast_item *
@@ -1156,7 +1162,7 @@ parse_port_uart1(void)
         // AST it
         uart_ast = zalloc(uart_ast);
         uart_ast->val = val;
-        return alloc_expr(uart_ast, AST_UART);
+        return ast_expr_create(uart_ast, AST_UART);
 }
 
 struct ast_item *
@@ -1174,16 +1180,14 @@ parse_while_expr(void)
         if(!cond) { return NULL; }
         lexer_match_next(TOK_RBRACE);
 
-        lexer_match_next(TOK_LCBRACE);
         body = parse_block();
         if(!cond) { return NULL; }
-        lexer_match_next(TOK_RCBRACE);
 
         // AST it
         w = zalloc(w);
         w->cond = cond;
         w->body = body;
-        return alloc_expr(w, AST_WHILE);
+        return ast_expr_create(w, AST_WHILE);
 }
 
 struct ast_item *
@@ -1215,10 +1219,12 @@ parse_block(void)
 {
         // A block is a list of multiple <expr> with
         // in chronological order
-        struct ast_item *start = NULL;
-        struct ast_item *last  = NULL;
+        struct ast_item *start  = NULL;
+        struct ast_item *last   = NULL;
+        int has_braces          = 0;
 
-        lexer_match_opt(TOK_LCBRACE);
+        has_braces = lexer_match(TOK_LCBRACE);
+        if(has_braces) lexer_match_next(TOK_LCBRACE);
 
         while (!lexer_match(TOK_RCBRACE)) {
                 struct ast_item *e = parse_expr();
@@ -1235,6 +1241,8 @@ parse_block(void)
                         last = e;
                 }
         }
+
+        if(has_braces) lexer_match_next(TOK_RCBRACE);
 
         // Return the start of the list
         return start;

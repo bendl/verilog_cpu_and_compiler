@@ -39,6 +39,10 @@ ast_func_free(_inout_ struct ast_func *f)
 void
 ast_free(_inout_ struct ast_item *node)
 {
+        if(!node) {
+                return;
+        }
+
         if (node->next != NULL)
                 ast_free(node->next);
 
@@ -79,13 +83,11 @@ ast_free(_inout_ struct ast_item *node)
 
         } // End switch
 
-        free(node->expr);
         free(node);
 }
 
-
 struct ast_var *
-alloc_var(char *name, int dt)
+ast_var_create(char *name, int dt)
 {
         struct ast_var *ret = zalloc(ret);
         ret->name = name;
@@ -94,7 +96,7 @@ alloc_var(char *name, int dt)
 }
 
 struct ast_lvar *
-alloc_lvar(struct ast_var *var)
+ast_lvar_create(struct ast_var *var)
 {
         struct ast_lvar *ret = zalloc(ret);
         ret->var = var;
@@ -103,7 +105,9 @@ alloc_lvar(struct ast_var *var)
 }
 
 struct ast_proto *
-alloc_proto(char *name, struct list_item *args, int argc)
+ast_proto_create(char *name,
+                 struct list_item *args,
+                 int argc)
 {
         struct ast_proto *ret = zalloc(ret);
         ret->name = name;
@@ -113,7 +117,7 @@ alloc_proto(char *name, struct list_item *args, int argc)
 }
 
 struct ast_item *
-alloc_expr(void *expr, enum ast_type type)
+ast_expr_create(void *expr, enum ast_type type)
 {
         struct ast_item *ret = zalloc(ret);
         ret->expr = expr;
@@ -122,7 +126,9 @@ alloc_expr(void *expr, enum ast_type type)
 }
 
 struct ast_bin *
-alloc_bin(char op, struct ast_item *lhs, struct ast_item *rhs)
+ast_bin_create(char op,
+               struct ast_item *lhs,
+               struct ast_item *rhs)
 {
         struct ast_bin *ret = zalloc(ret);
         ret->op = op;
@@ -132,7 +138,8 @@ alloc_bin(char op, struct ast_item *lhs, struct ast_item *rhs)
 }
 
 struct ast_func *
-alloc_func(struct ast_proto *proto, struct ast_item *body)
+ast_func_create(struct ast_proto *proto,
+                struct ast_item *body)
 {
         struct ast_func *ret = zalloc(ret);
         ret->proto = proto;
@@ -143,7 +150,7 @@ alloc_func(struct ast_proto *proto, struct ast_item *body)
 }
 
 struct ast_num *
-alloc_num(int num_val)
+ast_num_create(int num_val)
 {
         struct ast_num *ret = zalloc(ret);
         ret->val = num_val;
@@ -151,7 +158,9 @@ alloc_num(int num_val)
 }
 
 struct ast_call *
-alloc_call(char *callee, struct list_item *args, int argc)
+ast_call_create(char *callee,
+                struct list_item *args,
+                int argc)
 {
         struct ast_call *ret = zalloc(ret);
         ret->callee = callee;
@@ -161,7 +170,9 @@ alloc_call(char *callee, struct list_item *args, int argc)
 }
 
 struct ast_if *
-alloc_if(struct ast_item *cond, struct ast_item *then, struct ast_item *els)
+ast_if_create(struct ast_item *cond,
+              struct ast_item *then,
+              struct ast_item *els)
 {
         struct ast_if *ret = zalloc(ret);
         ret->cond = cond;
@@ -171,24 +182,15 @@ alloc_if(struct ast_item *cond, struct ast_item *then, struct ast_item *els)
 }
 
 struct ast_for *
-alloc_for(struct ast_item *start,
-          struct ast_item *cond,
-          struct ast_item *step,
-          struct ast_item *body)
+ast_for_create(struct ast_item *start,
+               struct ast_item *cond,
+               struct ast_item *step,
+               struct ast_item *body)
 {
         struct ast_for *ret = zalloc(ret);
         ret->start = start;
         ret->cond = cond;
         ret->step = step;
         ret->body = body;
-        return ret;
-}
-
-struct ast_lvar *
-alloc_ldecl(struct ast_var *var)
-{
-        struct ast_lvar *ret = zalloc(ret);
-        ret->bp_offset = 0;
-        ret->var = var;
         return ret;
 }

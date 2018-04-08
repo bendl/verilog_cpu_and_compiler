@@ -63,7 +63,7 @@ struct prco_emu_core {
 struct prco_emu_core core = {0};
 
 #define PRINT_SPACE(d) \
-        dprintf((d), "\t\t\t\t\t\t\t\t\t");
+        dbprintf((d), "\t\t\t\t\t\t\t\t\t");
 
 struct prco_op_struct   emu_decode(unsigned short mc);
 void                    emu_exec(struct prco_op_struct *op);
@@ -74,9 +74,9 @@ void print_regs(void)
 
         PRINT_SPACE(D_EMU);
         for(i = 0; i < 8; i++) {
-                dprintf(D_EMU, "%02x ", core.r_regs[i]);
+                dbprintf(D_EMU, "%02x ", core.r_regs[i]);
         }
-        dprintf(D_EMU, "\r\n");
+        dbprintf(D_EMU, "\r\n");
 }
 
 void print_mem(void)
@@ -85,13 +85,13 @@ void print_mem(void)
         int width = 8;
         int i2 = 0;
 
-        dprintf(D_EMU, "\r\n\r\n");
+        dbprintf(D_EMU, "\r\n\r\n");
 
         for (i = 0; i < width; i++) {
-                dprintf(D_EMU, "%02x\t", i);
+                dbprintf(D_EMU, "%02x\t", i);
         }
 
-        dprintf(D_EMU, "\r\n"
+        dbprintf(D_EMU, "\r\n"
                "============================="
                "============================="
                "============================="
@@ -99,25 +99,25 @@ void print_mem(void)
 
         for (i = 0; i <= 0xff; i++) {
                 if(i == core.r_regs[7])
-                        dprintf(D_EMU, "SP");
+                        dbprintf(D_EMU, "SP");
                 if(i == core.r_regs[6])
-                        dprintf(D_EMU, "BP");
+                        dbprintf(D_EMU, "BP");
 
-                dprintf(D_EMU, "%02x\t", core.lmem[i]);
+                dbprintf(D_EMU, "%02x\t", core.lmem[i]);
                 if(i2 == width-1) {
-                        dprintf(D_EMU, "\r\n");
+                        dbprintf(D_EMU, "\r\n");
                         i2 = 0;
                 } else {
                         i2++;
                 }
         }
-        dprintf(D_EMU, "\r\n");
+        dbprintf(D_EMU, "\r\n");
 }
 
 void print_uart(void)
 {
-        dprintf(D_EMU, "UART tx buf:\r\n");
-        dprintf(D_EMU, "%s\r\n", uart_tx_buf);
+        dbprintf(D_EMU|D_EMU_TEST, "UART tx buf:\r\n");
+        dbprintf(D_EMU|D_EMU_TEST, "%s\r\n", uart_tx_buf);
 }
 
 unsigned short
@@ -129,7 +129,7 @@ alu_cmp(struct prco_emu_core *core,
 
         tmp = a - b;
         PRINT_SPACE(D_EMU2);
-        dprintf(D_EMU2, "ALU_TMP(%d bits): %x\r\n",
+        dbprintf(D_EMU2, "ALU_TMP(%d bits): %x\r\n",
                 sizeof(tmp)*8, tmp);
 
         // Zero flag
@@ -149,7 +149,7 @@ alu_cmp(struct prco_emu_core *core,
         }
 
         PRINT_SPACE(D_EMU2);
-        dprintf(D_EMU2, "ALU_CMP: %02x %02x = %02x\r\n",
+        dbprintf(D_EMU2, "ALU_CMP: %02x %02x = %02x\r\n",
                 a, b, ret);
 
         return ret;
@@ -197,7 +197,7 @@ alu_should_jmp(unsigned char imm8)
 unsigned short
 alu_should_set(unsigned char imm8)
 {
-        dprintf(D_EMU2, "SR REG: %02x\r\n", core.r_sr);
+        dbprintf(D_EMU2, "SR REG: %02x\r\n", core.r_sr);
         switch(imm8) {
         case JMP_JE:
                 return (core.r_sr & 0b1) == 1;
@@ -249,7 +249,7 @@ void emu_exec(struct prco_op_struct *op)
 {
         switch(op->op) {
         default:
-                dprintf(D_EMU,
+                dbprintf(D_EMU,
                         "UKNOWN OP: %s %x\r\n", OP_STR[op->op],
                         op->op);
                 break;
@@ -288,7 +288,7 @@ void emu_exec(struct prco_op_struct *op)
         case SW:
                 core.lmem[core.r_regs[op->regA] + op->simm5] = core.r_regs[op->regD];
                 PRINT_SPACE(D_EMU2);
-                dprintf(D_EMU2, "SW $%02x, mem[%02x]\r\n",
+                dbprintf(D_EMU2, "SW $%02x, mem[%02x]\r\n",
                         core.r_regs[op->regD],
                         core.r_regs[op->regA + op->simm5]);
                 print_mem();
@@ -296,7 +296,7 @@ void emu_exec(struct prco_op_struct *op)
         case LW:
                 core.r_regs[op->regD] = core.lmem[core.r_regs[op->regA] + op->simm5];
                 PRINT_SPACE(D_EMU2);
-                dprintf(D_EMU2, "LW mem[%02x], $%02x\r\n",
+                dbprintf(D_EMU2, "LW mem[%02x], $%02x\r\n",
                         core.r_regs[op->regA + op->simm5],
                         core.r_regs[op->regD]);
                 print_regs();
@@ -307,7 +307,7 @@ void emu_exec(struct prco_op_struct *op)
                         &core,
                         core.r_regs[op->regD],
                         core.r_regs[op->regA]);
-                dprintf(D_EMU2, "SR REG: %02x\r\n", core.r_sr);
+                dbprintf(D_EMU2, "SR REG: %02x\r\n", core.r_sr);
                 break;
         case JMP:
                 core.should_branch = alu_should_jmp(op->imm8);
@@ -320,12 +320,12 @@ void emu_exec(struct prco_op_struct *op)
 
         case WRITE:
                 PRINT_SPACE(D_EMU2);
-                dprintf(D_EMU2, "PORT %d\r\n", op->port);
+                dbprintf(D_EMU2, "PORT %d\r\n", op->port);
 
                 switch(op->port) {
                 case UART1:
                         PRINT_SPACE(D_EMU2);
-                        dprintf(D_EMU,
+                        dbprintf(D_EMU,
                                 "UART <- '%c' 0x%x\r\n",
                                 core.r_regs[op->regD],
                                 core.r_regs[op->regD]);
@@ -369,7 +369,7 @@ int emu_init(struct prco_emu_core *core)
 int emu_run(struct prco_emu_core *core)
 {
         while(1) {
-                dprintf(D_EMU, "0x%02x ", core->pc);
+                dbprintf(D_EMU, "0x%02x ", core->pc);
 
                 // Decode the instruction
                 core->current_op = emu_decode(core->lmem[core->pc]);
@@ -385,7 +385,7 @@ int emu_run(struct prco_emu_core *core)
                 if(core->should_branch) {
                         PRINT_SPACE(D_EMU2);
                         core->pc = core->r_regs[core->current_op.regD];
-                        dprintf(D_EMU2, "Branching to %02x\r\n", core->pc);
+                        dbprintf(D_EMU2, "Branching to %02x\r\n", core->pc);
                         core->should_branch = 0;
                 } else {
                         core->pc++;
@@ -395,10 +395,29 @@ int emu_run(struct prco_emu_core *core)
 
 int main(int argc, char **argv)
 {
+        int return_code = 0;
+        int opt;
+        char *src_name = NULL;
+
         // Turn on all debug prints
         g_dbug_level = 0xff;
 
-        dprintf(D_INFO, "LIBPRCO Emulator. Version %f\r\n\r\n",
+        // Parse command line
+        while ((opt = getopt(argc, argv, "i:dD:O:")) != -1) {
+                switch (opt) {
+                case 'i': src_name = optarg;
+                        break;
+                case 'D': {
+                        char *ptr;
+                        g_dbug_level = strtoul(optarg, &ptr, 16);
+                } break;
+                default:
+                        dbprintf(D_ERR, "Unknown arguments.\r\n");
+                        exit(1);
+                }
+        }
+
+        dbprintf(D_INFO, "LIBPRCO Emulator. Version %f\r\n\r\n",
                 LIBPRCO_EMU_VERSION);
 
         // Initialise the core
@@ -408,19 +427,19 @@ int main(int argc, char **argv)
         print_mem();
         print_regs();
 
-        printf("alu: %x\r\n", alu_cmp(&core, 5, 5));
-
         // Run the emulator
         emu_run(&core);
 
         // After, print registers and memory
-        dprintf(D_EMU, "\r\nCore HALTED after %d executions.\r\n",
+        dbprintf(D_EMU, "\r\nCore HALTED after %d executions.\r\n",
                 core.exec_count);
         print_mem();
         print_regs();
 
         print_uart();
 
+        return_code = core.r_regs[0];
+
         // Return Ax register for testing
-        return core.r_regs[0];
+        return return_code;
 }

@@ -1,7 +1,7 @@
 
 __stdcall fnc main()
 {
-    int a = "ben";
+    int a = "mystring";
     int start = a;
     int length = 0;
 
@@ -13,4 +13,6 @@ __stdcall fnc main()
     length = start - a;
 
     UART1(length + 48);
+
+    length;
 }

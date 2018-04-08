@@ -1,6 +1,8 @@
 
 __stdcall fnc main()
 {
+    99;
+
     if(5) {
         32;
     }

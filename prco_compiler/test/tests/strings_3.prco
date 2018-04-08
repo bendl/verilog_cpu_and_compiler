@@ -11,4 +11,6 @@ __stdcall fnc main()
     UART1(@b+0);
     UART1(@b+1);
     UART1(@b+2);
+
+    @b+2;
 }

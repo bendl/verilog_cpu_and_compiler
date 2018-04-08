@@ -28,7 +28,7 @@ SOFTWARE.
 
 unsigned int g_dbug_level = D_WARN|D_ERR;
 
-void dprintf(unsigned int level, char *fmt, ...)
+void dbprintf(unsigned int level, char *fmt, ...)
 {
     if (level & g_dbug_level || level == D_ALL) {
         va_list args;

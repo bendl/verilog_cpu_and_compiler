@@ -17,7 +17,7 @@ assert_opcode(struct prco_op_struct *op, char print)
                 assert((op->opcode >> 11) == op->op);
                 assert(((op->opcode >> 8) & PRCO_OP_BITS_REG) == op->regD);
                 assert(((op->opcode >> 5) & PRCO_OP_BITS_REG) == op->regA);
-                dprintf(D_GEN, "%s\t\t\t%04x\t\t%d\t%s\r\n",
+                dbprintf(D_GEN, "%s\t\t\t%04x\t\t%d\t%s\r\n",
                        OP_STR[op->op],
                        op->opcode,
                        op->asm_flags,
@@ -30,7 +30,7 @@ assert_opcode(struct prco_op_struct *op, char print)
                 if(op->asm_flags & ASM_ASCII) {
                         assert((op->op >> 11) == op->op);
                         assert(((op->opcode >> 0) & PRCO_OP_BITS_IMM8) == op->imm8);
-                        dprintf(D_GEN, "%s\t%c\t%d\t%04x\t\t%d\t%s\r\n",
+                        dbprintf(D_GEN, "%s\t%c\t%d\t%04x\t\t%d\t%s\r\n",
                                 "ASCII",
                                 op->imm8,
                                 op->id,
@@ -40,7 +40,7 @@ assert_opcode(struct prco_op_struct *op, char print)
                         break;
                 } else {
                         assert((op->op >> 11) == op->op);
-                        dprintf(D_GEN, "%s\t%c\t\t%04x\t\t%d\t%s\r\n",
+                        dbprintf(D_GEN, "%s\t%c\t\t%04x\t\t%d\t%s\r\n",
                                 OP_STR[op->op],
                                 op->imm8,
                                 op->opcode,
@@ -55,7 +55,7 @@ assert_opcode(struct prco_op_struct *op, char print)
                 assert((op->opcode >> 11) == op->op);
                 assert(((op->opcode >> 8) & PRCO_OP_BITS_REG) == op->regD);
                 assert(((op->opcode >> 5) & PRCO_OP_BITS_REG) == op->regA);
-                dprintf(D_GEN, "  %s\t%s,\t%+d(%s)\t%04x\t\t%d\t%s\r\n",
+                dbprintf(D_GEN, "  %s\t%s,\t%+d(%s)\t%04x\t\t%d\t%s\r\n",
                        OP_STR[op->op],
                        REG_STR[op->regD],
                        op->simm5,
@@ -70,7 +70,7 @@ assert_opcode(struct prco_op_struct *op, char print)
         case NEG:
                 assert((op->opcode >> 11) == op->op);
                 assert(((op->opcode >> 8) & PRCO_OP_BITS_REG) == op->regD);
-                dprintf(D_GEN, "%s\t%s\t\t%04x\t\t%d\t%s\r\n", OP_STR[op->op],
+                dbprintf(D_GEN, "%s\t%s\t\t%04x\t\t%d\t%s\r\n", OP_STR[op->op],
                        REG_STR[op->regD],
                        op->opcode,
                        op->asm_flags,
@@ -81,7 +81,7 @@ assert_opcode(struct prco_op_struct *op, char print)
         case JMP:
                 assert((op->opcode >> 11) == op->op);
                 assert(((op->opcode >> 8) & PRCO_OP_BITS_REG) == op->regD);
-                dprintf(D_GEN, "%s\t%s,\t%s\t%04x\t\t%d\t%s\r\n",
+                dbprintf(D_GEN, "%s\t%s,\t%s\t%04x\t\t%d\t%s\r\n",
                         OP_STR[op->op],
                         REG_STR[op->regD],
                         JMP_STR[op->imm8],
@@ -95,7 +95,7 @@ assert_opcode(struct prco_op_struct *op, char print)
                 assert((op->opcode >> 11) == op->op);
                 assert(((op->opcode >> 8) & PRCO_OP_BITS_REG) == op->regD);
                 assert(((op->opcode >> 0) & PRCO_OP_BITS_IMM8) == op->imm8);
-                dprintf(D_GEN, "%s\t$%+d,\t%s\t%04x\t\t%d\t%s\r\n",
+                dbprintf(D_GEN, "%s\t$%+d,\t%s\t%04x\t\t%d\t%s\r\n",
                         OP_STR[op->op], (signed char) op->imm8,
                         REG_STR[op->regD],
                         op->opcode, op->asm_flags,
@@ -106,7 +106,7 @@ assert_opcode(struct prco_op_struct *op, char print)
                 assert((op->opcode >> 11) == op->op);
                 assert(((op->opcode >> 8) & PRCO_OP_BITS_REG) == op->regD);
                 assert(((op->opcode >> 0) & PRCO_OP_BITS_IMM8) == op->imm8);
-                dprintf(D_GEN, "%s\t%s,\t%s\t%04x\t\t%d\t%s\r\n",
+                dbprintf(D_GEN, "%s\t%s,\t%s\t%04x\t\t%d\t%s\r\n",
                         OP_STR[op->op],
                         REG_STR[op->regD],
                         JMP_STR[op->imm8],
@@ -118,7 +118,7 @@ assert_opcode(struct prco_op_struct *op, char print)
         case RET:
                 assert((op->opcode >> 11) == op->op);
                 assert(((op->opcode >> 0) & PRCO_OP_BITS_IMM8) == op->imm8);
-                dprintf(D_GEN, "%s\t$%02x\t\t%04x\t\t%d\t%s\r\n", OP_STR[op->op], op->imm8,
+                dbprintf(D_GEN, "%s\t$%02x\t\t%04x\t\t%d\t%s\r\n", OP_STR[op->op], op->imm8,
                        op->opcode,
                        op->asm_flags,
                        op->comment);
@@ -131,7 +131,7 @@ assert_opcode(struct prco_op_struct *op, char print)
                 assert((op->opcode >> 11) == op->op);
                 assert(((op->opcode >> 8) & PRCO_OP_BITS_REG) == op->regD);
                 assert(((op->opcode >> 5) & PRCO_OP_BITS_REG) == op->regA);
-                dprintf(D_GEN, "%s\t%s,\t%s\t%04x\t\t%d\t%s\r\n",
+                dbprintf(D_GEN, "%s\t%s,\t%s\t%04x\t\t%d\t%s\r\n",
                        OP_STR[op->op],
                        REG_STR[op->regD],
                        REG_STR[op->regA],
@@ -144,10 +144,10 @@ assert_opcode(struct prco_op_struct *op, char print)
                 assert((op->opcode >> 11) == op->op);
                 assert(((op->opcode >> 8) & PRCO_OP_BITS_REG) == op->regD);
                 if(!(((op->opcode >> 0) & PRCO_OP_BITS_IMM8) == op->imm8)) {
-                        dprintf(D_ERR, "MOVI Assert error!\r\n");
+                        dbprintf(D_ERR, "MOVI Assert error!\r\n");
                 }
                 assert(((op->opcode >> 0) & PRCO_OP_BITS_IMM8) == op->imm8);
-                dprintf(D_GEN, "%s\t$%x,\t%s\t%04x\t\t%d\t%s\r\n",
+                dbprintf(D_GEN, "%s\t$%x,\t%s\t%04x\t\t%d\t%s\r\n",
                        OP_STR[op->op],
                        op->imm8,
                        REG_STR[op->regD],
@@ -161,7 +161,7 @@ assert_opcode(struct prco_op_struct *op, char print)
                 assert((op->opcode >> 11) == op->op);
                 assert(((op->opcode >> 8) & PRCO_OP_BITS_REG) == op->regD);
                 assert(((op->opcode >> 0) & PRCO_OP_BITS_PORT) == op->port);
-                dprintf(D_GEN, "%s\t%s,\t%s\t%04x\t%s\r\n",
+                dbprintf(D_GEN, "%s\t%s,\t%s\t%04x\t%s\r\n",
                        OP_STR[op->op],
                        REG_STR[op->regD],
                        PORT_STR[op->port],
@@ -169,7 +169,7 @@ assert_opcode(struct prco_op_struct *op, char print)
                        op->comment);
                 break;
         default:
-                dprintf(D_GEN, "UNKNOWN OP!\r\n");
+                dbprintf(D_GEN, "UNKNOWN OP!\r\n");
                 assert("UNKNOWN OP!" && 0);
                 break;
         }

@@ -24,7 +24,7 @@ extern "C" {
 // Lexer definitions
 #define FOREACH_TOK(TOK) \
     TOK(TOK_EOF) \
-    TOK(TOK_DEF) \
+    TOK(TOK_FNC) \
     TOK(TOK_EXT) \
     TOK(TOK_ID) \
     TOK(TOK_NUM) \
@@ -160,7 +160,7 @@ extern struct ast_proto *
 parse_proto(enum token_type t);
 
 extern struct ast_func *
-parse_def(void);
+parse_fnc(void);
 
 extern struct ast_item *
 parse_call(char *ident);
