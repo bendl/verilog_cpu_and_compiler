@@ -172,6 +172,48 @@
         }%
 \makeatother
 
+% The Final Report Template Front cover
+\begin{titlepage}
+\begin{center}
+\vspace*{2cm}
+
+\Huge
+Plymouth University
+
+\vspace{2cm}
+\huge
+School of Computing, Electronics, and Mathematics
+
+\vspace{2cm}
+\huge
+PRCO304\\
+Final Stage Computing Project\\
+2017/2018\\
+
+\vspace{1.5cm}
+\huge
+BSc (Hons) Computer Science
+
+
+\Large
+\vspace{1.5cm}
+Ben Lancaster
+
+\vspace{1cm}
+10424877
+
+\vspace{1cm}
+FPGA-based RISC Microprocessor and Compiler
+
+
+
+
+\end{center}
+\end{titlepage}
+
+
+% Real front cover page
+\newpage
 \begin{titlepage}
 \begin{center}
 
@@ -230,7 +272,10 @@ PRCO304 - Final Stage Computing Project
 \chapter*{Abstract}
 \startcontents[chapters]
 \printcontents[chapters]{}{1}{}
-ben
+Embedded processors are 
+
+
+This report describes a software and electronic development project to design and implement a new embedded processor and architecture targeting small FPGA devices.
 
 \newpage
 \renewcommand*\contentsname{Table of Contents}
@@ -280,7 +325,7 @@ The processor core will implement it's own processor and instruction set archite
 
 \subsection{Core Deliverables}
 These core (C) deliverables are the base requirement for the project to be released in a functional and worthwhile state.
-\begin{enumerate}[label=C\arabic*.]
+\begin{enumerate}[label=\bfseries C\arabic*.]
 \item{To improve my knowledge and experience of FPGA development, processor architecture, compilers, and embedded systems engineering.}
 \item{To build a working and operational soft-core processor core capable of performing simple tasks.}
 \item{Implementation of the soft-core processor design on real hardware.}
@@ -290,7 +335,7 @@ These core (C) deliverables are the base requirement for the project to be relea
 
 \subsection{Extended Deliverables}
 These extended (E) deliverables may not be achievable in the time frame specific in section \ref{sect:proj_time} as they may require extra time to design and implement, require more experience or skill, or require resources currently unattainable.
-\begin{enumerate}[label=E\arabic*.]
+\begin{enumerate}[label=\bfseries E\arabic*.]
 \item{To provide embedded products a convenient solution to in-field updating.}
 \item{To provide easy interfacing between the FPGA design and the embedded core.}
 \item{GCC/LLVM/8CC compiler backend for C programming.}\label{sect:deliv:ed:gcc}
@@ -379,6 +424,11 @@ The greater number of IO options and larger FPGA make the Arty board better suit
 
 The project will require a computer or laptop to develop the core and compiler on and continuous integration systems to perform testing on the incremental builds. For the project demo, an oscilloscope (already owned) or digital logic analyser may be required to demonstrate some of the core's features.
 
+
+
+
+
+
 \chapter{\scname{} Processor Design}
 {\hypersetup{linkcolor=black}
 \startcontents[chapters]
@@ -390,6 +440,28 @@ The project will require a computer or laptop to develop the core and compiler o
 The \scname{} Processor Design is the first of two deliverable sub-projects required for this project. The processor is designed to be a small, instantiated, Verilog module that can be easily inserted into existing FPGA-based Verilog projects.
 
 The processor core is not designed for physical implementation in silicon but rather for FPGA devices.
+
+\section{Project Management}
+
+\subsection{Core Deliverables}
+The following Core Processor Deliverables (CPD) are deliverables that must be implemented for the processor to be deemed functional.
+
+\begin{enumerate}[label=\bfseries CPD\arabic*.]
+\item{Support a wide range of executable programs.}
+\item{Provide a 16-bit instruction set capable of supporting simple programs.}
+\item{Support simple arithmetic and bitwise operations.}
+\item{Operate on 16-bit data sizes.}
+\item{Fully synthesize-able on FPGA hardware.}
+\end{enumerate}
+
+\subsection{Extended Deliverables}
+The following Extended Processor Deliverables (EPD) are deliverables that must be implemented for the processor to be deemed functional.
+\begin{enumerate}[label=\bfseries EPD\arabic*.]
+\item{Provide multiplication, division, modulus, instructions.}
+\item{Provide SIMD style instructions for faster vector manipulation.}
+\item{Provide in/out GPIO and UART modules for external communication.}
+\item{Provide an interrupt system allowing asynchronous events to be handled.}
+\end{enumerate}
 
 
 \section{High Level Design}
@@ -496,11 +568,11 @@ Type 2 & 15-11 & 10-8 & \multicolumn{2}{c|}{7-0} \\
 Type 3 & 15-11 & \multicolumn{3}{c|}{7-0} \\ 
 \hline 
 \end{tabular}
-\caption{The 2 instruction format types used by the \scname{} processor.}
+\caption{The 3 instruction format types used by the \scname{} processor.}
 \end{table}
 
 \subsection{Instructions}
-\begin{table}[h]
+\begin{table}[H]
 	\def\arraystretch{1.5}
     \begin{tabularx}{\textwidth}{|p{4cm}|c|c|c|c|X|}
     \hline
@@ -527,7 +599,7 @@ Type 3 & 15-11 & \multicolumn{3}{c|}{7-0} \\
     READ	& 10100 & Rd & \multicolumn{2}{c|}{Imm8} & See {\nameref{core_read}} \\ \hline
     SETC	& 10101 & Rd & \multicolumn{2}{c|}{Imm8} & Set Rd to 1 if Imm8 is set in {\nameref{sect:core_regs_sr}} from last CMP instruction, else 0. \\ \hline
     \end{tabularx}
-    \caption{Number of respondants for treatment}
+    \caption{All \scname{} processor instructions and their semantics.}
 \end{table}
 
 \subsection{Conditional Branching}
@@ -650,6 +722,7 @@ The \scname{} processor core features a single-step input line that can be pulse
 
 
 
+\section{Sub-project Review}
 
 
 
