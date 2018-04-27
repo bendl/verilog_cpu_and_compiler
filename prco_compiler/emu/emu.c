@@ -410,7 +410,7 @@ int main(int argc, char **argv)
         char *src_name = NULL;
 
         // Turn on all debug prints
-        g_dbug_level = 0xff;
+        g_dbug_level = D_ALL;
 
         // Parse command line
         while ((opt = getopt(argc, argv, "i:dD:O:")) != -1) {
@@ -441,13 +441,14 @@ int main(int argc, char **argv)
         emu_run(&core);
 
         // After, print registers and memory
-        dbprintf(D_EMU, "\r\nCore HALTED after %d executions.\r\n",
+        dbprintf(D_INFO|D_EMU, "\r\nCore HALTED after %d executions.\r\n",
                 core.exec_count);
         print_mem();
         print_regs();
 
         print_uart();
 
+        dbprintf(D_INFO|D_EMU, "Ax: %x\r\n", core.r_regs[0]);
         return_code = core.r_regs[0];
 
         // Return Ax register for testing

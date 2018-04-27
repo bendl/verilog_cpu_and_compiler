@@ -816,7 +816,6 @@ cg_bin_template(struct ast_bin *b)
                 asm_push(opcode_set_ri(Ax, JMP_JL));
                 break;
         case TOK_BOOL_LE:
-                printf("BOOL_LE");
                 cg_pop_prco(Cx);
                 asm_push(opcode_cmp_rr(Cx, Ax));
                 asm_push(opcode_set_ri(Ax, JMP_JLE));
@@ -848,7 +847,18 @@ cg_bin_template(struct ast_bin *b)
 void
 cg_number_template(struct ast_num *n)
 {
-        asm_push(opcode_mov_ri(Ax, n->val));
+        assert(n);
+
+        if(n->val > 0xff) {
+                // Can't fit more than 8-bits into a MOVI,
+                // TODO: Build up 16 bit word using:
+                //   MOVI, LSHIFT, MOVI, OR
+                asm_push(opcode_mov_ri(Ax, n->val));
+        } else {
+                // Use MOVI
+                asm_push(opcode_mov_ri(Ax, n->val));
+        }
+
         asm_comment("NUMBER");
 }
 

@@ -17,5 +17,5 @@ fnc mul(a, b)
 
 fnc main() 
 {
-    mul(1000, 10);
+    mul(100, 100);
 }

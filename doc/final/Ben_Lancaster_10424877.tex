@@ -452,6 +452,7 @@ The following Core Processor Deliverables (CPD) are deliverables that must be im
 \item{Support simple arithmetic and bitwise operations.}
 \item{Operate on 16-bit data sizes.}
 \item{Fully synthesize-able on FPGA hardware.}
+\item{Implement a simple pipeline architecture.}
 \end{enumerate}
 
 \subsection{Extended Deliverables}
@@ -461,6 +462,7 @@ The following Extended Processor Deliverables (EPD) are deliverables that must b
 \item{Provide SIMD style instructions for faster vector manipulation.}
 \item{Provide in/out GPIO and UART modules for external communication.}
 \item{Provide an interrupt system allowing asynchronous events to be handled.}
+\item{Implement a super-scalar pipeline architecture.}
 \end{enumerate}
 
 
@@ -723,6 +725,25 @@ The \scname{} processor core features a single-step input line that can be pulse
 
 
 \section{Sub-project Review}
+\subsection{Project Deliverables}
+\begin{enumerate}[label=\bfseries CPD\arabic*.]
+\item[Support a wide range of executable programs.] {fpp}
+\item{Provide a 16-bit instruction set capable of supporting simple programs.}
+\item{Support simple arithmetic and bitwise operations.}
+\item{Operate on 16-bit data sizes.}
+\item{Fully synthesize-able on FPGA hardware.}
+\item{Implement a simple pipeline architecture.}
+\end{enumerate}
+
+\subsection{Extended Deliverables}
+The following Extended Processor Deliverables (EPD) are deliverables that must be implemented for the processor to be deemed functional.
+\begin{enumerate}[label=\bfseries EPD\arabic*.]
+\item{Provide multiplication, division, modulus, instructions.}
+\item{Provide SIMD style instructions for faster vector manipulation.}
+\item{Provide in/out GPIO and UART modules for external communication.}
+\item{Provide an interrupt system allowing asynchronous events to be handled.}
+\item{Implement a super-scalar pipeline architecture.}
+\end{enumerate}
 
 
 
@@ -747,7 +768,8 @@ The \scname{} compiler is a command line based software tool used to convert a h
 
 The compiler is invoked with parameters for the input code file and optional parameters specifying optimisation level, target architecture, verbosity, output file name, and include directory paths. The full command line parameter list can be found in {\nameref{sect:compiler_cli}}.
 
-\section{Functional Requirements}
+\section{Project Management}
+\subsection{Functional Requirements}
 This section details the functional requirements (F) and their technical dependencies of the compiler to allow users to produce complete and functional programs. Figure \ref{fig:compiler_dependencies} breaks down each functional requirement to show their technical dependencies.
 
 \begin{enumerate}[label=F\arabic*.]
@@ -786,7 +808,7 @@ cmake --build . --target install
 \end{minted}
 
 
-\section{Text Grammar}
+\subsection{Text Grammar}
 \label{sect:compiler_grammar}
 The input to the compiler is a generic programming language similar to C.
 
@@ -834,7 +856,7 @@ The text parser is inspired by Jack Crenshaw's "Let's Build a Compiler" book, \c
 
 While parser generators already exist, such as Bison and Java's ANTLR, it was decided to implement the parser by hand using recursive descent principles as a matter of learning rather than ease of use. Although parsing a more complex grammar would easily be more achievable using a parse generator, the overhead of generating compliant assembly for that complex grammar would be too time consuming and is hence out of scope (see extended deliverable \ref{sect:deliv:ed:gcc}).
 
-\section{AST Generation}
+\subsection{AST Generation}
 \label{sect:compiler_ast}
 The recursive descent parser stores all terminals in the grammar as structures in \textit{ast.h} containing relocatable information about the parsed text and it's future implementation. This AST result of the text parser is the initial immediate representation used by the compiler.
 
@@ -865,12 +887,12 @@ struct ast_func {
 
 
 
-\section{Optimisation}
+\subsection{Optimisation}
 The \scname{} compiler can optionally perform simple optimisations, such as unreachable code elimination and constant folding. The optimisations can be controlled by specifying the \verb|-On| parameter to the CLI, where \verb|n| is the level of optimisation.
 
 The techniques used by the optimiser to perform these optimisations are primitive; the optimiser is not given AST information in SSA (static single assignment) form; and because of this limitation, only basic optimisations can be identified.
 
-\subsection{Constant Folding}
+\subsubsection{Constant Folding}
 Constant folding is performed by the optimiser to reduce (fold) expressions that can be identified as constant. This allows the optimiser to replace AST tree structures containing constant values and no dependencies with shorter and simpler AST items. This optimisation can drastically improve the performance of the output code by reducing the number of instructions emitted.
 
 For example, the following expression in Figure \ref{fig:constant_fold_yes} can be identified as constant and can be reduced to a single AST node as shown in Figure \ref{fig:constant_fold_ast}. As the optimiser is not passed AST information in SSA form, the optimiser cannot follow or track variable references and modifications throughout the life-cycle of the program. Although the parser does a contain a primitive symbol table, the symbol table does not map variables to values, and so the code segment in Figure \ref{fig:constant_fold_no} cannot be identified as constant by the optimiser.
@@ -914,17 +936,17 @@ int c = a + b;
 
 
 
-\subsection{Unreachable Code Elimination}
+\subsubsection{Unreachable Code Elimination}
 Unreachable code elimination is the removal of code that will never be run on the processor. This can be in the form of uncalled function, unused variables, and control statements that operate on constant values.
 
 The \scname{} compiler can identify some unreachable code segments, such as control statements that operate on constant values, by utilising it's constant folding optimisation discussed previously. By first running the constant folding optimisation on the body of functions, the optimiser looks at the conditions of \textit{if} statements. If it's condition has been constant folded to a constant and is \textit{true} (i.e. not 0) then the AST tree can be replaced with the items in it's body, effectively removing the condition check if it's always true, or the whole structure if it's false.
 
-\section{Code Generation}
+\subsection{Code Generation}
 The compiler Code Generation stage converts the optimised AST into an intermediatary list of \mintinline{c}{struct prco_op_struct}. It does this by iterating over each \mintinline{c}{struct ast_item} in the AST and checks whether the item requires code generation. For example, an \mintinline{c}{struct ast_item} with type \mintinline{c}{AST_FUNC} is one which requires code generation. The AST is then passed to the \mintinline{c}{void cg_func_prco(...)} function where the code generation takes please. For this type, the stack frame header is generated first, before the body of the function. At the end of the function's body, the stack frame end code generation routing is run.
 
 This code generation stage is named intermediatary because absolute addresses of \verb|JMP| instructions have not been calculated. The calculation of these addresses is performed in the following Assembling stage. In addition, the location (and offset's) of functions may need to be rearranged.
 
-\subsection{Variables}
+\subsubsection{Variables}
 \label{sect:compiler_cg_vars}
 An initial requirement for the \scname{} compiler was to support three types of variables: global, local, and parameter variables. Due to time constraints and unforeseen \textit{"sleeper"} bugs only local and argument variables have been implemented as of compiler version 2.50 (06/04/2018). Global variable allocation has been implemented in the assembler but declaring or referencing global variables has not been implemented.
 
