@@ -816,6 +816,7 @@ cg_bin_template(struct ast_bin *b)
                 asm_push(opcode_set_ri(Ax, JMP_JL));
                 break;
         case TOK_BOOL_LE:
+                printf("BOOL_LE");
                 cg_pop_prco(Cx);
                 asm_push(opcode_cmp_rr(Cx, Ax));
                 asm_push(opcode_set_ri(Ax, JMP_JLE));

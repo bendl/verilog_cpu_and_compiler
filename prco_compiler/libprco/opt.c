@@ -87,6 +87,9 @@ opt_cf(struct ast_item *node)
                         case TOK_BOOL_G:
                                 new_num->val = tmp_bin_lhs->val > tmp_bin_rhs->val;
                                 break;
+                        case TOK_BOOL_LE:
+                                new_num->val = tmp_bin_lhs->val <= tmp_bin_rhs->val;
+                                break;
                         default:
                                 dbprintf(D_ERR, "OPT: CF: No CF OP for token: %c\r\n",
                                         tmp_bin->op);

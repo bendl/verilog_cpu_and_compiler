@@ -16,7 +16,7 @@ fnc_make() {
 }
 
 fnc_run_cli() {
-    ../lbuild/cli/cli -i $1 -d -D0x0002
+    ../lbuild/cli/cli -i $1 -d -D0x0002 -O0
 }
 
 fnc_run_emu() {
@@ -71,6 +71,20 @@ fnc_run_test ./tests/strings_3.prco 111
 
 fnc_run_test ./tests/vars_1.prco 0
 fnc_run_test ./tests/vars_2.prco 3
+
+fnc_run_test ./tests/mul_1.prco 30
+fnc_run_test ./tests/mul_2.prco 3
+fnc_run_test ./tests/mul_3.prco 100
+fnc_run_test ./tests/mul_4.prco 10000
+
+fnc_run_test ./tests/div_1.prco 1
+fnc_run_test ./tests/div_2.prco 5
+fnc_run_test ./tests/div_3.prco 0
+fnc_run_test ./tests/div_4.prco 1
+
+fnc_run_test ./tests/bool_le.prco 1
+fnc_run_test ./tests/bool_le_2.prco 0
+fnc_run_test ./tests/bool_le_3.prco 1
 
 echo -e "\n$passed_tests/$num_tests passed."
 

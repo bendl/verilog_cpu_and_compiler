@@ -230,7 +230,6 @@ parser_fopen(_in_ const char *fname,
                 #endif
         }
 
-
         dbprintf(D_INFO, "New path exists: %s\r\n", new_parser->lpstr_input_fp);
 
 l_fname_exists:
@@ -258,7 +257,7 @@ parser_add_resv(char *pstr_name, int dt_size, token_type tok)
         struct list_item *ll;
 
         ll = zalloc(ll);
-        w = zalloc(w);
+        w  = zalloc(w);
         w->lpstr_name = pstr_name;
         w->dt_size = dt_size;
         w->tok = tok;
@@ -357,6 +356,9 @@ parser_run(_in_ struct text_parser *parser)
         // PORT words
         parser_add_resv("PORT1", 0, TOK_PORT_PORT1);
         parser_add_resv("UART1", 0, TOK_PORT_UART1);
+
+        parser_add_resv("LE", 0, TOK_BOOL_LE);
+        parser_add_resv("GE", 0, TOK_BOOL_GE);
 
 
         // Push new parser to stack
@@ -643,7 +645,7 @@ parse_proto(enum token_type t)
 
         args = zalloc(args);
 
-        // def ident (
+        // fnc ident (
         lexer_match_opt(TOK_CC_STDCALL);
         lexer_match_opt(TOK_CC_CDECL);
         lexer_match_opt(TOK_CC_FASTCALL);

@@ -1,0 +1,18 @@
+
+fnc div(a, b)
+{
+    int i = b;
+    int n = 0;
+
+    while(i LE a) {
+        n = n + 1;
+        i = i + b;
+    }
+
+    n;
+}
+
+fnc main() 
+{
+    div(10, 10);
+}

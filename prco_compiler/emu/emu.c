@@ -185,6 +185,11 @@ alu_should_jmp(unsigned char imm8)
                 ret = (
                         ((core.r_sr & 0b10) >> 1) != ((core.r_sr & 0b100) >> 2)
                 );
+        case JMP_JLE:
+                ret = (core.r_sr & 0b1) |
+                      (
+                              ((core.r_sr & 0b10) >> 1) != ((core.r_sr & 0b100) >> 2)
+                      );
                 break;
         default:
                 ret = 0;
@@ -203,6 +208,11 @@ alu_should_set(unsigned char imm8)
                 return (core.r_sr & 0b1) == 1;
         case JMP_JL:
                 return ((core.r_sr & 0b10) >> 1) != ((core.r_sr & 0b100) >> 2);
+        case JMP_JLE:
+                return (core.r_sr & 0b1) ||
+                        (
+                                ((core.r_sr & 0b10) >> 1) != ((core.r_sr & 0b100) >> 2)
+                        );
         case JMP_JG:
                 return ((core.r_sr & 0b1) == 0) &
                        (

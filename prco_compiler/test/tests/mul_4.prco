@@ -1,0 +1,21 @@
+
+fnc mul(a, b)
+{
+    int i;
+    int sum = 0;
+    
+    for(i = 0; i < b; i = i + 1) {
+        UART1(100);
+
+        sum = sum + a;
+
+        UART1(sum + 48);
+    }
+
+    sum;
+}
+
+fnc main() 
+{
+    mul(1000, 10);
+}
