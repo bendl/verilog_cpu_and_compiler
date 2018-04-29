@@ -277,6 +277,8 @@ Embedded processors are
 
 This report describes a software and electronic development project to design and implement a new embedded processor and architecture targeting small FPGA devices.
 
+
+
 \newpage
 \renewcommand*\contentsname{Table of Contents}
 
@@ -298,7 +300,24 @@ Number of math displayed: 0
 \end{minted}
 
 \newpage
+\chapter*{Preface}
+This report discusses the design, implementation, and verification, of an FPGA-based embedded processor (\scname{} processor) and compiler.
 
+\begin{figure}[H]
+%\begin{wrapfigure}{r}{0.5\textwidth}
+\begin{center}
+\includegraphics[scale=0.4]{fpga}
+\end{center}
+\caption{Xilinx Spartan-II FPGA layout \citep{spartan2}.}
+\label{fig:}
+%\end{wrapfigure}
+\end{figure}
+
+A field-programmable gate array (FPGA) is a reprogrammable logic device that enables digital electronic designs to be realised and executed on-chip. FPGAs utilise configurable logic blocks (CLB) that can be configured to emulate primitive gates. Connecting these primitive gates with others allows the engineer to realise complex logic such as combinational gates, multiplexers, and lookup-tables. Modern FPGA devices also include components such as block-RAMs, DLLs, and DSP blocks.
+
+The embedded processor will be designed using the Verilog hardware description language (HDL). A HDL can be thought of as a front-end to a software compiler. Other HDL front-ends exist such as VHDL. The HDL is synthesised into an retargetable intermediate form consisting of nets - a form describing the gates, flip-flops, and their interconnections. After this synthesis takes place, the intermediate net list form is transformed into implementation specific forms. As this processor is designed for FGPA implementation, processes such as "place and route" are utilised to map the net list to physical resources on the FPGA. Different processes are performed for difference implementations, such as for ASICs and CPLDs.
+
+\newpage
 \chapter{Embedded Processors}
 {\hypersetup{linkcolor=black}
 \startcontents[chapters]
@@ -315,9 +334,15 @@ for FPGA-based product designers wishing to employ an embedded processor solutio
 
 \section{Background}
 \subsection{Current Implementations}
-\lipsum[0-1]
-\newpage
+There exists many commercial and open-source embedded processors, each providing different features and specialities such as digital signal processing, analogue components, instruction set architectures, and interfaces.
 
+Popular embedded processors include:
+\begin{itemize}
+\item{\textit{Xilinx MicroBlaze.}}
+\item{\textit{ARM Cortex SoC.}}
+\end{itemize}
+
+\newpage
 \section{Project Overview}
 This project aims to provide an efficient and cost-saving alternative for board and hardware product designers utilising side-microprocessors by designing, implementing, and demonstrating, a small, portable, FPGA processor core design to be used in-place of the side-microprocessor. 
 
@@ -721,13 +746,27 @@ The \scname{} processor core features a single-step input line that can be pulse
 
 
 
+\newpage
+\section{Core Analysis}
+\subsection{Performance}
+\textit{Instructions Per Cycle} (IPC) and \textit{Dhrystone Million Instructions Per Second} (DMIPS) are two measurements used to measure the performance of a processor.
+
+The downside of these measurements is that they assume each instruction executes in constant time. This is not the case in the \scname{} processor and other modern processors.
+\\\\
+The \scname{} processor can execute instructions in 3 to 10 clock cycles, depending on the instruction. Instructions that require no and few dependencies (ALU, RAM, registers, etc.) such as NOP, HALT, and PORT, can be executed in as little as 3 clock cycles (20ns per clock at 50MHz) resulting in 0.67 IPC and 16.7 DMIPS. Instructions requiring many dependencies and off-chip resources (RAM) can take up to 10 clock cycles, resulting in an IPC value of 0.1 and 5 DMIPS.
+
+The most used instructions, MOVI, MOV, ADD, ADDI, JMP, and CMP, take around 5 clock cycles each, resulting in 0.2 IPC and 10 DMIPS.
+\\\\
+Comparing this against Xilinx's MicroBlaze embedded processor which features 1.3 DMIPS/MHz (65 DMIPS/50 MHz) shows the performance benefits of super-scalar processor architectures. 
+
+The \scname{} processor is similar to AMD's Am386 (1991) processor with 9 MIPS and 0.225 IPC when run at 40 MHz \citep{am386}.
 
 
-
+\newpage
 \section{Sub-project Review}
 \subsection{Project Deliverables}
 \begin{enumerate}[label=\bfseries CPD\arabic*.]
-\item[Support a wide range of executable programs.] {fpp}
+\item{Support a wide range of executable programs.}
 \item{Provide a 16-bit instruction set capable of supporting simple programs.}
 \item{Support simple arithmetic and bitwise operations.}
 \item{Operate on 16-bit data sizes.}
@@ -1134,6 +1173,12 @@ void cg_pop_prco(enum prco_reg rd)
 
 
 \section{Assembling}
+The final stage of the compiler is the assembling stage. This stage takes the list of \mintinline{c}{struct prco_op_struct} and outputs a list of machine code instructions. The assembler accomplishes this by calculating offsets and addresses of functions, branching instructions, and global variable addresses. It may also rearrange function locations so that the main function is the first instruction to be emitted.
+
+Assembling code is found in \verb|assembler_labels()| at \verb|arch/template_impl.c:38|.
+
+\subsection{Executable Layout}
+
 %\begin{figure}[H]
 \begin{wrapfigure}{r}{0.3\textwidth}
 \begin{center}
@@ -1143,12 +1188,6 @@ void cg_pop_prco(enum prco_reg rd)
 \label{fig:asm_mem_layout}
 %\end{figure}
 \end{wrapfigure}
-The final stage of the compiler is the assembling stage. This stage takes the list of \mintinline{c}{struct prco_op_struct} and outputs a list of machine code instructions. The assembler accomplishes this by calculating offsets and addresses of functions, branching instructions, and global variable addresses. It may also rearrange function locations so that the main function is the first instruction to be emitted.
-
-Assembling code is found in \verb|assembler_labels()| at \verb|arch/template_impl.c:38|.
-
-\subsection{Executable Layout}
-
 
 Another role of the assembler in the \scname{} processor is to output the machine code in a format that allows the widest range of programs to be run by the processor.
 
