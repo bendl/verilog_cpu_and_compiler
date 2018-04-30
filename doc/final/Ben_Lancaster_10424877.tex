@@ -272,12 +272,16 @@ PRCO304 - Final Stage Computing Project
 \chapter*{Abstract}
 \startcontents[chapters]
 \printcontents[chapters]{}{1}{}
-Embedded processors are 
-
-
-This report describes a software and electronic development project to design and implement a new embedded processor and architecture targeting small FPGA devices.
-
-
+\noindent
+This report describes a software and electronic development project to design, implement, and verify, a new embedded processor and architecture targeting small FPGA devices, and a high-level code compiler for generating executable code for the processor.
+\\\\
+The embedded processor design targets smaller FPGA devices with fewer logic cells with the aim of removing the requirement for side-microprocessors in FPGA-based products by embedding this processor into the FPGA.
+\\\\
+This report outlines the design decisions of the new embedded processor's instruction set architecture, register sets, and compiler. In addition, a high-level programming language is introduced that can be compiled into executable code for the embedded processor. Implementation details of the embedded processor and compiler is described, including pipelining, memory-management, code-generation, and optimisations. Performance measurements of core and compiler are performed showing a speed of 10 DMIPS (Dhrystone million instructions per second) at 50 MHz with 0.2 IPC (instructions per clock).
+\\\\
+Employed project management work-flows are described with their considerations and affect on the project. 
+\\\\
+A project post-mortem is performed to reflect on the achievements of the project with respect to the initial project objectives and to discuss further improvements to the project management, design, implementation, and verification, of the project.
 
 \newpage
 \renewcommand*\contentsname{Table of Contents}
