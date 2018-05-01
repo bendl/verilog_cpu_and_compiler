@@ -23,20 +23,20 @@ Releasing updates to embedded projects is a challenging problem. With the integr
 The outcome of the project will be to design a small, portable, FPGA-based, CPU core that electronic Product Designers can choose as an alternative to a physical side-microprocessor to embed into their product.
 
 \subsubsection*{Core Deliverables}
-\begin{enumerate}
-\item{(Core deliverable) To improve my knowledge and experience of FPGA  development, CPU architecture, and low-level programming.}
-\item{(Core deliverable) To build a working and operational soft-core CPU core capable of performing simple tasks.}
-\item{(Core deliverable) To provide product designers with an affordable alternative to a side-microprocessor in their FPGA-based products.}
-\item{(Core deliverable) To provide a technical documentation and specification for the embedded core.}
-\item{(Sub deliverable) To provide embedded products a convenient solution to in-field updating.}
-\item{(Sub deliverable) To provide easy interfacing between the FPGA design and the embedded core.}  
+\begin{enumerate}[label=\bfseries P\arabic*.]
+\item{(Project deliverable) To improve my knowledge and experience of FPGA  development, CPU architecture, and low-level programming.}
+\item{(Project deliverable) To build a working and operational soft-core CPU core capable of performing simple tasks.}
+\item{(Project deliverable) To provide product designers with an affordable alternative to a side-microprocessor in their FPGA-based products.}
+\item{(Project deliverable) To provide a technical documentation and specification for the embedded core.}
+\item{(Project-sub deliverable) To provide embedded products a convenient solution to in-field updating.}
+\item{(Project-sub deliverable) To provide easy interfacing between the FPGA design and the embedded core.}  
 \end{enumerate}
 
 \subsection*{Initial Scope}
 \subsubsection*{Core Deliverables}
 These deliverables are the base requirement for the project to be released in a functional and worthwhile state.
 
-\begin{enumerate}
+\begin{enumerate}[label=\bfseries C\arabic*.]
 \item{(Core deliverable) A small, portable, instantiate-able, FPGA-based CPU core.}\label{scope_core}
 
 \item{(Core deliverable) A C-like programming interface. A compiler taking input of a C-like grammar and outputting executable machine code for the embedded core. The machine code can be embedded into the FPGA bitstream and loaded onto the FPGA to run. Time estimate: 1 month.}\label{scope_compiler}
@@ -49,7 +49,7 @@ These deliverables are the base requirement for the project to be released in a 
 \subsubsection*{Extended Deliverables}
 These deliverables may not be achievable in the time frame specific in subsection \ref{sect:plan}. These deliverables may require extra time to develop, require more experience and skill to develop, or require resources currently unattainable.
 
-\begin{enumerate}
+\begin{enumerate}[label=\bfseries E\arabic*.]
 \item{GCC/LLVM/8CC compiler backend for C programming.}
 \item{Wishbone interface for easier modularity and inter-module communication.}\label{ext_wishbone}
 \item{Multi-core design with Wishbone (\ref{ext_wishbone}).}
@@ -154,25 +154,25 @@ Project risks and challenges are identified in subsection \ref{sect:risk} along 
 
 \newpage
 \subsection*{Initial Risk Assessment}\label{sect:risk}
-The following subsection outlines potential projects risks their suitable management strategy.
+The following subsection outlines potential projects risks (R) and their suitable management strategy.
 
-\begin{enumerate}
+\begin{enumerate}[label=\bfseries R\arabic*.]
 \item{
-Real hardware synthesis. 
+\textbf{Real hardware synthesis. }
 
 A challenge involved in the development of FPGA, CPLD, and other programmable logic devices, is the realization of the HDL code on real hardware. This can result in different behaviour of the real implementation to the simulated design - a major (and expensive) problem. This issue is caused by not meeting physical constraints required by the FPGA. These include timing, space, and power constraints.
 
 To help reduce this issue, I will utilise the ISE Design Suite's constraint validator tool. Before deploying to real hardware, the design must meet the constraints I declare that enable it to run correctly on real hardware. I can use these constraints to identify how much space, time, and power, I have left to implement features.
 }\label{risk:hw}
 \item{
-HDL programming. 
+\textbf{HDL programming.} 
 
 HDL (Hardware Description Language) is a text based language used to describe hardware components and their inter-connections. Verilog, a HDL language closer to C than VHDL, is what my FPGA core will be programmed in. This language is taught very little of in the Computer Science course and will require external learning resources so I can use it effectively. 
 
 My placement,  telecommunications signal generator company, Spirent Communications, heavily utilise FPGA devices in their products, in which I gained valuable knowledge on the FPGA development life cycle and deployment. To improve my knowledge of the tools required (ISE Design Suite) gained from my placement experience, I shall learn from HDL programming books such as HDL Programming Fundamentals: VHDL and Verilog \citep{hdl}.
 }
 
-\item{Compiler development time. 
+\item{\textbf{Compiler development time. }
 
 A compiler will be required to provide an easy method of running user code on the FPGA core. The compiler is a lesser deliverable but will take considerable to time implement.
 
@@ -182,14 +182,14 @@ The possibility also exists of using an existing compiler, such as GCC, LLVM, or
 }
 
 \item{
-Schedule overrun. 
+\textbf{Schedule overrun. }
 
 This is a complex project will multiple sub-projects (core \& compiler). Ensuring the large number of features will require a tight development schedule which is prone to over-running.
 
 I can identify and account for this by having weekly progress updates that will be scheduled with the project supervisor outlying feature progress and challenges. If the schedule slips largely due to an unforeseen problem or unreasonable requirement, this shall be brought up in the following meeting and a solution will be agreed upon, be it modifying deliverable or allowing extra time for the feature.
 }
 
-\item{Technology failure. 
+\item{\textbf{Technology failure.} 
 
 To overcome the risks of data loss all code and resources will be stored in local and remote Git repositories.
 In the event of the FPGA development kit failing, be it a component on the board or the FPGA itself, either: (a) a demo of the FPGA core not showing features of the failed component; or (b) a simulated design that meets constraints imposed by the physical FPGA will be provided and demonstrated in a simulator.
@@ -205,16 +205,16 @@ The following quality strategies will be employed to achieve a successful projec
     \hline
     Quality Check (QC) & Strategy \\
 	\specialrule{2pt}{-2pt}{0pt}
-	QC1. Requirement reality & Requirements will be checked during the weekly highlight reports to verify that when requirements begin to be implemented they are realistic and achievable within the time frame specified in subsection \ref{sect:plan}.
+	\textbf{QC1. Requirement reality} & Requirements will be checked during the weekly highlight reports to verify that when requirements begin to be implemented they are realistic and achievable within the time frame specified in subsection \ref{sect:plan}.
 	\\ \hline
 	
-	QC2. Soft-core design validation & While continuous testing and verification will be performed on the core (unit test, FPGA constraints reached), a variable period of time (stage 2.1.1) will be allocated after the development sprints to fix bugs and unexpected behaviour, and polish the final design. 
+	\textbf{QC2. Soft-core design validation} & While continuous testing and verification will be performed on the core (unit test, FPGA constraints reached), a variable period of time (stage 2.1.1) will be allocated after the development sprints to fix bugs and unexpected behaviour, and polish the final design. 
 	\\ \hline
 	
-	QC3. Compiler validation & As with QC2, unit tests and continuous integration tests will be performed for each code change to validate that changes do not produce bad code generation. A time varying period (stage 2.2.1) is also allocated to fix and polish the compiler.
+	\textbf{QC3. Compiler validation} & As with QC2, unit tests and continuous integration tests will be performed for each code change to validate that changes do not produce bad code generation. A time varying period (stage 2.2.1) is also allocated to fix and polish the compiler.
 	\\ \hline
 	
-	QC4. Real hardware performance & Electronic test equipment, such oscilloscopes and digital logic analysers, will be used to verify the correct behaviour of the code on real hardware. Initial risk (\ref{risk:hw}) states that there is a risk of the FPGA deployed core will behave differently to the simulation.
+	\textbf{QC4. Real hardware performance} & Electronic test equipment, such oscilloscopes and digital logic analysers, will be used to verify the correct behaviour of the code on real hardware. Initial risk (\ref{risk:hw}) states that there is a risk of the FPGA deployed core will behave differently to the simulation.
 	\\ \hline
     \end{tabularx}
     \caption{Initial Quality Plan.}
