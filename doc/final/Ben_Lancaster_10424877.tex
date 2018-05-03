@@ -300,11 +300,11 @@ A project post-mortem is performed to reflect on the achievements of the project
  
 \subsection*{Word Count}
 \begin{minted}{text}
-Words in text: 4519
-Words in headers: 116
-Words outside text (captions, etc.): 213
-Number of headers: 60
-Number of floats/tables/figures: 19
+Words in text: 6386
+Words in headers: 247
+Words outside text (captions, etc.): 261
+Number of headers: 106
+Number of floats/tables/figures: 28
 Number of math inlines: 0
 Number of math displayed: 0
 \end{minted}
@@ -371,14 +371,17 @@ These core (C) deliverables are the base requirement for the project to be relea
 \item{To improve my knowledge and experience of FPGA development, processor architecture, compilers, and embedded systems engineering.}
 \item{To build a working and operational soft-core processor core capable of performing simple tasks.}
 \item{Implementation of the soft-core processor design on real hardware.}
-\item{To provide product designers with an affordable alternative to a side-microprocessor in their FPGA-based products.}
-\item{To provide a technical processor reference guide and specification for the embedded core.}
+\item{To provide a high-level code compiler to run user-code on the processor.}
 \end{enumerate}
+
+\todo[inline]{These are slightly different to the PID, is this OK?}
 
 \subsection{Extended Deliverables}\todo{Call PE?}
 These extended (E) deliverables may not be achievable in the time frame specific in section \ref{sect:proj_time} as they may require extra time to design and implement, require more experience or skill, or require resources currently unattainable.
 \begin{enumerate}[label=\bfseries E\arabic*.]
+\item{To provide a technical processor reference guide and specification for the embedded core.}
 \item{To provide embedded products a convenient solution to in-field updating.}
+\item{To provide product designers with an affordable alternative to a side-microprocessor in their FPGA-based products.}
 \item{To provide easy interfacing between the FPGA design and the embedded core.}
 \item{GCC/LLVM/8CC compiler backend for C programming.}\label{sect:deliv:ed:gcc}
 \item{Wishbone interface for easier modularity and inter-module communication.}
