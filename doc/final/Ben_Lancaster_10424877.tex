@@ -14,6 +14,9 @@
 \usepackage{amsfonts}
 \usepackage{amssymb}
 
+%https://www.overleaf.com/help/41-can-i-add-inline-or-margin-comments-to-the-pdf
+\usepackage[colorinlistoftodos,prependcaption,textsize=small]{todonotes}
+
 
 %https://tex.stackexchange.com/questions/3001/list-sections-of-chapter-at-beginning-of-that-chapter
 % !!! NEEDS TO BE ABOVE HYPEREF !!!
@@ -165,6 +168,8 @@
 \begin{document}
 \arrayrulecolor{blue9}
 
+\listoftodos
+
 \makeatletter
 \DeclareRobustCommand*{\nameref}{%
 \color{blue}%
@@ -280,6 +285,7 @@ The embedded processor design targets smaller FPGA devices with fewer logic cell
 This report outlines the design decisions of the new embedded processor's instruction set architecture, register sets, and compiler. In addition, a high-level programming language is introduced that can be compiled into executable code for the embedded processor. Implementation details of the embedded processor and compiler is described, including pipelining, memory-management, code-generation, and optimisations. Performance measurements of core and compiler are performed showing a speed of 10 DMIPS (Dhrystone million instructions per second) at 50 MHz with 0.2 IPC (instructions per clock).
 \\\\
 Employed project management work-flows are described with their considerations and affect on the project. 
+\todo{more}
 \\\\
 A project post-mortem is performed to reflect on the achievements of the project with respect to the initial project objectives and to discuss further improvements to the project management, design, implementation, and verification, of the project.
 
@@ -302,6 +308,13 @@ Number of floats/tables/figures: 19
 Number of math inlines: 0
 Number of math displayed: 0
 \end{minted}
+\todo{To much info, just give word in text.}
+
+\subsection*{Sources\todo{More like everything - rename to Sources and Designs?}}
+\begin{description}[style=nextline]
+\item[GitHub (with git repository metadata)]{\url{https://github.com/bendl/prco304}}
+\item[OneDrive (raw files)]{\url{https://liveplymouthac-my.sharepoint.com/:f:/g/personal/ben_lancaster_students_plymouth_ac_uk/EmzpOaOZhyZIvDhGLSUQC8oBbRX5iO6Ujwe81TUa1VlV-A?e=Ndd677}}
+\end{description}
 
 \newpage
 \chapter*{Preface}
@@ -344,7 +357,7 @@ Popular embedded processors include:
 \begin{itemize}
 \item{\textit{Xilinx MicroBlaze.}}
 \item{\textit{ARM Cortex SoC.}}
-\end{itemize}
+\end{itemize}\todo{Reference and needs more}
 
 \newpage
 \section{Project Overview}
@@ -352,7 +365,7 @@ This project aims to provide an efficient and cost-saving alternative for board 
 
 The processor core will implement it's own processor and instruction set architecture and so a compiler and assembler will also be provided so that software code can easily be executed on the processor.
 
-\subsection{Core Deliverables}
+\subsection{Core Deliverables}\todo{Call PC?}\todo{ To differentiate between top-level project and feature deliverables?}
 These core (C) deliverables are the base requirement for the project to be released in a functional and worthwhile state.
 \begin{enumerate}[label=\bfseries C\arabic*.]
 \item{To improve my knowledge and experience of FPGA development, processor architecture, compilers, and embedded systems engineering.}
@@ -362,7 +375,7 @@ These core (C) deliverables are the base requirement for the project to be relea
 \item{To provide a technical processor reference guide and specification for the embedded core.}
 \end{enumerate}
 
-\subsection{Extended Deliverables}
+\subsection{Extended Deliverables}\todo{Call PE?}
 These extended (E) deliverables may not be achievable in the time frame specific in section \ref{sect:proj_time} as they may require extra time to design and implement, require more experience or skill, or require resources currently unattainable.
 \begin{enumerate}[label=\bfseries E\arabic*.]
 \item{To provide embedded products a convenient solution to in-field updating.}
@@ -383,7 +396,7 @@ The \scname{} processor will be able to read and write to all data passing throu
 \subsection{Fit for Purpose}
 The \scname{} processor is \textbf{not} designed to run general purpose operating systems, such as Linux or embedded RTOS systems. All memory devices attached to the FPGA are fully accessible to the processor core and instructions/programs running through it, meaning that operating systems or secure applications storing private and sensitive information is not protected by modern processor features such as privilege modes and virtual memory sections. The processor lacks common components required to run modern operating systems, such as a memory management unit (MMU) and privilege modes, and so \textbf{should not be run on the processor}.
 
-The \scname{} processor is \textbf{not} designed to run in high-reliability or safety-critical environments that require established safety standards, such as the UK Defence Standard 00-56 \citep{defstan_0056_2} and IEC 61508 \citep{iec61508}.
+The \scname{} processor is \textbf{not} designed to run in high-reliability or safety-critical environments that require established safety standards, such as the UK Defence Standard 00-56 \citep{defstan_0056_2} and IEC 61508 \citep{iec61508}.\todo{Cite actual standards documents, not papers describing them.}
 
 The \scname{} processor is \textbf{not} designed for implementation in silicon and makes no guarantees of reliability or performance in this format.
 \newline\newline
@@ -412,11 +425,16 @@ The code generated by the compiler is \textbf{not guaranteed} to:
 
 \section{Time Management}
 \label{sect:proj_time}
+\todo[inline]{Show gantt chart}
 
 \section{Method of Approach}
 Development of the \textbf{core} and \textbf{compiler} will be done in separate stages of the project (see section \ref{sect:proj_time}). The two deliverables will be split into 2 sub-projects. Both sub-projects will employ the \textbf{Agile development process}, using Agile's sprints to split up tasks into sub-tasks and Agile's scrums to discuss progress, features, and changes. This technique allows revisiting of tasks to tweak and iterate over their implementation which will be key when for incrementally adding features to both sub-projects, for example, adding to the core's ALU module to add conditional branching, or adding new instructions to the core's decoder module.
 
+\todo[inline]{Show github kanban board}
+
 \section{Requirements}
+\todo[inline]{?}
+
 \section{Resources and Dependencies}
 For the first half of the development cycle, the core can be developed and verified using the Verilog simulator and test suite, \textbf{Verilator}, and VHDL and Verilog simulator, \textbf{iSim}.
 
@@ -451,9 +469,11 @@ The greater number of IO options and larger FPGA make the Arty board better suit
 The project will require a computer or laptop to develop the core and compiler on and continuous integration systems to perform testing on the incremental builds. For the project demo, an oscilloscope (already owned) or digital logic analyser may be required to demonstrate some of the core's features.
 
 \section{Tools}
+\todo[inline]{This is project dependant (compiler/core). Should it be moved into their chapters?}
 
 \subsection{Source Control}
 Version control will be utilised to improve work-flow, reference and review code changes, and protect the project from data loss and corruption. GitHub, a git hosting provider, will be utilised to host all project files, including documentation and design files. 
+\todo[inline]{Describe how github keeps automatic backups.}
 
 The repository can be found here: \href{https://github.com/bendl/prco304}{https://github.com/bendl/prco304}
 
@@ -471,12 +491,14 @@ The project is organised into 4 distinct stages: research, requirement gathering
 \subsubsection*{Stage 1.3: Compiler high level design}
 
 \subsection*{Stage 2.x}
+\todo[inline]{Should sub-project stages be moved into their own chapter?}
 \subsubsection*{Stage 2.0: Core Register-set Implementation.}
 \subsubsection*{Stage 2.1: Core: Register-set Implementation.}
 \subsubsection*{Stage 2.2: Core: ALU, RAM Implementation.}
 \subsubsection*{Stage 2.3: Core: GPIO, Communication.}
 
 \subsection*{Stage 3.x}
+\todo[inline]{Should sub-project stages be moved into their own chapter?}
 \subsubsection*{Stage 3.0: Compiler:. Parser impl.}
 \subsubsection*{Stage 3.1: Compiler: Code-generation.}
 \subsubsection*{Stage 3.2: Compiler: Assembler.}
@@ -499,6 +521,8 @@ The project is organised into 4 distinct stages: research, requirement gathering
 The \scname{} Processor Design is the first of two deliverable sub-projects required for this project. The processor is designed to be a small, instantiated, Verilog module that can be easily inserted into existing FPGA-based Verilog projects.
 
 The processor core is not designed for physical implementation in silicon but rather for FPGA devices.
+
+\todo{more}
 
 \newpage
 \section{Project Management}
@@ -525,11 +549,16 @@ The following Extended Processor Deliverables (EPD) are deliverables that must b
 \item{Implement a super-scalar pipeline architecture.}
 \end{enumerate}
 
+\todo[inline]{Justify and explain sources of these deliverables - existing processors provide these etc.}
+\subsection{Project Stage }
+This is a test.
+\todo{Describe the stages related to the processor design and how/why chosen.}
 
 \newpage
 \section{High Level Design}
 The \scname{} processor is a modularised processor with independent components for the ALU, Registers, RAM, and it's peripherals. 
 
+\todo[inline]{Also need a lower-level block diagram showing communication between components (ALU, decoder, etc.)}
 
 \begin{figure}[H]
 \begin{center}
@@ -543,7 +572,7 @@ The \scname{} processor is a modularised processor with independent components f
 \scname{} has a total of 6 addressable, read and write, registers. These registers are identified by letters A through H.
 
 \subsection{General Purpose Registers}
-Registers A through E are designed for general purpose use and are safe to store user values over the run-time of the processor.
+Registers A through E \todo{Compiler code calls registers Ax-Hx} are designed for general purpose use and are safe to store user values over the run-time of the processor.
 
 \begin{table}[h]
 \def\arraystretch{1.5}%  1 is the default, change whatever you need
@@ -560,6 +589,7 @@ Registers A through E are designed for general purpose use and are safe to store
 Instructions that require a destination register, such as CMP, can reference any register (even special registers if that is your requirement). For the CMP instruction as an example, the processor will put the result of the comparison instruction in the destination register, overwriting any value present in that register.
 
 \subsection{Special Registers}
+\todo{Remove? Latest update removes these registers - only Status register remains and isnt addressable.}
 Registers F through H are special registers within the processor. The processor cannot guarantee that a value written or read in these registers will persist over the run-time of the processor. Erroneously writing to these registers may severely affect program and processor behaviour.
 
 Even though all registers can be used at the will of the programmer, it is recommended to isolate a few registers to provide special features, such as RAM stack management, interrupts, and IO multiplexing.
@@ -614,8 +644,11 @@ The Stack Pointer is similar to the x86 Stack Pointer in that it stores the addr
 
 \section{Instruction Set Architecture}
 The \scname{} processor implements it's own fixed 16-bit instruction set.
+\todo{More}
 
 \subsection{Instruction Types}
+\todo[inline]{Why these types... limitations...}
+
 \begin{table}[h]
 \def\arraystretch{1.5}
 \centering
@@ -692,19 +725,18 @@ Table \ref{tab:isa_jmp_bits} below details each conditional branch parameter and
 
 \subsection{Design Considerations}
 The \scname{} processor's ISA has been through multiple iterations.
+\todo{more}
 
 \subsubsection*{Opcode Bits} 
 Initially, the opcode length was 4-bits allowing a total of 16 unique opcodes. This was later changed to 5-bits to add more opcodes, however
 
 \subsubsection*{SETC Instruction}
+\todo[inline]{This is a design consideration. Where to put design changes? here?}
 The \verb|SETC| instruction was added to reduce the number of instruction required to perform boolean logic operations on registers. Without the \verb|SETC| instruction, to evaluate the expression \mintinline{c}{1 < 5}, the compiler would need to emit multiple JMP instructions to set the result to 0 or 1 and JMP over the other result. In my testing, the compiler would require between 5-8 instruction for each boolean expression. 
 
 The \verb|SETC| instruction is inspired by the x86 instruction: \verb|SETcc| Set Byte on Condition \citep{isa_x86}.
 
 With the introduction of the \verb|SETC| instruction late in development, the number of instructions could be reduced to around two instruction. (one for the initial comparison, and one for setting 1 or 0 with \verb|SETC|). This greatly improved program execution time and size.
-\begin{minted}{c}
-if (1 < 5) {
-\end{minted}
 
 \section{Pipeline Architecture}
 The \scname{} processor employs a \textit{feed-forward} pipeline strategy. 
@@ -712,7 +744,7 @@ This pipeline supports:
 \begin{itemize}
 \item{Time-varying processes: Multi-clock cycle decoding; Memory access; ALU ops.}
 \item{Module re-ordering: Instruction dependencies; Module skipping; Output redirection. }
-\item{Interruption (see section \ref{sect:interrupts}: {\nameref{sect:interrupts}}).}
+\item{Interruption (see section \ref{sect:interrupts}: {\nameref{sect:interrupts}}).\todo{fix}}
 \end{itemize}
 
 As the pipeline is feed-forward, no information is sent back to previous modules to tell them of their status. This means that if a module is stalled (due to mutli-cycle processes or future modules are stalled), and the previous module is ready, the previous module will signal the next module that information is ready and it should take it, but the current module is unable to as it is busy. The pipeline resolves this issue by it's cyclic nature. This means that only 1 module at any time is processing data. Of-course, the downside to this approach is that instruction parallelism is reduced.
@@ -741,6 +773,7 @@ For instructions that require RAM access, a typical pipeline order might look li
 \caption{\scname{} processor instruction cycle time diagram.}
 \label{fig:dft_algorithm}
 \end{figure}
+\todo{Outdated. Change to reflect new pipelines varying time processes.}
 
 \section{Testing and Verification}
 \label{sect:core_test}
@@ -778,6 +811,10 @@ An example test report for the ALU running OR instructions on different operands
 \item{\textbf{Single-step implementation runs} are used to verify the correct behaviour of the RTL code on a real FPGA device. 
 
 The \scname{} processor core features a single-step input line that can be pulsed to signal the core to execute the next instruction. In these tests, generally the first register Ax is redirected to the 8 LEDs on the development board, allowing the tester to visually see it's contents. However, only the higher-or-lower byte can be viewed at any single time (as registers are 16-bits wide). UART printing is also used to visualise register contents, however, integer to ASCII conversion is not implemented so only single digits can be displayed in ASCII.}
+
+\item{
+\todo[inline]{Describe creation and usage of emulator introduced later in project.}
+}
 \end{itemize}
 
 
@@ -785,7 +822,7 @@ The \scname{} processor core features a single-step input line that can be pulse
 \newpage
 \section{Core Analysis}
 \subsection{Performance}
-\textit{Instructions Per Cycle} (IPC) and \textit{Dhrystone Million Instructions Per Second} (DMIPS) are two measurements used to measure the performance of a processor.
+\textit{Instructions Per Cycle} (IPC) and \todo{Not really DMIPS, more like MIPS. Describe why...}\textit{Dhrystone Million Instructions Per Second} (DMIPS) are two measurements used to measure the performance of a processor.
 
 The downside of these measurements is that they assume each instruction executes in constant time. This is not the case in the \scname{} processor and other modern processors.
 \\\\
@@ -795,7 +832,7 @@ The most used instructions, MOVI, MOV, ADD, ADDI, JMP, and CMP, take around 5 cl
 \\\\
 Comparing this against Xilinx's MicroBlaze embedded processor which features 1.3 DMIPS/MHz (65 DMIPS/50 MHz) shows the performance benefits of super-scalar processor architectures. 
 
-The \scname{} processor is similar to AMD's Am386 (1991) processor with 9 MIPS and 0.225 IPC when run at 40 MHz \citep{am386}.
+The \scname{} processor is similar to AMD's Am386 (1991) processor with 9 MIPS and 0.225 IPC when run at 40 MHz \todo{Cite actual processor datasheet, not a magazine...}\citep{am386}.
 
 
 \newpage
@@ -809,6 +846,7 @@ The \scname{} processor is similar to AMD's Am386 (1991) processor with 9 MIPS a
 \item{Fully synthesize-able on FPGA hardware.}
 \item{Implement a simple pipeline architecture.}
 \end{enumerate}
+\todo[inline]{Discuss if deliverable was achieved and how.}
 
 \subsection{Extended Deliverables}
 The following Extended Processor Deliverables (EPD) are deliverables that must be implemented for the processor to be deemed functional.
@@ -819,6 +857,7 @@ The following Extended Processor Deliverables (EPD) are deliverables that must b
 \item{Provide an interrupt system allowing asynchronous events to be handled.}
 \item{Implement a super-scalar pipeline architecture.}
 \end{enumerate}
+\todo[inline]{Discuss if deliverable was achieved and how.}
 
 
 
@@ -857,7 +896,7 @@ This section details the functional requirements (F) and their technical depende
 \item{\textbf{User-defined encapsulated program.} The compiler will support encapsulating user-defined programs into functions to improve program control and support more complex programs.}
 \end{enumerate}
 
-For example, to support 'F4 User-defined program flow', the compiler needs to support control sequences such as 'for' and 'if' statements which themselves require implementation of 'variables' and 'conditional branching', and so on.
+For example, to support 'F4 User-defined program flow', the compiler needs to support control sequences such as 'for' and 'if' statements \todo{Reword}which themselves require implementation of 'variables' and 'conditional branching', and so on.
 
 \section{Implementation}
 The design philosophy for this project is to be forward compatible -- such that future projects and ideas are able to utilise the technology and functions of this project. The compiler is implemented fully in the ANSI C programming language due to it's portability and being interoperable with standard binary interfaces (such as calling conventions). In addition, I have good familiarity and experience in the language, which reduces risk and time requirements for learning new technologies.
@@ -925,6 +964,7 @@ While parser generators already exist, such as Bison and Java's ANTLR, it was de
 
 \subsection{AST Generation}
 \label{sect:compiler_ast}
+\todo{Describe what AST is and how it represents things, and why chosen.}
 The recursive descent parser stores all terminals in the grammar as structures in \textit{ast.h} containing relocatable information about the parsed text and it's future implementation. This AST result of the text parser is the initial immediate representation used by the compiler.
 
 \begin{figure}[H]
@@ -1015,7 +1055,8 @@ This code generation stage is named intermediatary because absolute addresses of
 
 \subsubsection{Variables}
 \label{sect:compiler_cg_vars}
-An initial requirement for the \scname{} compiler was to support three types of variables: global, local, and parameter variables. Due to time constraints and unforeseen \textit{"sleeper"} bugs only local and argument variables have been implemented as of compiler version 2.50 (06/04/2018). Global variable allocation has been implemented in the assembler but declaring or referencing global variables has not been implemented.
+An initial requirement for the \scname{} compiler was to support three types of variables: global, local, and parameter variables. Due to time constraints and unforeseen \textit{"sleeper"} bugs only local and argument variables have been implemented as of compiler version 
+\todo{Add section showing compiler versions and changes.}2.50 (06/04/2018). Global variable allocation has been implemented in the assembler but declaring or referencing global variables has not been implemented.
 
 \subsubsection*{Local Variables}
 Similar to C89, all local variables must be declared at the start of the function before any logic, such as function calling. This is because the compiler will not rearrange the AST tree to move variable declarations to the first child of the function AST tree.
@@ -1122,7 +1163,7 @@ fnc main()
 
 \subsubsection*{Pointers and Value Dereferencing}
 With the implementation of string variables, the concepts of pointers and dereferencing is implicitly introduced. 
-\begin{figure}[!h]
+\begin{figure}[H]
     \begin{minipage}{0.5\textwidth}
         \centering
 \begin{minted}[linenos]{c}
@@ -1168,7 +1209,7 @@ fnc strlen() {
 \label{sect:compiler_cg_push_pop}
 Due to limitations of the \scname{} processor's instruction set, high-level instructions such as PUSH and POP cannot be performed in a single instruction. Instead, the compiler is able to replicate the behaviour of these high level instructions by emitting multiple primitive instructions. Figure \ref{fig:compiler_cg_push_pop} below details how the compiler emulates these high-level instructions.
 
-\begin{figure}[!h]
+\begin{figure}[H]
     \begin{minipage}{0.5\textwidth}
         \centering
         \begin{minted}{c}
@@ -1197,6 +1238,7 @@ void cg_pop_prco(enum prco_reg rd)
     \mintinline{C}{cg_push_prco(Ax)} to push register Ax to the stack; \mintinline{C}{cg_pop_prco(Ax)} to pop stack into Ax.}
     \label{fig:compiler_cg_push_pop}
 \end{figure}
+\todo{Remove asm comment lines}
 
 
 
@@ -1207,15 +1249,16 @@ Assembling code is found in \verb|assembler_labels()| at \verb|arch/template_imp
 
 \subsection{Executable Layout}
 
-%\begin{figure}[H]
-\begin{wrapfigure}{r}{0.3\textwidth}
+\begin{figure}[H]
+%\begin{wrapfigure}{r}{0.3\textwidth}
 \begin{center}
 \includegraphics[scale=0.4]{prco_memory_layout}
 \end{center}
 \caption{\scname{} memory layout.}
 \label{fig:asm_mem_layout}
-%\end{figure}
-\end{wrapfigure}
+%\end{wrapfigure}
+\end{figure}
+\todo{wrap text}
 
 Another role of the assembler in the \scname{} processor is to output the machine code in a format that allows the widest range of programs to be run by the processor.
 
@@ -1233,6 +1276,7 @@ ORI   %Ax,     $0xCA
 JMP   %Ax,     JE_UC (unconditional)
 \end{minted}
 %TC:endignore
+\todo{Explain what each line is doing.}
 
 \section{Testing and Verification}
 Verifying the output assembly is a bit more involved as there are multiple layers of tests required. The output code generation must be tested for:
@@ -1254,13 +1298,15 @@ During the later stages of the project, it was decided to build a software emula
 If extra time was allowed, the emulator could be integrated with the unit tests. This would allow for the dynamic compilation of high-level code test programs and analysing their behaviour during emulation against expected values. This would greatly speed up compiler code generation development times.
 
 \subsection*{Continuous Integration}
-The \scname{} compiler employs continuous integration testing to show if a code commit breaks certain functionality. The continuous integration system service used is Travis CI \citep{travisci}. Every time a commit is made to the repository, Travis CI pulls the commit and runs the \verb|test/travis-ci.sh| script. This script runs the compiler and emulator on each \verb|test/*.prco| file and checks the return code. If the return code does not match the expected functionality, the test fails and the developer can investigate further by enabling more debug prints with the \verb|-D| parameter.
+The \scname{} compiler employs continuous integration testing to show if a code commit breaks certain functionality. The continuous integration system service used is Travis CI \todo{fix}\citep{travisci}. Every time a commit is made to the repository, Travis CI pulls the commit and runs the \verb|test/travis-ci.sh| script. This script runs the compiler and emulator on each \verb|test/*.prco| file and checks the return code. If the return code does not match the expected functionality, the test fails and the developer can investigate further by enabling more debug prints with the \verb|-D| parameter.
 
 An example output of the continuous integration test runner is located in section \ref{appendix:travisci} {\nameref{appendix:travisci}}.
 
 \newpage
 \section{Sub-project Review}
 \subsection{Core Deliverables}
+
+\todo[inline]{Must be a better way to display this...}
 \begin{table}[H]
 \def\arraystretch{1.5}
 \caption{Compiler Core Deliverables Review}
@@ -1287,6 +1333,7 @@ Assembling 		& Yes & 1.40 & Basic offset calculation and re-encoding.\\
 
 
 \subsection{Extended Deliverables}
+\todo[inline]{Must be a better way to display this...}
 \begin{table}[H]
 \def\arraystretch{1.5}
 \caption{Compiler Extended Deliverables Review}
@@ -1317,6 +1364,8 @@ Assembler memory layout & Yes & 2.10 & First instructions (low memory) jump into
 }
 
 \section{Project Post-mortem}
+\todo[inline]{more}
+
 \subsection{Project Objectives}
 \subsection{Development Process}
 \subsection{Personal Contributions}
@@ -1339,6 +1388,7 @@ And from the embedded processor:
 \end{itemize}
 I believe these technologies and their implementation details should be shared as an open, educational resource for future projects and people interested in low-level code generation and embedded processor architecture.
 
+\todo[inline]{Review project management methods}
 
 
 
@@ -1346,7 +1396,7 @@ I believe these technologies and their implementation details should be shared a
 
 \newpage
 \bibliography{prco304}
-
+\todo[inline]{more}
 
 
 
@@ -1440,6 +1490,7 @@ cmake --build . --target install
 
 \subsection*{Example Output}
 \inputminted{text}{emu_output.tex}
+\todo[inline]{Explain what this is showing}
 
 \newpage
 \subsection{\scname{} Compiler Continuous Integration Tests}
@@ -1448,10 +1499,13 @@ cmake --build . --target install
 
 \newpage
 \subsection{\scname{} Processor Instruction Set Architecture}
+\todo[inline]{Some are missing}
+\todo[inline]{Some are outdated}
 \input{isa.tex}
 
 \newpage
 \section{Appendix B. Project Management Artefacts}
+\todo{How much of the PID should be re-written in the report?}
 \input{pid.tex}
 
 \newpage
@@ -1470,6 +1524,7 @@ cmake --build . --target install
 \caption{\scname{} compiler Functional requirements and their technical implementation requirements.}
 \label{fig:compiler_dependencies}
 \end{figure}
+\todo[inline]{Describe how this shows dependencies.}
 
 \subsection{Compiler Sequence Diagram}
 \label{sect:compiler_seq_uml}
