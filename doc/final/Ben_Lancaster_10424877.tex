@@ -258,6 +258,10 @@ PRCO304 - Final Stage Computing Project
     Date & Version & Changes \\
     \arrayrulecolor{blue9}
 	\specialrule{2pt}{-2pt}{0pt}
+	04/05/2018 & 3.10 & Add section \ref{sect:core_analysis} {\nameref{sect:core_analysis}} to describe performance of the embedded processor. \\ \hline
+	04/05/2018 & 3.00 & Add section {\nameref{sect:preface}}. \\ \hline
+	03/05/2018 & 2.90 & Add acknowledgements and glossary. \\ \hline
+	20/04/2018 & 2.81 & Add details of emulator and it's integration with unit testing.\\ \hline
 	30/03/2018 & 2.80 & Add details of Argument Variables implementation. \\ \hline
 	30/03/2018 & 2.70 & Add description of compiler function requirements. \\ \hline
 	30/03/2018 & 2.60 & Add word count below TOC. \\ \hline
@@ -342,6 +346,7 @@ Number of math displayed: 0
 
 \newpage
 \chapter*{Preface}
+\label{sect:preface}
 This report discusses the design, implementation, and verification, of an FPGA-based embedded processor (\scname{} processor) and compiler.
 
 \begin{figure}[H]
@@ -851,6 +856,7 @@ The \scname{} processor core features a single-step input line that can be pulse
 
 \newpage
 \section{Core Analysis}
+\label{sect:core_analysis}
 \subsection{Performance}
 \textit{Instructions Per Cycle} (IPC) and \todo{Not really DMIPS, more like MIPS. Describe why...}\textit{Dhrystone Million Instructions Per Second} (DMIPS) are two measurements used to measure the performance of a processor.
 
@@ -914,7 +920,7 @@ The compiler is invoked with parameters for the input code file and optional par
 
 \section{Project Management}
 \subsection{Functional Requirements}
-This section details the functional requirements (F) and their technical dependencies of the compiler to allow users to produce complete and functional programs. Figure \ref{fig:compiler_dependencies} breaks down each functional requirement to show their technical dependencies.
+This section details the functional requirements (F) and their technical implementation dependencies of the compiler to allow users to produce complete and functional programs. Figure \ref{fig:compiler_dependencies} breaks down each functional requirement to show their technical dependencies.
 
 \begin{enumerate}[label=F\arabic*.]
 \item{\textbf{Text Components.} The compiler will be able to parse the programming language's grammar's (see section {\nameref{sect:compiler_grammar}}  \ref{sect:compiler_grammar}) terminals into distinct groups, such as text strings, arithmetic symbols, and other text symbols.}
@@ -1307,6 +1313,7 @@ JMP   %Ax,     JE_UC (unconditional)
 \end{minted}
 %TC:endignore
 \todo{Explain what each line is doing.}
+This is described in GitHub issue \href{https://github.com/bendl/prco304/issues/20}{\#20}.
 
 \section{Testing and Verification}
 Verifying the output assembly is a bit more involved as there are multiple layers of tests required. The output code generation must be tested for:

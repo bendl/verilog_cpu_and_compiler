@@ -12,6 +12,9 @@
 #include "arch/target.h"
 #include "module.h"
 
+// http://wiki.tcl.tk/36951
+#include "tok_prec.inc.c"
+
 #ifdef _WIN32
         #include <Shlwapi.h>
         #define PLAT_MAX_PATH MAX_PATH
@@ -1027,40 +1030,6 @@ parse_primary(void)
                 dbprintf(D_ERR, "Unknown primary token: %d %c\r\n",
                         lexer_token(), lexer_token());
                 return NULL;
-        }
-}
-
-int
-get_tok_prec(void)
-{
-        switch (lexer_token()) {
-        default:
-                dbprintf(D_INFO, "No token precedence for '%d'\r\n",
-                        lexer_token());
-                return -1;
-
-        case TOK_BOOL_LE:
-                return 5;
-        case TOK_BOOL_L:
-                return 5;
-        case TOK_BOOL_G:
-                return 5;
-        case TOK_BOOL_EQ:
-                return 5;
-        case TOK_BOOL_NE:
-                return 5;
-        case TOK_BOOL_OR:
-                return 5;
-
-        case TOK_PLUS:
-                return 20;
-        case TOK_SUB:
-                return 20;
-
-        case TOK_STAR:
-                return 40;
-        case TOK_DIV:
-                return 40;
         }
 }
 

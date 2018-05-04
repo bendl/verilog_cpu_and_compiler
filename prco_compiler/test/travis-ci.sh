@@ -75,7 +75,11 @@ fnc_run_test ./tests/vars_2.prco 3
 fnc_run_test ./tests/mul_1.prco 30
 fnc_run_test ./tests/mul_2.prco 3
 fnc_run_test ./tests/mul_3.prco 100
-fnc_run_test ./tests/mul_4.prco 10000
+
+# Test removed because int declarations with values over
+# 255 not supported.
+# See https://github.com/bendl/prco304/issues/20 
+#fnc_run_test ./tests/mul_4.prco 10000
 
 fnc_run_test ./tests/div_1.prco 1
 fnc_run_test ./tests/div_2.prco 5
