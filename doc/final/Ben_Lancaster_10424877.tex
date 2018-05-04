@@ -313,10 +313,31 @@ Number of math displayed: 0
 \end{minted}
 \todo{To much info, just give word in text.}
 
-\subsection*{Sources\todo{More like everything - rename to Sources and Designs?}}
+\subsection*{Sources}
 \begin{description}[style=nextline]
-\item[GitHub (with git repository metadata)]{\url{https://github.com/bendl/prco304}}
+\item[GitHub (with git repository metadata)]{\todo{How early can I make this repository public?}\url{https://github.com/bendl/prco304}}
 \item[OneDrive (raw files)]{\url{https://liveplymouthac-my.sharepoint.com/:f:/g/personal/ben_lancaster_students_plymouth_ac_uk/EmzpOaOZhyZIvDhGLSUQC8oBbRX5iO6Ujwe81TUa1VlV-A?e=Ndd677}}
+\end{description}
+
+\subsection*{Glossary}
+\begin{description}
+\item[FPGA]{Field-programmable Gate Array}
+\item[ASIC]{Application-specific integrated circuit}
+\item[RISC]{Reduced instruction set computer}
+\item[ISA]{Instruction set architecture}
+\item[Pipeline]{The control and transfer of data in a system}
+\item[RTL]{Register-transfer level}
+\item[HDL]{Hardware description language}
+\item[Synthesis]{A process of transforming HDL into RTL}
+\item[Assembler]{A process of transforming a higher representation of code into a machine executable format}
+\item[AST]{Abstract Syntax Tree}
+\item[SSA]{Static Single Assignment}
+\item[IR]{Intermediate representation}
+\item[Opcode]{Bits of an instruction indicating the type of operation}
+\item[Operand]{A parameter or part of an instruction}
+\item[Imm8]{8-bit immediate value}
+\item[Simm5]{5-bit signed immediate value}
+\item[CMake]{A cross-platform project generator}
 \end{description}
 
 \newpage
@@ -578,10 +599,10 @@ The \scname{} processor is a modularised processor with independent components f
 \end{figure}
 
 \section{Registers}
-\scname{} has a total of 6 addressable, read and write, registers. These registers are identified by letters A through H.
+\scname{} has a total of \todo{8 and Rx}6 addressable, read and write, registers. These registers are identified by letters A through H.
 
 \subsection{General Purpose Registers}
-Registers A through E \todo{Compiler code calls registers Ax-Hx} are designed for general purpose use and are safe to store user values over the run-time of the processor.
+Registers \todo{Compiler code calls registers Ax-Hx}A through E are designed for general purpose use and are safe to store user values over the run-time of the processor.
 
 \begin{table}[h]
 \def\arraystretch{1.5}%  1 is the default, change whatever you need
@@ -1273,10 +1294,10 @@ Another role of the assembler in the \scname{} processor is to output the machin
 
 This format is not enforced by the processor core and it's up to the compiler to lay out the processor's memory contents. The only feature that the processor states is that it will start reading instructions from address \verb|0x00|. The compiler uses this information to structure the output program. The first two words of memory (\verb|0x00| and \verb|0x01|) contain \verb|MOVI| and \verb|JMP| instructions to jump the processor to the address of the \verb|main()| function.
 
-\subsection{Limitations}
+\subsection{Address Limitations}
 Due to time constraints, the assembler introduces many constraints to the output program that are not explicitly identified in the high-level code.
 
-The most prominent limitation is that the assembler can only address 255 words of memory. This is because the assembler only builds up instruction addresses using a single MOVI instruction, which is limited to an 8-bit immediate. This is easily fixable as the assembler could insert additional instructions to build up 16-bit addresses to use. For example, to build a 16-bit address, \textit{0xFECA}, the following instructions could be used:
+The most prominent limitation is that the assembler can only address 256 words of memory. This is because the assembler only builds up instruction addresses using a single MOVI instruction, which is limited to an 8-bit immediate. This is easily fixable as the assembler could insert additional instructions to build up 16-bit addresses to use. For example, to build a 16-bit address, \textit{0xFECA}, the following instructions could be used (move \verb|0xFE| into \verb|Ax| and shift left 8-bits, then \verb|OR| it with \verb|0xCA| to make \verb|0xFECA|):
 %TC:ignore
 \begin{minted}{asm}
 MOVI  $0xFE,   %Ax
@@ -1296,7 +1317,7 @@ Verifying the output assembly is a bit more involved as there are multiple layer
 \end{itemize}
 
 \subsection*{Unit Testing}
-For (A), a code generation routine refers to the code generation function used to produce machine code for a specific structure, for example a function or assignment expression. When machine code instructions are emitted from the code generation routines, they are pushed to a list of \mintinline{c}{struct prco_op_struct} containing information about the emitted instruction. Using this information, the final output machine code word (e.g. \mintinline{c}{0x2020}) is rebuilt into an equivalent \mintinline{c}{struct prco_op_struct} structure and compared against the original. If they are the same, the encoded machine code word is considered correct. This check happens every time an instruction is emitted from the code generation routines.
+For (A) and (B), a code generation routine refers to the code generation function used to produce machine code for a specific structure, for example a function or assignment expression. When machine code instructions are emitted from the code generation routines, they are pushed to a list of \mintinline{c}{struct prco_op_struct} containing information about the emitted instruction. Using this information, the final output machine code word (e.g. \mintinline{c}{0x2020}) is rebuilt into an equivalent \mintinline{c}{struct prco_op_struct} structure and compared against the original. If they are the same, the encoded machine code word is considered correct. This check happens every time an instruction is emitted from the code generation routines.
 
 \subsection*{Real Hardware Tests}
 The \textit{best} approach to verifying output machine code is to run it directly on the \scname{} processor. However, this requires rebuilding the FPGA design with the new program code which is time consuming and not always practical. In addition, viewing of internal registers and signals is much more difficult due to the lack of a debugging interface on the processor.
@@ -1304,10 +1325,12 @@ The \textit{best} approach to verifying output machine code is to run it directl
 \subsection*{Emulation}
 During the later stages of the project, it was decided to build a software emulator for the \scname{} processor. The emulator, found at \verb|prco_compiler/emu/emu.c|, would utilise structures used in the compiler's assembling stage to rebuild instructions and their contents from raw machine code words. Due to the late development of the emulator, and it not being a deliverable, and only developed as an alternate means to test the processor, the emulator is not a full emulation of the processor. The emulator implements most features of the processor, including registers, memory, ALU operations, and most instructions. It is capable of emulating all the test programs (found in \verb|proc_compiler/tests/*.prco|).
 
-If extra time was allowed, the emulator could be integrated with the unit tests. This would allow for the dynamic compilation of high-level code test programs and analysing their behaviour during emulation against expected values. This would greatly speed up compiler code generation development times.
+With the introduction of the emulator, the process of deploying high-level code changed from: write, compile, deploy, verify, repeat; to write, compile, emulate, verify, repeat, deploy. By reducing the number of deploys, time taken to successfully write working code was drastically improved.
+
+Late in the project, the ability of integrating the emulator into unit tests for the compiler was completed. This allowed for fast and more complete verification of the compiler that could be ran on every new code change.
 
 \subsection*{Continuous Integration}
-The \scname{} compiler employs continuous integration testing to show if a code commit breaks certain functionality. The continuous integration system service used is Travis CI \todo{fix}\citep{travisci}. Every time a commit is made to the repository, Travis CI pulls the commit and runs the \verb|test/travis-ci.sh| script. This script runs the compiler and emulator on each \verb|test/*.prco| file and checks the return code. If the return code does not match the expected functionality, the test fails and the developer can investigate further by enabling more debug prints with the \verb|-D| parameter.
+The \scname{} compiler employs continuous integration testing to show if a code commit breaks certain functionality. The continuous integration system service used is Travis CI \todo{fix}\citep{travisci}. Every time a commit is made to the repository, Travis CI pulls the commit and runs the \verb|test/travis-ci.sh| script. This script runs the compiler and emulator on each \verb|test/*.prco| file and checks the return code. If the return code does not match the expected functionality, the test fails and the developer can investigate further by enabling more debug prints with the \verb|-D| parameter. These tests will generate a report detailing passed and failed tests with their actual and expected outputs. This method accomplishes verification requirement (C).
 
 An example output of the continuous integration test runner is located in section \ref{appendix:travisci} {\nameref{appendix:travisci}}.
 
@@ -1420,7 +1443,7 @@ I believe these technologies and their implementation details should be shared a
 \section{Appendix A. User Guides}
 \subsection{\scname{} Core Reference Guide}
 \subsubsection*{Instantiating the core in your FPGA design}
-The \scname{} processor core can be instantiated in your FPGA design with the following code snippet:
+The \scname{} processor core can be instantiated in an FPGA design with the following code snippet:
 \begin{minted}{verilog}
 // Instantiate a processor core
 prco_core inst_core (
@@ -1493,9 +1516,10 @@ cmake --build . --target install
 
 \item [Description]
 \verb|-i| Input machine code file. 1 instruction word per line. CRLF/LF accepted.
-\end{description}
 
 \verb|-D{bits}| Select debug printing level. Example of use: \verb|-D0xFF| to enable all debug bits. 
+\end{description}
+
 
 \subsection*{Example Output}
 \inputminted{text}{emu_output.tex}
