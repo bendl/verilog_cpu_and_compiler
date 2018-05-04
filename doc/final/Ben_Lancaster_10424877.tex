@@ -278,7 +278,9 @@ PRCO304 - Final Stage Computing Project
 
 \newpage
 \chapter*{Acknowledgements}
-\todo{todo}
+I would like to thank my project supervisors Nigel Barlow and Serge Thill for their support and guidance throughout this project. 
+\\\\
+I would also like to thank James Spalding (Spirent Communications) and firmware team for their encouragement, ideas, and industrial sponsorship supporting this final project.
 
 \newpage
 \chapter*{Abstract}
@@ -763,7 +765,10 @@ The \scname{} processor's ISA has been through multiple iterations.
 \todo{more}
 
 \subsubsection*{Opcode Bits} 
-Initially, the opcode length was 4-bits allowing a total of 16 unique opcodes. This was later changed to 5-bits to add more opcodes, however
+Initially, the opcode length was 4-bits allowing a total of 16 unique opcodes. This was later changed to 5-bits to add more opcodes at the cost of addressing fewer registers and having smaller immediate values.
+
+\subsubsection*{Multiplication and Division}
+Due to time constraints, multiplication or division instructions are not implemented within the \scname{} processor. The equivalent functionality and more can still be achieved using the currently available instructions. The test file \verb|prco_compiler/test/tests/mul_1.prco| and \verb|prco_compiler/test/tests/div_1.prco| contain example unsigned integer multiply and divide functions.
 
 \subsubsection*{SETC Instruction}
 \todo[inline]{This is a design consideration. Where to put design changes? here?}
@@ -772,6 +777,7 @@ The \verb|SETC| instruction was added to reduce the number of instruction requir
 The \verb|SETC| instruction is inspired by the x86 instruction: \verb|SETcc| Set Byte on Condition \citep{isa_x86}.
 
 With the introduction of the \verb|SETC| instruction late in development, the number of instructions could be reduced to around two instruction. (one for the initial comparison, and one for setting 1 or 0 with \verb|SETC|). This greatly improved program execution time and size.
+
 
 \section{Pipeline Architecture}
 The \scname{} processor employs a \textit{feed-forward} pipeline strategy. 
@@ -1330,16 +1336,18 @@ For (A) and (B), a code generation routine refers to the code generation functio
 The \textit{best} approach to verifying output machine code is to run it directly on the \scname{} processor. However, this requires rebuilding the FPGA design with the new program code which is time consuming and not always practical. In addition, viewing of internal registers and signals is much more difficult due to the lack of a debugging interface on the processor.
  
 \subsection*{Emulation}
-During the later stages of the project, it was decided to build a software emulator for the \scname{} processor. The emulator, found at \verb|prco_compiler/emu/emu.c|, would utilise structures used in the compiler's assembling stage to rebuild instructions and their contents from raw machine code words. Due to the late development of the emulator, and it not being a deliverable, and only developed as an alternate means to test the processor, the emulator is not a full emulation of the processor. The emulator implements most features of the processor, including registers, memory, ALU operations, and most instructions. It is capable of emulating all the test programs (found in \verb|proc_compiler/tests/*.prco|).
+During the later stages of the project, it was decided to build a software emulator for the \scname{} processor. The emulator, found at \verb|prco_compiler/emu/emu.c|, would utilise structures used in the compiler's assembling stage to rebuild instructions and their contents from raw machine code words. The emulator aims to replicate the structure and design of the embedded processor: on-chip memory, registers, complex ALU operations such as CMP, JMP, and SETC, and UART.
 
-With the introduction of the emulator, the process of deploying high-level code changed from: write, compile, deploy, verify, repeat; to write, compile, emulate, verify, repeat, deploy. By reducing the number of deploys, time taken to successfully write working code was drastically improved.
+Due to the late development of the emulator, and it not being a deliverable, and only developed as an alternate means to test the processor, the emulator is not a full emulation of the processor. The emulator implements most features of the processor, including registers, memory, ALU operations, and most instructions. It is capable of emulating all the test programs (found in \verb|proc_compiler/tests/*.prco|).
 
-Late in the project, the ability of integrating the emulator into unit tests for the compiler was completed. This allowed for fast and more complete verification of the compiler that could be ran on every new code change.
+With the introduction of the emulator, the process of deploying high-level code changed from: \textbf{write, compile, deploy, verify, repeat}; to \textbf{write, compile, emulate, verify, repeat, deploy, verify}. By reducing the number of deploys, time taken to successfully write working code was drastically improved.
+
+Late in the project, the ability of integrating the emulator into unit tests for the compiler was completed. This allowed for fast and more complete verification of the compiler that could run multiple programs on every code change.
 
 \subsection*{Continuous Integration}
 The \scname{} compiler employs continuous integration testing to show if a code commit breaks certain functionality. The continuous integration system service used is Travis CI \todo{fix}\citep{travisci}. Every time a commit is made to the repository, Travis CI pulls the commit and runs the \verb|test/travis-ci.sh| script. This script runs the compiler and emulator on each \verb|test/*.prco| file and checks the return code. If the return code does not match the expected functionality, the test fails and the developer can investigate further by enabling more debug prints with the \verb|-D| parameter. These tests will generate a report detailing passed and failed tests with their actual and expected outputs. This method accomplishes verification requirement (C).
 
-An example output of the continuous integration test runner is located in section \ref{appendix:travisci} {\nameref{appendix:travisci}}.
+An example output of the continuous integration test runner is located in section \ref{appendix:travisci} {\nameref{appendix:travisci}}. The continuous integration results can be viewed here: \url{https://travis-ci.com/bendl/prco304/}.
 
 \newpage
 \section{Sub-project Review}
@@ -1406,6 +1414,8 @@ Assembler memory layout & Yes & 2.10 & First instructions (low memory) jump into
 \todo[inline]{more}
 
 \subsection{Project Objectives}
+\todo[inline]{Compare against top-level project objectives}
+\todo[inline]{compiler and processor objectives already reviewed in their own chapters}
 \subsection{Development Process}
 \subsection{Personal Contributions}
 
@@ -1554,6 +1564,8 @@ cmake --build . --target install
 
 \newpage
 \section{Appendix C. Other Documents}
+\todo[inline]{Need more project management drawings (requirements, time plans, stages, plans, etc.}
+
 \subsection{Compiler Functional Requirements}
 \label{sect:compiler_func_req}
 
