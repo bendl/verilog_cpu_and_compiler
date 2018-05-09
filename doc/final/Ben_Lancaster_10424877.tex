@@ -15,7 +15,13 @@
 \usepackage{amssymb}
 
 %https://www.overleaf.com/help/41-can-i-add-inline-or-margin-comments-to-the-pdf
+\usepackage{xargs} % Use more than one optional parameter in a new comma
 \usepackage[colorinlistoftodos,prependcaption,textsize=small]{todonotes}
+\newcommandx{\unsure}[2][1=]{\todo[linecolor=red,backgroundcolor=red!25,bordercolor=red,#1]{#2}}
+\newcommandx{\change}[2][1=]{\todo[linecolor=blue,backgroundcolor=blue!25,bordercolor=blue,#1]{#2}}
+\newcommandx{\info}[2][1=]{\todo[linecolor=green,backgroundcolor=green!25,bordercolor=green,#1]{#2}}
+\newcommandx{\improvement}[2][1=]{\todo[linecolor=purple,backgroundcolor=purple!25,bordercolor=purple,#1]{#2}}
+\newcommandx{\thiswillnotshow}[2][1=]{\todo[disable,#1]{#2}}
 
 
 %https://tex.stackexchange.com/questions/3001/list-sections-of-chapter-at-beginning-of-that-chapter
@@ -80,7 +86,7 @@
 
 %% Report variables
 \newcommand{\scname}{PRCO304}
-\newcommand{\dlatestv}{2.80}
+\newcommand{\dlatestv}{3.10}
 
 \definecolor{babyblueeyes}{rgb}{0.63, 0.79, 0.95}
 \definecolor{ballblue}{rgb}{0.13, 0.67, 0.8}
@@ -281,6 +287,9 @@ PRCO304 - Final Stage Computing Project
 I would like to thank my project supervisors Nigel Barlow and Serge Thill for their support and guidance throughout this project. 
 \\\\
 I would also like to thank James Spalding (Spirent Communications) and firmware team for their encouragement, ideas, and industrial sponsorship supporting this final project.
+\\\\
+I would also like to thank my parents who still have no idea what this project is about.
+%I also thank my parents, who still have no idea what this project is about, for their suggestions and encouragement.
 
 \newpage
 \chapter*{Abstract}
@@ -294,7 +303,7 @@ The embedded processor design targets smaller FPGA devices with fewer logic cell
 This report outlines the design decisions of the new embedded processor's instruction set architecture, register sets, and compiler. In addition, a high-level programming language is introduced that can be compiled into executable code for the embedded processor. Implementation details of the embedded processor and compiler is described, including pipelining, memory-management, code-generation, and optimisations. Performance measurements of core and compiler are performed showing a speed of 10 DMIPS (Dhrystone million instructions per second) at 50 MHz with 0.2 IPC (instructions per clock).
 \\\\
 Employed project management work-flows are described with their considerations and affect on the project. 
-\todo{more}
+\improvement{more}
 \\\\
 A project post-mortem is performed to reflect on the achievements of the project with respect to the initial project objectives and to discuss further improvements to the project management, design, implementation, and verification, of the project.
 
@@ -317,11 +326,11 @@ Number of floats/tables/figures: 28
 Number of math inlines: 0
 Number of math displayed: 0
 \end{minted}
-\todo{To much info, just give word in text.}
+\change{To much info, just give word in text.}
 
 \subsection*{Sources}
 \begin{description}[style=nextline]
-\item[GitHub (with git repository metadata)]{\todo{How early can I make this repository public?}\url{https://github.com/bendl/prco304}}
+\item[GitHub (with git repository metadata)]{\info{How early can I make this repository public?}\url{https://github.com/bendl/prco304}}
 \item[OneDrive (raw files)]{\url{https://liveplymouthac-my.sharepoint.com/:f:/g/personal/ben_lancaster_students_plymouth_ac_uk/EmzpOaOZhyZIvDhGLSUQC8oBbRX5iO6Ujwe81TUa1VlV-A?e=Ndd677}}
 \end{description}
 
@@ -386,9 +395,26 @@ There exists many commercial and open-source embedded processors, each providing
 
 Popular embedded processors include:
 \begin{itemize}
-\item{\textit{Xilinx MicroBlaze.}}
+\item{\textit{Xilinx MicroBlaze.} MicroBlaze features a 32-bit big-endian RISC architecture targeting FPGA devices. 
+\\\\
+The processor features a 
+\\\\
+The processor can included in FPGA designs using a graphical configuration tool, the MicroBlaze Configuration Wizard. This allows the designer to customise the features and implementation of the processor in their design. Designers can choose to integrate: commercial interface features, such as PCI Express interfaces; additional functionality, such as memory management units and floating point units; and performance features, such as instruction caching, and hardware multipliers/dividers.
+
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.5]{mcw2}
+\caption{The MicroBlaze Configuration Wizard, showing options for clock frequency, memory sizes, UART, GPIO, interrupts, and more. Source: \url{https://embeddedmicro.com/blogs/tutorials/embedded-processors}}
+\end{figure}
+
+}
+
+
+
 \item{\textit{ARM Cortex SoC.}}
-\end{itemize}\todo{Reference and needs more}
+
+\item{\textit{Xilinx PicoBlaze. }}
+\end{itemize}\improvement{Reference and needs more}
 
 \newpage
 
@@ -408,7 +434,7 @@ These core (C) deliverables are the base requirement for the project to be relea
 \item{To provide a high-level context-free code compiler to run user-code on the processor.}
 \end{enumerate}
 
-\todo[inline]{These are slightly different to the PID, is this OK?}
+\unsure{These are slightly different to the PID, is this OK?}
 
 \subsection{Extended Deliverables}
 These extended (E) deliverables may not be achievable in the time frame specific in section \ref{sect:proj_time} as they may require extra time to design and implement, require more experience or skill, or require resources currently unattainable.
@@ -433,7 +459,7 @@ The \scname{} processor will be able to read and write to all data passing throu
 \subsection{Fit for Purpose}
 The \scname{} processor is \textbf{not} designed to run general purpose operating systems, such as Linux or embedded RTOS systems. All memory devices attached to the FPGA are fully accessible to the processor core and instructions/programs running through it, meaning that operating systems or secure applications storing private and sensitive information is not protected by modern processor features such as privilege modes and virtual memory sections. The processor lacks common components required to run modern operating systems, such as a memory management unit (MMU) and privilege modes, and so \textbf{should not be run on the processor}.
 
-The \scname{} processor is \textbf{not} designed to run in high-reliability or safety-critical environments that require established safety standards, such as the UK Defence Standard 00-56 \citep{defstan_0056_2} and IEC 61508 \citep{iec61508}.\todo{Cite actual standards documents, not papers describing them.}
+The \scname{} processor is \textbf{not} designed to run in high-reliability or safety-critical environments that require established safety standards, such as the UK Defence Standard 00-56 \citep{defstan_0056_2} and IEC 61508 \citep{iec61508}.\improvement{Cite actual standards documents, not papers describing them.}
 
 The \scname{} processor is \textbf{not} designed for implementation in silicon and makes no guarantees of reliability or performance in this format.
 \newline\newline
@@ -462,15 +488,15 @@ The code generated by the compiler is \textbf{not guaranteed} to:
 
 \section{Time Management}
 \label{sect:proj_time}
-\todo[inline]{Show gantt chart}
+\improvement[inline]{Show gantt chart}
 
 \section{Method of Approach}
 Development of the \textbf{core} and \textbf{compiler} will be done in separate stages of the project (see section \ref{sect:proj_time}). The two deliverables will be split into 2 sub-projects. Both sub-projects will employ the \textbf{Agile development process}, using Agile's sprints to split up tasks into sub-tasks and Agile's scrums to discuss progress, features, and changes. This technique allows revisiting of tasks to tweak and iterate over their implementation which will be key when for incrementally adding features to both sub-projects, for example, adding to the core's ALU module to add conditional branching, or adding new instructions to the core's decoder module.
 
-\todo[inline]{Show github kanban board}
+\improvement[inline]{Show github kanban board}
 
 \section{Requirements}
-\todo[inline]{?}
+\improvement[inline]{?}
 
 \section{Resources and Dependencies}
 For the first half of the development cycle, the core can be developed and verified using the Verilog simulator and test suite, \textbf{Verilator}, and VHDL and Verilog simulator, \textbf{iSim}.
