@@ -32,7 +32,8 @@
 \usepackage{hyperref}
 \hypersetup{
     colorlinks,
-    citecolor=gray,
+    %citecolor=gray,
+    citecolor=blue,
     filecolor=black,
     linkcolor=blue,
     urlcolor=blue,
@@ -46,9 +47,11 @@
 \usepackage{lipsum}% http://ctan.org/pkg/lipsum
 
 %% Bibliography/references packages
-\usepackage[comma]{natbib}
+%\usepackage[comma]{natbib}
+\usepackage[square,sort,comma,numbers]{natbib}
 %\bibliographystyle{agsm}
-\bibliographystyle{dcu}
+%\bibliographystyle{dcu}
+\bibliographystyle{unsrt}
 
 % CODE
 %\usepackage{listings}
@@ -317,16 +320,7 @@ A project post-mortem is performed to reflect on the achievements of the project
 \newpage
  
 \subsection*{Word Count}
-\begin{minted}{text}
-Words in text: 6386
-Words in headers: 247
-Words outside text (captions, etc.): 261
-Number of headers: 106
-Number of floats/tables/figures: 28
-Number of math inlines: 0
-Number of math displayed: 0
-\end{minted}
-\change{To much info, just give word in text.}
+Words count: 6984
 
 \subsection*{Sources}
 \begin{description}[style=nextline]
@@ -365,7 +359,7 @@ This report discusses the design, implementation, and verification, of an FPGA-b
 \begin{center}
 \includegraphics[scale=0.4]{fpga}
 \end{center}
-\caption{Xilinx Spartan-II FPGA layout \citep{spartan2}.}
+\caption{Xilinx Spartan-II FPGA layout \cite{spartan2}.}
 \label{fig:}
 %\end{wrapfigure}
 \end{figure}
@@ -390,16 +384,16 @@ for FPGA-based product designers wishing to employ an embedded processor solutio
 %\lipsum[0-1]
 
 \section{Background}
-\subsection{Current Implementations}
+\subsection{Current Implementations}\label{current_impl}
 There exists many commercial and open-source embedded processors, each providing different features and specialities such as digital signal processing, analogue components, instruction set architectures, and interfaces.
 
 Popular embedded processors include:
 \begin{itemize}
-\item{\textit{Xilinx MicroBlaze.} MicroBlaze features a 32-bit big-endian RISC architecture targeting FPGA devices. 
+\item{\textit{Xilinx MicroBlaze \cite{microblaze}.} MicroBlaze features a 32-bit big-endian RISC architecture targeting FPGA devices. 
 
 The processor's instruction set contains over 100 instructions, covering traditional RISC operations such as arithmetic (ADD), comparison (CMP), floating point operations (FADD), bitwise (XOR), memory operations (LW, SW). Interestingly, the processor allows full control of the program counter, and provides multiple instructions for controlling it.
 
-MicroBlaze features 32 32-bit general purpose registers similar to other RISC architectures (ARM Thumb2 with 31 32-bit general purpose registers). The high register count allows for storing of more values over the lifetime of programs, increasing performance by reducing timely memory operations.
+MicroBlaze features 32 32-bit general purpose registers similar to other RISC architectures (ARMv8-A) with 32 32-bit general purpose registers). The high register count allows for storing of more values over the lifetime of programs, increasing performance by reducing timely memory operations.
 
 The processor can included in FPGA designs using a graphical configuration tool, the MicroBlaze Configuration Wizard. This allows the designer to customise the features and implementation of the processor in their design. Designers can choose to integrate: commercial interface features, such as PCI Express interfaces; additional functionality, such as memory management units and floating point units; and performance features, such as instruction caching, and hardware multipliers/dividers.
 
@@ -412,10 +406,15 @@ The processor can included in FPGA designs using a graphical configuration tool,
 
 
 
-\item{\textit{ARM Cortex SoC.}}
+\item{\textit{ARM Cortex-A9 MPCore \cite{cortexa9}.} The Cortex-A9 implements ARM's 32-bit Thumb-2 RISC instruction set. This architecture supports 15 32-bit registers, half of what MicroBlaze supports.
 
-\item{\textit{Xilinx PicoBlaze. }}
+In addition to FPGA-based implementation, the Cortex-A9 is also designed for silicon based SoC designs. The processor is implemented in many commercial SoC products such as \todo{cite}Broadcom's BCM11311, \todo{cite}STMicroelectronics' SPEAr1310, and Apple's A5 mobile chip. }
+
+\item{\textit{Xilinx PicoBlaze \cite{picoblaze}.} }
 \end{itemize}\improvement{Reference and needs more}
+
+\subsection{Current Compiler Toolchains}
+
 
 \newpage
 
@@ -460,7 +459,7 @@ The \scname{} processor will be able to read and write to all data passing throu
 \subsection{Fit for Purpose}
 The \scname{} processor is \textbf{not} designed to run general purpose operating systems, such as Linux or embedded RTOS systems. All memory devices attached to the FPGA are fully accessible to the processor core and instructions/programs running through it, meaning that operating systems or secure applications storing private and sensitive information is not protected by modern processor features such as privilege modes and virtual memory sections. The processor lacks common components required to run modern operating systems, such as a memory management unit (MMU) and privilege modes, and so \textbf{should not be run on the processor}.
 
-The \scname{} processor is \textbf{not} designed to run in high-reliability or safety-critical environments that require established safety standards, such as the UK Defence Standard 00-56 \citep{defstan_0056_2} and IEC 61508 \citep{iec61508}.\improvement{Cite actual standards documents, not papers describing them.}
+The \scname{} processor is \textbf{not} designed to run in high-reliability or safety-critical environments that require established safety standards, such as the UK Defence Standard 00-56 \cite{defstan_0056_2} and IEC 61508 \cite{iec61508}.\improvement{Cite actual standards documents, not papers describing them.}
 
 The \scname{} processor is \textbf{not} designed for implementation in silicon and makes no guarantees of reliability or performance in this format.
 \newline\newline
@@ -506,7 +505,7 @@ The second half of development will require deploying and debugging on real hard
 \\\\
 The following FPGA development kits are suitable for this project:
 \begin{enumerate}
-\item{MiniSpartan6+ - Scarab Hardware - £79 (already owned) \citep{scarabhardware}. The MiniSpartan6+ features a Spartan-6 XC6SLX9 FPGA, 8 LEDs, 2 digital and analogue headers, FT2232 FTDI USB to JTAG, 64Mb SPI flash memory, 32MB SDRAM, an audio output jack, and a MicroSD socket.
+\item{MiniSpartan6+ - Scarab Hardware - £79 (already owned) \cite{scarabhardware}. The MiniSpartan6+ features a Spartan-6 XC6SLX9 FPGA, 8 LEDs, 2 digital and analogue headers, FT2232 FTDI USB to JTAG, 64Mb SPI flash memory, 32MB SDRAM, an audio output jack, and a MicroSD socket.
 
 \begin{figure}[ht]
 \centering
@@ -516,7 +515,7 @@ The following FPGA development kits are suitable for this project:
 \end{figure}
 }
 
-\item{Arty Artix-7 FPGA Development Board - Digilent - £100 \citep{arty}. The Arty development board features a larger Artix-35T FPGA with over 20x the number of logic cells and block memory compared to the LX9 in the MiniSpartan6+. The board components include 256MB DDR3 RAM, 16MBx4 SPI flash memory, USB-JTAG, 8 LEDs (4 of which are RGB), 4 switches, 4 buttons, and multiple Pmod connectors.
+\item{Arty Artix-7 FPGA Development Board - Digilent - £100 \cite{arty}. The Arty development board features a larger Artix-35T FPGA with over 20x the number of logic cells and block memory compared to the LX9 in the MiniSpartan6+. The board components include 256MB DDR3 RAM, 16MBx4 SPI flash memory, USB-JTAG, 8 LEDs (4 of which are RGB), 4 switches, 4 buttons, and multiple Pmod connectors.
 \\\\
 The greater number of IO options and larger FPGA make the Arty board better suited to emulating real customer products.
 
@@ -590,32 +589,59 @@ The processor core is not designed for physical implementation in silicon but ra
 
 \newpage
 \section{Project Management}
+Using research gathered from existing embedded processor designs (see section \ref{current_impl}), and consideration of constraints such as time and resources (see section \ref{sect:proj_time}), the following core and extended deliverables have been decided:
 
 \subsection{Core Deliverables}
 The following Core Processor Deliverables (CPD) are deliverables that must be implemented for the processor to be deemed functional.
 
 \begin{enumerate}[label=\bfseries CPD\arabic*.]
 \item{Support a wide range of executable programs.}
-\item{Provide a 16-bit instruction set capable of supporting simple programs.}
-\item{Support simple arithmetic and bitwise operations.}
-\item{Operate on 16-bit data sizes.}
+\item{Provide a 16-bit instruction set capable of supporting simple programs (recursion, memory reading, strings (arrays), function calling).}
+\item{Support simple arithmetic and bitwise operations (ADD, SUB, OR, XOR, etc.).}
+\item{Operate on 16-bit data sizes (16-bit register and instruction sizes).}
 \item{Fully synthesize-able on FPGA hardware.}
-\item{Implement a simple scalar pipeline architecture.}
+\item{Implement a simple pipeline architecture.}
 \end{enumerate}
 
 \subsection{Extended Deliverables}
 The following Extended Processor Deliverables (EPD) are deliverables that must be implemented for the processor to be deemed functional.
 \begin{enumerate}[label=\bfseries EPD\arabic*.]
-\item{Provide multiplication, division, modulus, instructions.}
+\item{Provide hardware-based multiplication, division, modulus, instructions.}
 \item{Provide SIMD style instructions for faster vector manipulation.}
 \item{Provide in/out GPIO and UART modules for external communication.}
 \item{Provide an interrupt system allowing asynchronous events to be handled.}
-\item{Implement a super-scalar pipeline architecture.}
+\item{Implement a super-scalar pipeline architecture (execute more than 1 instruction per clock).}
 \end{enumerate}
 
 \todo[inline]{Justify and explain sources of these deliverables - existing processors provide these etc.}
-\subsection{Project Stage }
-This is a test.
+\subsection{Project Stages}
+The design, implementation, and verification of the processor design consist of the following project stages:
+
+\begin{description}[style=nextline]
+\item [Stage 1.2: Processor specification, architecture, ISA]
+As discussed in section \ref{current_impl}, existing embedded processors have been researched and compared in order to determine a suitable and realistic specification for the processor  design.
+
+This stage determines 
+
+\item [Stage 2.0: Core dev. Register set implementation]
+Foo bar.
+
+\item [Stage 2.1: Core dev. Decoder implementation]
+Foo bar.
+
+\item [Stage 2.2: Core dev. ALU, RAM implementation]
+Foo bar.
+
+\item [Stage 2.3: Core dev. GPIO, Comms implementation]
+Foo bar.
+
+\item [Stage 2.4: Core verification]
+Foo bar.
+
+
+\end{description}
+
+
 \todo{Describe the stages related to the processor design and how/why chosen.}
 
 \newpage
@@ -801,7 +827,7 @@ Due to time constraints, multiplication or division instructions are not impleme
 \todo[inline]{This is a design consideration. Where to put design changes? here?}
 The \verb|SETC| instruction was added to reduce the number of instruction required to perform boolean logic operations on registers. Without the \verb|SETC| instruction, to evaluate the expression \mintinline{c}{1 < 5}, the compiler would need to emit multiple JMP instructions to set the result to 0 or 1 and JMP over the other result. In my testing, the compiler would require between 5-8 instruction for each boolean expression. 
 
-The \verb|SETC| instruction is inspired by the x86 instruction: \verb|SETcc| Set Byte on Condition \citep{isa_x86}.
+The \verb|SETC| instruction is inspired by the x86 instruction: \verb|SETcc| Set Byte on Condition \cite{isa_x86}.
 
 With the introduction of the \verb|SETC| instruction late in development, the number of instructions could be reduced to around two instruction. (one for the initial comparison, and one for setting 1 or 0 with \verb|SETC|). This greatly improved program execution time and size.
 
@@ -901,7 +927,7 @@ The most used instructions, MOVI, MOV, ADD, ADDI, JMP, and CMP, take around 5 cl
 \\\\
 Comparing this against Xilinx's MicroBlaze embedded processor which features 1.3 DMIPS/MHz (65 DMIPS/50 MHz) shows the performance benefits of super-scalar processor architectures. 
 
-The \scname{} processor is similar to AMD's Am386 (1991) processor with 9 MIPS and 0.225 IPC when run at 40 MHz \todo{Cite actual processor datasheet, not a magazine...}\citep{am386}.
+The \scname{} processor is similar to AMD's Am386 (1991) processor with 9 MIPS and 0.225 IPC when run at 40 MHz \todo{Cite actual processor datasheet, not a magazine...}\cite{am386}.
 
 
 \newpage
@@ -1027,7 +1053,7 @@ It should be noted that the grammar and compiler do not have any terminals for d
 \subsection{Text Parser}
 The compiler implements it's own recursive descent parser for the grammar described in \ref{sect:compiler_grammar}. The parser is able to recognise all context free grammars and therefore would be capable of parsing more complete programming languages such as C and Python. 
 
-The text parser is inspired by Jack Crenshaw's "Let's Build a Compiler" book, \citep{crenshaw1988let}.
+The text parser is inspired by Jack Crenshaw's "Let's Build a Compiler" book, \cite{crenshaw1988let}.
 
 While parser generators already exist, such as Bison and Java's ANTLR, it was decided to implement the parser by hand using recursive descent principles as a matter of learning rather than ease of use. Although parsing a more complex grammar would easily be more achievable using a parser generator, the overhead of generating compliant assembly for that complex grammar would be too time consuming and is hence out of scope (see extended deliverable \ref{sect:deliv:ed:gcc}).
 
@@ -1168,7 +1194,7 @@ fnc main() {
 Variables are then accessed using the \verb|LW| instruction and passing a 5-bit signed immediate constant as seen above.
 
 \subsubsection*{Argument Variables}
-The compiler uses a modified implementation of the \verb|stdcall| calling convention \citep{callconv}. The difference is that arguments are pushed \textit{left to right} instead of \textit{right to left}. This difference is due to limited time constraints and was made worse by the use of a singly-linked list for storing arguments, which made list reversal time consuming. The compiler overcomes this difference by reversing variable offset addresses of the parameters of the function. The affect of this implementation might cause externally compiled programs to be incompatible with programs compiled with this \scname{} compiler. This is easily solvable by reversing the argument list before pushing.
+The compiler uses a modified implementation of the \verb|stdcall| calling convention \cite{callconv}. The difference is that arguments are pushed \textit{left to right} instead of \textit{right to left}. This difference is due to limited time constraints and was made worse by the use of a singly-linked list for storing arguments, which made list reversal time consuming. The compiler overcomes this difference by reversing variable offset addresses of the parameters of the function. The affect of this implementation might cause externally compiled programs to be incompatible with programs compiled with this \scname{} compiler. This is easily solvable by reversing the argument list before pushing.
 
 Figure \ref{fig:compiler_cg_vars_args} below shows the code generation routine used by the compiler to push function call arguments to the stack before jumping to the function.
 
@@ -1191,7 +1217,7 @@ list_for_each(args) {
 
 
 \subsubsection*{String Variables}
-Strings are an extended deliverable for the \scname{} compiler but was added to better demonstrate the capabilities of the compiler and processor. Strings in modern OS executable file formats, such as ELF \citep{elf_standard} and Windows' PE \citep {winpe_standard}, store explicitly declared strings as null-terminated ASCII (ASCIZ) strings in the String Table or \verb|.text| section of the executable file.
+Strings are an extended deliverable for the \scname{} compiler but was added to better demonstrate the capabilities of the compiler and processor. Strings in modern OS executable file formats, such as ELF \cite{elf_standard} and Windows' PE \cite {winpe_standard}, store explicitly declared strings as null-terminated ASCII (ASCIZ) strings in the String Table or \verb|.text| section of the executable file.
 
 The \scname{} processor places strings and global values at the start of low memory. As the processor starts executing instructions at address \verb|0x00|, the compiler must insert a jump instruction to the address of the \verb|main| function.
 
@@ -1372,7 +1398,7 @@ With the introduction of the emulator, the process of deploying high-level code 
 Late in the project, the ability of integrating the emulator into unit tests for the compiler was completed. This allowed for fast and more complete verification of the compiler that could run multiple programs on every code change.
 
 \subsection*{Continuous Integration}
-The \scname{} compiler employs continuous integration testing to show if a code commit breaks certain functionality. The continuous integration system service used is Travis CI \todo{fix}\citep{travisci}. Every time a commit is made to the repository, Travis CI pulls the commit and runs the \verb|test/travis-ci.sh| script. This script runs the compiler and emulator on each \verb|test/*.prco| file and checks the return code. If the return code does not match the expected functionality, the test fails and the developer can investigate further by enabling more debug prints with the \verb|-D| parameter. These tests will generate a report detailing passed and failed tests with their actual and expected outputs. This method accomplishes verification requirement (C).
+The \scname{} compiler employs continuous integration testing to show if a code commit breaks certain functionality. The continuous integration system service used is Travis CI \todo{fix}\cite{travisci}. Every time a commit is made to the repository, Travis CI pulls the commit and runs the \verb|test/travis-ci.sh| script. This script runs the compiler and emulator on each \verb|test/*.prco| file and checks the return code. If the return code does not match the expected functionality, the test fails and the developer can investigate further by enabling more debug prints with the \verb|-D| parameter. These tests will generate a report detailing passed and failed tests with their actual and expected outputs. This method accomplishes verification requirement (C).
 
 An example output of the continuous integration test runner is located in section \ref{appendix:travisci} {\nameref{appendix:travisci}}. The continuous integration results can be viewed here: \url{https://travis-ci.com/bendl/prco304/}.
 
