@@ -369,7 +369,7 @@ A field-programmable gate array (FPGA) is a reprogrammable logic device that ena
 The embedded processor will be designed using the Verilog hardware description language (HDL). A HDL can be thought of as a front-end to a software compiler. Other HDL front-ends exist such as VHDL. The HDL is synthesised into an retargetable intermediate form consisting of nets - a form describing the gates, flip-flops, and their interconnections. After this synthesis takes place, the intermediate net list form is transformed into implementation specific forms. As this processor is designed for FGPA implementation, processes such as "place and route" are utilised to map the net list to physical resources on the FPGA. Different processes are performed for difference implementations, such as for ASICs and CPLDs.
 
 \newpage
-\chapter{Embedded Processors}
+\chapter{Embedded Processors and Compilers}
 {\hypersetup{linkcolor=black}
 \startcontents[chapters]
 \printcontents[chapters]{}{1}{}
@@ -615,22 +615,25 @@ The following Extended Processor Deliverables (EPD) are deliverables that must b
 
 \todo[inline]{Justify and explain sources of these deliverables - existing processors provide these etc.}
 \subsection{Project Stages}
-The design, implementation, and verification of the processor design consist of the following project stages:
+The design, implementation, and verification of the new processor consist of the following project stages. These stages are described in the gantt time chart described in Figure \ref{fig:gantt} along with their time allocations.
 
 \begin{description}[style=nextline]
 \item [Stage 1.2: Processor specification, architecture, ISA]
-As discussed in section \ref{current_impl}, existing embedded processors have been researched and compared in order to determine a suitable and realistic specification for the processor  design.
+As discussed in section \ref{current_impl}, existing embedded processors have been researched and compared in order to determine a suitable and realistic specification for the processor  design. A comparison table is also available in appendix \ref{sect:existing_isa_cmp}.
 
-This stage determines 
+This stage starts the specification of the processor's instruction set architecture, register set, pipeline, and external interfacing. 
 
 \item [Stage 2.0: Core dev. Register set implementation]
-Foo bar.
+This stage covers the implementation of the register set in Verilog, as per the specification. 
+After this stage, the processor will be able to read and write 16-bit values in the dual port register set.
 
 \item [Stage 2.1: Core dev. Decoder implementation]
-Foo bar.
+The instruction decoder is a core part of all processors; they deconstruct incoming instructions and identify operands within the instruction, such as immediate values, opcodes, and register selects.
+
+
 
 \item [Stage 2.2: Core dev. ALU, RAM implementation]
-Foo bar.
+The ALU
 
 \item [Stage 2.3: Core dev. GPIO, Comms implementation]
 Foo bar.
@@ -1511,6 +1514,7 @@ I believe these technologies and their implementation details should be shared a
 }
 
 \section{Appendix X. Existing Embedded Processor Comparison}
+\label{sect:existing_isa_cmp}
 \begin{table}[H]
 \begin{tabularx}{\textwidth}{|l|l|l|l|p{2cm}|X|}
 \hline 
