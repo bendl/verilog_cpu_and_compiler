@@ -90,6 +90,9 @@ fnc_run_test ./tests/bool_le.prco 1
 fnc_run_test ./tests/bool_le_2.prco 0
 fnc_run_test ./tests/bool_le_3.prco 1
 
+fnc_run_test ./tests/opt_cf_1.prco 10
+fnc_run_test ./tests/opt_cf_2.prco 9
+
 echo -e "\n$passed_tests/$num_tests passed."
 
 if [ $passed_tests -eq $num_tests ]; then
