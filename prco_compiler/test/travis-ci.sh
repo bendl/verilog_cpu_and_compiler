@@ -16,7 +16,7 @@ fnc_make() {
 }
 
 fnc_run_cli() {
-    ../lbuild/cli/cli -i $1 -d -D0x0002 -O0
+    ../lbuild/cli/cli -i $1 -d -D0x0002 -O1
 }
 
 fnc_run_emu() {
