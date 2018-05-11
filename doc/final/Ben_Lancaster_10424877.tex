@@ -670,10 +670,10 @@ The \scname{} processor is a modularised processor with independent components f
 \end{figure}
 
 \section{Registers}
-\scname{} has a total of \todo{8 and Rx}6 addressable, read and write, registers. These registers are identified by letters A through H.
+\scname{} has a total of 8 addressable, read and write, registers. These registers are identified by letters A through H.
 
 \subsection{General Purpose Registers}
-Registers \todo{Compiler code calls registers Ax-Hx}A through E are designed for general purpose use and are safe to store user values over the run-time of the processor.
+Registers A through E are designed for general purpose use and are safe to store user values over the run-time of the processor.
 
 \begin{table}[h]
 \def\arraystretch{1.5}%  1 is the default, change whatever you need
@@ -723,9 +723,9 @@ The Status Register is a dedicated register used by the ALU to provide additiona
 	\specialrule{2pt}{-2pt}{0pt}
 	0 & SR\_Z & Set if the result of a CMP instruction is 0.
 	\\ \hline
-	1 & SR\_E & Set if the two operands of a CMP instruction are equal.
+	1 & SR\_S & Set if the result of a CMP instruction is signed (greatest bit is 1).
 	\\ \hline
-	2 & SR\_S & Set if operand B is greater than operand A.
+	2 & SR\_O & Set if the result's 17'bit of a CMP instruction's is set.
 	\\ \hline
     \end{tabularx}
     \caption{Status Register breakdown.}
@@ -748,7 +748,7 @@ The \scname{} processor implements it's own fixed 16-bit instruction set.
 \todo{More}
 
 \subsection{Instruction Types}
-\todo[inline]{Why these types... limitations...}
+It was decided to support the following 3 types of instructions. This allows for a wide range of instruction operands, such as more registers or larger immediate values.
 
 \begin{table}[h]
 \def\arraystretch{1.5}
@@ -762,7 +762,7 @@ Type 1 & 15-11 & 10-8 & 7-5 & 4-0 \\
 \hline 
 Type 2 & 15-11 & 10-8 & \multicolumn{2}{c|}{7-0} \\ 
 \hline 
-Type 3 & 15-11 & \multicolumn{3}{c|}{7-0} \\ 
+Type 3 & 15-11 & \multicolumn{3}{c|}{10-0} \\ 
 \hline 
 \end{tabular}
 \caption{The 3 instruction format types used by the \scname{} processor.}
@@ -811,14 +811,14 @@ Table \ref{tab:isa_jmp_bits} below details each conditional branch parameter and
     & 15-11 & 10-8 & \multicolumn{2}{c|}{7-0} & Semantics & {\nameref{sect:core_regs_sr}} \\
     \specialrule{2pt}{-2pt}{0pt}
     JMP		& 01100 & Rd & \multicolumn{2}{c|}{0000 0000} & Unconditional Jump & Any\\ \hline
-    JE		& 01100 & Rd & \multicolumn{2}{c|}{0000 0001} & Jump Equal & ZF=1\\ \hline
-    JNE		& 01100 & Rd & \multicolumn{2}{c|}{0000 0010} & Jump Not Equal & ZF=0\\ \hline
-    JG	& 01100 & Rd & \multicolumn{2}{c|}{0000 0011} & Jump Greater Than & ZF=0 and SF=OF\\ \hline
-    JGE		& 01100 & Rd & \multicolumn{2}{c|}{0000 0100} & Jump Greater Than or Equal & SF=OF\\ \hline
-    JL		& 01100 & Rd & \multicolumn{2}{c|}{0000 0101} & Jump Less Than & SF$<>$OF\\ \hline
-    JLE		& 01100 & Rd & \multicolumn{2}{c|}{0000 0110} & Jump Less Than or Equal & ZF=1 or SF$<>$OF\\ \hline
-    JS		& 01100 & Rd & \multicolumn{2}{c|}{0000 0111} & Jump Signed & SF=1\\ \hline
-    JNS		& 01100 & Rd & \multicolumn{2}{c|}{0000 1000} & Jump Not Signed & SF=0 \\ \hline
+    JE		& 01100 & Rd & \multicolumn{2}{c|}{0000 0001} & Jump Equal & SR\_Z=1\\ \hline
+    JNE		& 01100 & Rd & \multicolumn{2}{c|}{0000 0010} & Jump Not Equal & SR\_Z=0\\ \hline
+    JG	& 01100 & Rd & \multicolumn{2}{c|}{0000 0011} & Jump Greater Than & SR\_Z=0 and SR\_S = SR\_O\\ \hline
+    JGE		& 01100 & Rd & \multicolumn{2}{c|}{0000 0100} & Jump Greater Than or Equal & SR\_S = SR\_O\\ \hline
+    JL		& 01100 & Rd & \multicolumn{2}{c|}{0000 0101} & Jump Less Than & SR\_S$<>$SR\_O\\ \hline
+    JLE		& 01100 & Rd & \multicolumn{2}{c|}{0000 0110} & Jump Less Than or Equal & SR\_Z=1 or SR\_S$<>$SR\_O\\ \hline
+    JS		& 01100 & Rd & \multicolumn{2}{c|}{0000 0111} & Jump Signed & SR\_S=1\\ \hline
+    JNS		& 01100 & Rd & \multicolumn{2}{c|}{0000 1000} & Jump Not Signed & SR\_S=0 \\ \hline
     \end{tabularx}
     \caption{Conditional jump immediate bits}
     \label{tab:isa_jmp_bits}
