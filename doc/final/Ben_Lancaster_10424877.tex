@@ -323,7 +323,7 @@ A project post-mortem is performed to reflect on the achievements of the project
 \newpage
  
 \subsection*{Word Count}
-Words count: 6984
+Words count: 7740
 
 \subsection*{Sources}
 \begin{description}[style=nextline]
@@ -410,7 +410,7 @@ The processor can included in FPGA designs using a graphical configuration tool,
 
 
 
-\item{\textit{ARM Cortex-A9 MPCore \cite{cortexa9}.} The Cortex-A9 implements ARM's 32-bit Thumb-2 RISC instruction set. This architecture supports 15 32-bit registers, half of what MicroBlaze supports.
+\item{\textit{ARM Cortex-A9 MPCore} \cite{cortexa9}. The Cortex-A9 implements ARM's 32-bit Thumb-2 RISC instruction set. This architecture supports 15 32-bit registers, half of what MicroBlaze supports.
 
 In addition to FPGA-based implementation, the Cortex-A9 is also designed for silicon based SoC designs. The processor is implemented in many commercial SoC products such as \todo{cite}Broadcom's BCM11311, \todo{cite}STMicroelectronics' SPEAr1310, and Apple's A5 mobile chip. }
 
@@ -418,12 +418,29 @@ In addition to FPGA-based implementation, the Cortex-A9 is also designed for sil
 
 An important characteristic of the PicoBlaze embedded processor is that it only requires a minimum of 26 FPGA slices, meaning that implementation on a Spartan-6 (XC6SLX9) FPGA that has 1430 slices, where each consists of 4-LUTs and 8 Flip Flops  \cite{spartan6}, results in only 1.8\% of the resources being used, allowing for more complex logic to be bundled alongside the processor. This low resource requirement is a key characteristic that designers use when considering embedded processors and will be considered in the design of the new embedded processor.
 }
-
-
-\end{itemize}\improvement{Reference and needs more}
+\end{itemize}
 
 \subsection{Current Compiler Toolchains}
+To run functional and complex programs on the processor, a high-level code compiler will be required. This compiler must be able to take a high-level grammar as input and output an executable that the new processor can run. Only open-source compilers will be considered due to having better documentation and source code, which reduces risk in the project. The source code will need to be open and modifiable as this project requires a backend to be implemented.
 
+\begin{itemize}
+\item{\textit{LLVM} \cite{llvm}. LLVM is a set of reusable compiler technologies that allows developers to build frontends, backends, and optimisers, for different projects. LLVM uses a text-based intermediate representation (IR). This IR is relocatable, allowing front-ends of multiple input grammars to be compiled to it, and back-ends to accept it to generate implementation specific code. 
+
+LLVM, while a large project and still actively developed and used by many programming languages, such as Clang, Haskell, and Swift, suffers from poor and outdated documentation. This will be a large risk factor if chosen for this project as additional time will be required for learning it.
+}
+
+
+\item{\textit{8cc} \cite{8ccgithub}. 8cc is a small, open-source, C compiler built by Rui Ueyama.
+
+The compiler is the simplest of the above mentioned compilers as it was only developed in 40 days \cite{8cc}. Although not fully implementing a standards compliant language,  the compiler is still functional and has the ability to compile itself (self-hosting) which is a great achievement.
+
+The compiler does not assemble an executable file, but rather outputs x86\_64 AT\&T syntax assembly language. This is then assembled by a third-party assembler such as GCC's \textit{as} tool.
+
+The project's source code is "written to be as concise and easy-to-read as possible" \cite{8cc} and this is indeed true looking at the contents. Although little documentation is available, the code generation functions of importance to this project in \textit{gen.c}, can be easily modified to emit our new instruction set architecture machine code.
+
+Utilising this compiler will allow this processor to run more complex and functional programs. The disadvantage lies in the complexity of the C programming language, in that it requires many code generation routines for different variations of each program. To even compile a simple addition function, I will first need to implement many unused code generation routines such as datatype conversions, variable allocations, and more. In addition, some of these routines may not be implementable on the new processor and will result in undefined behaviour. This is a large risk to the project as an unknown amount of time will need to be allocated to create a backend for the compiler.
+}
+\end{itemize}
 
 \newpage
 
@@ -440,6 +457,7 @@ The new processor core and compiler tool chain will be named \textit{\scname{}}.
 These core (C) deliverables are the base requirement for the project to be released in a functional and worthwhile state.
 \begin{enumerate}[label=\bfseries C\arabic*.]
 \item{To improve my knowledge and experience of FPGA development, processor architecture, compilers, and embedded systems engineering.}
+\label{c1}
 \item{To build a working and operational soft-core processor core capable of performing simple tasks.}
 \item{Implementation of the soft-core processor design on real hardware (FPGA).}
 \item{To provide a high-level context-free code compiler to run user-code on the processor.}
@@ -460,6 +478,8 @@ These extended (E) deliverables may not be achievable in the time frame specific
 \item{Configurable build options (register/bus widths, optimisations/pipelining, user/privileged mode to support modern operating systems).}
 \item{Memory management modules to provide protected and virtual memory lookup tables.}
 \end{enumerate}
+
+Project 
 
 
 \newpage
@@ -744,7 +764,12 @@ Compilers and code generators should utilise this register for storing the addre
 The Stack Pointer is similar to the x86 Stack Pointer in that it stores the address of the top of the stack. This register is used primarily for PUSH and POP operations (see section \ref{sect:compiler_cg_push_pop} {\nameref{sect:compiler_cg_push_pop}} for example usage).
 
 \section{Instruction Set Architecture}
-The \scname{} processor implements it's own fixed 16-bit instruction set.
+\label{sect:isa}
+The chief project objective, \ref{c1}, is to improve my knowledge of FPGA development, processor architecture, and embedded systems. To do this, it was decided with the project supervisor to design and implement a new instruction set architecture (ISA) aimed specifically for this embedded processor. In addition to improving my knowledge and experience, it would avoid legal and ethical issues introduced if emulating an existing architecture, such as MIPS, ARM's Thumb2, or x86.
+
+The use of Agile development was beneficial in the design of the ISA. As the processor  was developed and programs were ran on the processor, the need for new instructions and requirements were observed. For example, it was observed that code generation for boolean comparisons (e.g. \verb|a < b|) could be reduced by introducing a new instruction, \verb|SETC|, therefore increasing program speed, reducing file size, and improving debugging. This is described further in section SETC \ref{setc}.
+\\\\
+The \scname{} processor implements it's own fixed 16-bit little-endian instruction set.
 \todo{More}
 
 \subsection{Instruction Types}
@@ -825,17 +850,18 @@ Table \ref{tab:isa_jmp_bits} below details each conditional branch parameter and
 \end{table}
 
 \subsection{Design Considerations}
-The \scname{} processor's ISA has been through multiple iterations.
-\todo{more}
+As stated in section \ref{sect:isa} above, the use of agile methodologies allowed for constant review of the functionality of the processor. After these reviews, design changes were proposed, tested, and integrated into the processor.
+
+The \scname{} processor's ISA has been through multiple iterations; from opcode length changes, operand bit position changes, and immediate value sizes. The following sections describe some of the design considerations and changes of the \scname{} processor.
 
 \subsubsection*{Opcode Bits} 
-Initially, the opcode length was 4-bits allowing a total of 16 unique opcodes. This was later changed to 5-bits to add more opcodes at the cost of addressing fewer registers and having smaller immediate values.
+Initially, the opcode length was 4-bits allowing a total of 16 unique opcodes. This was later changed to 5-bits to add more opcodes at the cost of addressing fewer registers and having smaller immediate values. This change was enabled by using the agile methodology.
 
 \subsubsection*{Multiplication and Division}
 Due to time constraints, multiplication or division instructions are not implemented within the \scname{} processor. The equivalent functionality and more can still be achieved using the currently available instructions. The test file \verb|prco_compiler/test/tests/mul_1.prco| and \verb|prco_compiler/test/tests/div_1.prco| contain example unsigned integer multiply and divide functions.
 
 \subsubsection*{SETC Instruction}
-\todo[inline]{This is a design consideration. Where to put design changes? here?}
+\label{setc}
 The \verb|SETC| instruction was added to reduce the number of instruction required to perform boolean logic operations on registers. Without the \verb|SETC| instruction, to evaluate the expression \mintinline{c}{1 < 5}, the compiler would need to emit multiple JMP instructions to set the result to 0 or 1 and JMP over the other result. In my testing, the compiler would require between 5-8 instruction for each boolean expression. 
 
 The \verb|SETC| instruction is inspired by the x86 instruction: \verb|SETcc| Set Byte on Condition \cite{isa_x86}.
@@ -1167,7 +1193,7 @@ An initial requirement for the \scname{} compiler was to support three types of 
 \subsubsection*{Local Variables}
 Similar to C89, all local variables must be declared at the start of the function before any logic, such as function calling. This is because the compiler will not rearrange the AST tree to move variable declarations to the first child of the function AST tree.
 
-When a local variable is declared, stack space is immediately allocated for the variable by subtracting the data type size (1 word) from the Base Pointer variable. Although the code generator knows how many local variables are in a function, due to time constraints, it will not reduce/fold multiple stack allocations into a single SUBI instruction. The output machine code looks similar to Figure \ref{fig:compiler_cg_vars} below.
+When a local variable is declared, stack space is immediately allocated for the variable by subtracting the data type size (1 word) from the Base Pointer variable. Although the code generator knows how many local variables are in a function, due to time constraints, it will not reduce/fold multiple stack allocations into a single SUBI instruction. The output machine code looks similar to Figure \ref{fig:compiler_cg_lvars} below.
 
 \begin{figure}[!h]
     \begin{minipage}{0.5\textwidth}
@@ -1181,8 +1207,8 @@ LW    %Ax, -3(%Bp) 08dd (REF a -3)
 LW    %Ax, -2(%Bp) 08de (REF b -2)
 LW    %Ax, -1(%Bp) 08df (REF c -1)
 \end{minted}
-        \captionof{figure}{Disassembly of the output machine code for the high-level code (\ref{fig:compiler_cg_vars_high}).}
-        \label{fig:compiler_cg_vars_asm}
+        \captionof{figure}{Disassembly of the output machine code for the high-level code (\ref{fig:compiler_cg_lvars_high}).}
+        \label{fig:compiler_cg_lvars_asm}
     \end{minipage}
     \begin{minipage}{0.05\textwidth}\hfill\end{minipage}
     \begin{minipage}{0.5\textwidth}
@@ -1196,10 +1222,10 @@ fnc main() {
 }
 \end{minted}
         \captionof{figure}{Input high-level code showing 3 variable declarations and references.}
-        \label{fig:compiler_cg_vars_high}
+        \label{fig:compiler_cg_lvars_high}
     \end{minipage}
     \captionof{figure}{Example machine code generation for local variables.}
-    \label{fig:compiler_cg_vars}
+    \label{fig:compiler_cg_lvars}
 \end{figure}
 
 Variables are then accessed using the \verb|LW| instruction and passing a 5-bit signed immediate constant as seen above.
@@ -1232,6 +1258,7 @@ Strings are an extended deliverable for the \scname{} compiler but was added to 
 
 The \scname{} processor places strings and global values at the start of low memory. As the processor starts executing instructions at address \verb|0x00|, the compiler must insert a jump instruction to the address of the \verb|main| function.
 
+A limitation in memory addressing and storage within the \scname{} processor prevents memory cells being indexed at byte boundaries. Due to limited time, it was decided with the project supervisor to store each byte character in a 2-byte cell. This keeps the functionality but reduces memory density.
 
 \begin{figure}[!h]
     \begin{minipage}{0.5\textwidth}
@@ -1246,7 +1273,7 @@ The \scname{} processor places strings and global values at the start of low mem
 0x06 ADDI   $-1, Sp  4fff (FUNC)
 \end{minted}
         \captionof{figure}{Disassembly of the output machine code for the high-level code. Local variable declaration '\textit{a}' is assigned the value \textit{0x02} which is the address of the first byte of the ASCIZ string.}
-        \label{fig:compiler_cg_vars_asm}
+        \label{fig:}
     \end{minipage}
     \begin{minipage}{0.05\textwidth}\hfill\end{minipage}
     \begin{minipage}{0.5\textwidth}
@@ -1261,10 +1288,10 @@ fnc main()
 }
 \end{minted}
         \captionof{figure}{Input high-level code showing a string variable declaration.}
-        \label{fig:compiler_cg_vars_high}
+        \label{fig:}
     \end{minipage}
     \captionof{figure}{Example machine code generation for string variables.}
-    \label{fig:compiler_cg_vars}
+    \label{fig:compiler_cg_strings}
 \end{figure}
 
 \subsubsection*{Pointers and Value Dereferencing}
@@ -1313,7 +1340,9 @@ fnc strlen() {
 
 \subsection{PUSH and POP}
 \label{sect:compiler_cg_push_pop}
-Due to limitations of the \scname{} processor's instruction set, high-level instructions such as PUSH and POP cannot be performed in a single instruction. Instead, the compiler is able to replicate the behaviour of these high level instructions by emitting multiple primitive instructions. Figure \ref{fig:compiler_cg_push_pop} below details how the compiler emulates these high-level instructions.
+PUSH and POP concepts are a simple yet powerful method in computer architectures to support complex, nested, and recursive functionality, such as function calling and parameter passing.
+
+Due to limitations of the \scname{} processor's instruction set, high-level instructions such as PUSH and POP cannot be performed in a single instruction as with architectures like x86 and ARM's Thumb2. With discussion with the project supervisor, it was decided to replicate the behaviour of these high level instructions by emitting multiple primitive instructions. Figure \ref{fig:compiler_cg_push_pop} below details how the compiler emulates these high-level instructions.
 
 \begin{figure}[H]
     \begin{minipage}{0.5\textwidth}
@@ -1404,10 +1433,12 @@ Due to the late development of the emulator, and it not being a deliverable, and
 
 With the introduction of the emulator, the process of deploying high-level code changed from: \textbf{write, compile, deploy, verify, repeat}; to \textbf{write, compile, emulate, verify, repeat, deploy, verify}. By reducing the number of deploys, time taken to successfully write working code was drastically improved.
 
-Late in the project, the ability of integrating the emulator into unit tests for the compiler was completed. This allowed for fast and more complete verification of the compiler that could run multiple programs on every code change.
+Late in the project, the ability of integrating the emulator into unit tests for the compiler was completed. This allowed for fast and more complete verification of the compiler that could verify multiple programs on every code change.
 
 \subsection*{Continuous Integration}
-The \scname{} compiler employs continuous integration testing to show if a code commit breaks certain functionality. The continuous integration system service used is Travis CI \todo{fix}\cite{travisci}. Every time a commit is made to the repository, Travis CI pulls the commit and runs the \verb|test/travis-ci.sh| script. This script runs the compiler and emulator on each \verb|test/*.prco| file and checks the return code. If the return code does not match the expected functionality, the test fails and the developer can investigate further by enabling more debug prints with the \verb|-D| parameter. These tests will generate a report detailing passed and failed tests with their actual and expected outputs. This method accomplishes verification requirement (C).
+The \scname{} compiler employs continuous integration testing to show if a code commit breaks certain functionality. The continuous integration system service used is Travis CI \todo{fix}\cite{travisci}. Every time a commit is made to the repository, Travis CI pulls the commit and runs the \verb|test/travis-ci.sh| script. This script runs the compiler and emulator on each \verb|test/*.prco| file and checks the return code. If the return code does not match the expected functionality, the test fails and the developer can investigate further by enabling more debug prints with the \verb|-D| parameter. These tests will generate a report detailing passed and failed tests with their actual and expected outputs. 
+
+This method accomplishes verification requirement (C). By running automatic tests for each code change, it allows the developer to quickly identify bugs. In addition, running all tests for any code change allows the developer to identify changes that unknowingly affect other parts of the program. This continuous integration testing methodology greatly aids the end-user in their goal of bug-free code compilation.
 
 An example output of the continuous integration test runner is located in section \ref{appendix:travisci} {\nameref{appendix:travisci}}. The continuous integration results can be viewed here: \url{https://travis-ci.com/bendl/prco304/}.
 
@@ -1642,7 +1673,6 @@ Following this is the list of executed instructions. Instruction execution start
 
 \newpage
 \section{Appendix B. Project Management Artefacts}
-\todo{How much of the PID should be re-written in the report?}
 \input{pid.tex}
 
 \newpage
