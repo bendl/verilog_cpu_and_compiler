@@ -293,9 +293,6 @@ PRCO304 - Final Stage Computing Project
 I would like to thank my project supervisors Nigel Barlow and Serge Thill for their support and guidance throughout this project. 
 \\\\
 I would also like to thank James Spalding (Spirent Communications) and firmware team for their encouragement, ideas, and industrial sponsorship supporting this final project.
-\\\\
-I would also like to thank my parents who still have no idea what this project is about.
-%I also thank my parents, who still have no idea what this project is about, for their suggestions and encouragement.
 
 \newpage
 \chapter*{Abstract}
@@ -542,6 +539,7 @@ The following FPGA development kits are suitable for this project:
        \label{fig:res:minispartan}
 \end{figure}
 }
+\label{res:minispartan}
 
 \item{Arty Artix-7 FPGA Development Board - Digilent - £100 \cite{arty}. The Arty development board features a larger Artix-35T FPGA with over 20x the number of logic cells and block memory compared to the LX9 in the MiniSpartan6+. The board components include 256MB DDR3 RAM, 16MBx4 SPI flash memory, USB-JTAG, 8 LEDs (4 of which are RGB), 4 switches, 4 buttons, and multiple Pmod connectors.
 \\\\
@@ -942,10 +940,6 @@ An example test report for the ALU running OR instructions on different operands
 \item{\textbf{Single-step implementation runs} are used to verify the correct behaviour of the RTL code on a real FPGA device. 
 
 The \scname{} processor core features a single-step input line that can be pulsed to signal the core to execute the next instruction. In these tests, generally the first register Ax is redirected to the 8 LEDs on the development board, allowing the tester to visually see it's contents. However, only the higher-or-lower byte can be viewed at any single time (as registers are 16-bits wide). UART printing is also used to visualise register contents, however, integer to ASCII conversion is not implemented so only single digits can be displayed in ASCII.}
-
-\item{
-\todo[inline]{Describe creation and usage of emulator introduced later in project.}
-}
 \end{itemize}
 
 
@@ -953,6 +947,15 @@ The \scname{} processor core features a single-step input line that can be pulse
 \newpage
 \section{Core Analysis}
 \label{sect:core_analysis}
+
+\subsection{ISE Implementation Report}
+\label{ise_impl}
+In the ISE suite, reports are generated for synthesis, place-and-route, and programming file generation. These report detail how resources on the physical device are utilised in the HDL design, for example the number of slices, LUTs, latches, and block RAMs.
+
+The full implementation report for the \scname{} processor is listed in \ref{ise_report} {\nameref{ise_report}}. An important characteristic is the number of slices the FPGA supports. The XC6SLX9 Spartan-6 FPGA used in this project has 1,430 slices available. From the implementation report, it can be seen that the \scname{} processor uses 844 (59\%) of the available slices. Although the Spartan-6 device used is a small FPGA, the number of slices used is still high, indicating inefficiencies in my HDL design.
+
+A good result is that 0 latches are created. Latches are often created when conditional or combinational statements are not assigned under all conditions, and a state must be 'latched' to account for it. These latches can lead to longer routing delays on the implemented design, reducing maximum clock speeds which leads to more constricted space and timing constraints.
+
 \subsection{Performance}
 \textit{Instructions Per Cycle} (IPC) and \todo{Not really DMIPS, more like MIPS. Describe why...}\textit{Dhrystone Million Instructions Per Second} (DMIPS) are two measurements used to measure the performance of a processor.
 
@@ -1514,8 +1517,30 @@ Comparing the project objectives
 \begin{description}[style=nextline]
 \item [C1. To improve my knowledge and experience of FPGA development, processor architecture, compilers, and embedded systems engineering.]
 
-This primary objective has been accomplished. The combination of the initial research into existing embedded processors and compilers and applying that knowledge to design a new architecture and it's implementation on FPGA devices. In addition, methods to test and verify both processor and compiler have been 
+This primary objective has been accomplished. The combination of the initial research into existing embedded processors and compilers and applying that knowledge to design a new architecture and it's implementation on FPGA devices. 
 
+A detailed specification of the new \scname{} processor, describing the feed-forward pipeline, timings 
+
+A new processor architecture, with a feed-forward pipeline, 
+
+In addition, methods to test and verify both processor and compiler have been 
+
+
+\item[C2. To build a working and operational soft-core processor core capable of performing simple tasks.]
+The first half of this project was to design, implement, and verify an embedded processor. The processor was designed in Verilog, a hardware description language. Modularised components were written, such as the decoder, register set, and ALU, and connected with control signals to implement a simple data pipeline. 
+
+Once the processor was able to support a program counter, instructions could be fetched, executed, data written, and control execution of the processor. With the addition of comparison and branching instructions, CMP and JMP, dynamic execution and program flow was introduction. This allows the processor, without knowledge of high-level concepts such as \textit{if} and \textit{for} loop statements, to perform complex logic sequences by executing primitive instructions.
+
+With the aid of the compiler, tasks such as multiplication, division, string manipulation, and variables, complex tasks are more easily accomplished. In addition, the inclusion of a UART interface allows the processor to send data externally. The UART output can be connected to other devices as a UART input to share data, for example printing text to an RS232 shell.
+
+\item[C3. Implementation of the soft-core processor design on real hardware (FPGA).]
+A large risk of the project, \ref{risk:hw} to implement the Verilog processor on an FPGA device, specifically the MiniSpartan-6+ XC6SLX9 development board (\ref{res:minispartan}), had appeared throughout development of the processor. As stated in the {\nameref{pid}}, issues like this occur when synthesised HDL code does not meet the physical constraints of the device (in our case, an FPGA). This results in different behaviour between simulation and hardware which is a critical problem. 
+
+This issue was reduced by enabling warnings during ISE's synthesis and place-and-route tools of the HDL code to the FPGA device. When these warnings were present, the respective code was redesigned in order to meet the device's constraints.
+
+
+
+\item[C4. To provide a high-level context-free code compiler to run user-code on the processor.]
 
 \end{description}
 
@@ -1727,6 +1752,24 @@ Starting at \textit{F1}, we can see that the compiler needs to support strings, 
 \label{fig:hld}
 \end{figure}
 %TC:endignore
+
+\newpage
+\subsection{ISE XC6SLX9 Implementation Report}
+\label{ise_report}
+\begin{figure}[H]
+    \begin{minipage}{0.5\textwidth}
+        \centering
+\includegraphics[scale=0.43]{ise1}
+\includegraphics[scale=0.43]{ise2}
+    \end{minipage}
+    \begin{minipage}{0.01\textwidth}\hfill\end{minipage}
+    \begin{minipage}{0.5\textwidth}
+        \centering
+\includegraphics[scale=0.45]{ise3}\\
+    \end{minipage}
+    \caption{ISE implementation report for the \scname{} processor on the XC6SLX9 FPGA device.}
+    \label{fig:}
+\end{figure}
 
 
 \end{document}
