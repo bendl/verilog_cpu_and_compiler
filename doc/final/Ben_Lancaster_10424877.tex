@@ -954,10 +954,14 @@ In the ISE suite, reports are generated for synthesis, place-and-route, and prog
 
 The full implementation report for the \scname{} processor is listed in \ref{ise_report} {\nameref{ise_report}}. An important characteristic is the number of slices the FPGA supports. The XC6SLX9 Spartan-6 FPGA used in this project has 1,430 slices available. From the implementation report, it can be seen that the \scname{} processor uses 844 (59\%) of the available slices. Although the Spartan-6 device used is a small FPGA, the number of slices used is still high, indicating inefficiencies in my HDL design.
 
+It can be seen that the number of slices used for single-port and dual-port memories is 0. This is likely the cause of the high slice count. The \scname{} processor has 256 words of internal single-port RAM memory and 8 words of duel-port register memory. This means that my design of these components were not successfully inferred to physical block RAMs on the the FPGA and were instead implemented by the synthesis tool as LUTs.
+
 A good result is that 0 latches are created. Latches are often created when conditional or combinational statements are not assigned under all conditions, and a state must be 'latched' to account for it. These latches can lead to longer routing delays on the implemented design, reducing maximum clock speeds which leads to more constricted space and timing constraints.
 
+Overall, the report is acceptable, but future improvements should primarily be aimed at reducing this resource footprint. This would allow the processor to be deployed on even smaller FPGAs and also leave more resources for the user's FPGA logic.
+
 \subsection{Performance}
-\textit{Instructions Per Cycle} (IPC) and \todo{Not really DMIPS, more like MIPS. Describe why...}\textit{Dhrystone Million Instructions Per Second} (DMIPS) are two measurements used to measure the performance of a processor.
+\textit{Instructions Per Cycle} (IPC) and \textit{Million Instructions Per Second} (MIPS) are two measurements used to measure the performance of a processor.
 
 The downside of these measurements is that they assume each instruction executes in constant time. This is not the case in the \scname{} processor and other modern processors.
 \\\\
@@ -1538,9 +1542,15 @@ A large risk of the project, \ref{risk:hw} to implement the Verilog processor on
 
 This issue was reduced by enabling warnings during ISE's synthesis and place-and-route tools of the HDL code to the FPGA device. When these warnings were present, the respective code was redesigned in order to meet the device's constraints.
 
+As discussed in section {\nameref{ise_impl}}, the \scname{} processor has been successfully implemented on the MiniSpartan6+ development board. Although successful, the implementation did take up more FPGA slice resources, likely caused by poorly designed register and RAM components that did not infer to physical FPGA block RAMs. This would result in smaller user FPGA logic space.
 
 
 \item[C4. To provide a high-level context-free code compiler to run user-code on the processor.]
+A C-life grammar compiler was designed, implemented, and verified. The compiler accepted a context-free grammar similar to C's grammar. The grammar featured terminal symbols for variables and arithmetic operators, and non-terminal  symbols for complex patterns like \textit{for} loops and function definitions.
+
+The compiler would represent this input grammar in an abstract syntax tree structure. This structure allowed for easy rearrangement and modification for optimisations to be performed. Simple optimisations like constant-folding and dead-code elimination were implemented.
+
+The compiler successfully output machine code in a format accepted by the \scname{} processor. Example programs were provided showing implementation of simple tasks, such as string length finding, variables, and UART transmitting.
 
 \end{description}
 
