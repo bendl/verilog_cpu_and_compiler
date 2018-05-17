@@ -8,6 +8,10 @@
 \usepackage{helvet}
 \renewcommand{\familydefault}{\sfdefault}
 
+
+
+\linespread{1.3}
+
 \usepackage[margin=0.8in]{geometry}
 \usepackage[utf8]{inputenc}
 \usepackage{amsmath}
@@ -270,6 +274,7 @@ PRCO304 - Final Stage Computing Project
     Date & Version & Changes \\
     \arrayrulecolor{blue9}
 	\specialrule{2pt}{-2pt}{0pt}
+	15/05/2018 & 3.11 & Correct CMP (\ref{isa:cmp}) instruction bits. \\ \hline
 	04/05/2018 & 3.10 & Add section \ref{sect:core_analysis} {\nameref{sect:core_analysis}} to describe performance of the embedded processor. \\ \hline
 	04/05/2018 & 3.00 & Add section {\nameref{sect:preface}}. \\ \hline
 	03/05/2018 & 2.90 & Add acknowledgements and glossary. \\ \hline
@@ -382,10 +387,11 @@ Modern computing and electronics equipment, like function generators, oscillosco
 The aim of this project is to implement this side-microprocessor into the FPGA to save on BOM costs, PCB  space,  and  power  costs,  which  contribute  to  higher  development  and  product  costs.  While  savings can  be  made  by  the  lack  of  side  microprocessor,  the  product  may  need  a  larger  FPGA  to  accommodate the embedded microprocessor.  The project will produce a small, soft-core, CPU design and compiler. Although there is no direct client in this project, I believe this project will produce an attractive product
 for FPGA-based product designers wishing to employ an embedded processor solution.
 
+This report details the design considerations, implementation, and verification, 
 %\lipsum[0-1]
 
 \section{Background}
-\subsection{Current Implementations}\label{current_impl}
+\subsection{Existing Embedded Processor}\label{current_impl}
 There exists many commercial and open-source embedded processors, each providing different features and specialities such as digital signal processing, analogue components, instruction set architectures, and interfaces.
 
 Popular embedded processors include:
@@ -573,7 +579,7 @@ The repository can be found here: \href{https://github.com/bendl/prco304}{https:
 \end{figure}
 
 \subsection{Document Control}
-All documents will be authored in \LaTeX and markdown. This allows all documents to follow a custom style guide, share resources, and display complex visualisations (such as syntax highlighting), and has great support for version control and collaboration.
+All documents will be authored in LaTeX and markdown. This allows all documents to follow a custom style guide, share resources, and display complex visualisations (such as syntax highlighting), and has great support for version control and collaboration.
 
 All documentation is stored in the \verb|prco304| GitHub repository (URL above) in the \verb|doc/| directory alongside the source directories (\verb|prco_compiler/| and \verb|prco_core/|). By including documentation with sources, a pattern employed by large open-source projects such as GCC, Linux, and CPython, allows future projects utilising the resources in this project to easily navigate, understand, and contribute back to the project.
 
@@ -678,14 +684,13 @@ The following Extended Processor Deliverables (EPD) are deliverables that must b
 \end{enumerate}
 
 \todo[inline]{Justify and explain sources of these deliverables - existing processors provide these etc.}
-\subsection{Project Stages}
-The design, implementation, and verification of the new processor consist of the following project stages. These stages are described in the gantt time chart described in Figure \ref{fig:gantt} along with their time allocations.
+\subsection{Applicable Stages}
+The design, implementation, and verification of the new processor consist of the  project stages 1.2 to 2.4. Initially described above in section \ref{stages}, below details additional technical considerations, challenges, and changes that occurred during these stages.
 
 \begin{description}[style=nextline]
 \item [Stage 1.2: Processor specification, architecture, ISA]
 As discussed in section \ref{current_impl}, existing embedded processors have been researched and compared in order to determine a suitable and realistic specification for the processor  design. A comparison table is also available in appendix \ref{sect:existing_isa_cmp}.
 
-This stage starts the specification of the processor's instruction set architecture, register set, pipeline, and external interfacing. 
 
 \item [Stage 2.0: Core dev. Register set implementation]
 This stage covers the implementation of the register set in Verilog, as per the specification. 
@@ -697,7 +702,7 @@ The instruction decoder is a core part of all processors; they deconstruct incom
 
 
 \item [Stage 2.2: Core dev. ALU, RAM implementation]
-The ALU
+Like the decoder, the ALU was required to implement changing instruction definitions, such as status register bits and comparison operands. Initially, the status register was included in the register set as a dedicated register, but it was later changed to a local register accessible only to the ALU. This was because the register set 
 
 \item [Stage 2.3: Core dev. GPIO, Comms implementation]
 Foo bar.
@@ -732,7 +737,7 @@ The \scname{} processor is a modularised processor with independent components f
 Registers A through E are designed for general purpose use and are safe to store user values over the run-time of the processor.
 
 \begin{table}[h]
-\def\arraystretch{1.5}%  1 is the default, change whatever you need
+\def\arraystretch{1.3}%  1 is the default, change whatever you need
     \begin{tabularx}{\textwidth}{|p{2cm}|l|X|}
     \hline
     Registers & Bits & Description \\
@@ -752,7 +757,7 @@ Registers F through H are special registers within the processor. The processor 
 Even though all registers can be used at the will of the programmer, it is recommended to isolate a few registers to provide special features, such as RAM stack management, interrupts, and IO multiplexing.
 
 \begin{table}[h]
-\def\arraystretch{1.5}%  1 is the default, change whatever you need
+\def\arraystretch{1.3}%  1 is the default, change whatever you need
     \begin{tabularx}{\textwidth}{|p{2cm}|l|X|}
     \hline
     Registers & Bits & Description \\
@@ -772,7 +777,7 @@ Even though all registers can be used at the will of the programmer, it is recom
 The Status Register is a dedicated register used by the ALU to provide additional information on results of instructions. Using the Status Register is essential for programs wanting to perform conditional branching or operate on dynamic data.
 
 \begin{table}[h]
-\def\arraystretch{1.5}%  1 is the default, change whatever you need
+\def\arraystretch{1.3}%  1 is the default, change whatever you need
     \begin{tabularx}{\textwidth}{|p{2cm}|l|X|}
     \hline
     Bit & Name & Description \\
@@ -805,14 +810,14 @@ The chief project objective, \ref{c1}, is to improve my knowledge of FPGA develo
 
 The use of Agile development was beneficial in the design of the ISA. As the processor  was developed and programs were ran on the processor, the need for new instructions and requirements were observed. For example, it was observed that code generation for boolean comparisons (e.g. \verb|a < b|) could be reduced by introducing a new instruction, \verb|SETC|, therefore increasing program speed, reducing file size, and improving debugging. This is described further in section SETC \ref{setc}.
 \\\\
-The \scname{} processor implements it's own fixed 16-bit little-endian instruction set.
-\todo{More}
+The \scname{} processor implements it's own fixed 16-bit little-endian instruction set. A 5-bit opcode is present in each instruction, identifying the type of instruction. This allows for $2^5$ (32) unique instructions. However, this can be extended if unused bits in instructions are utilised. 
+
 
 \subsection{Instruction Types}
 It was decided to support the following 3 types of instructions. This allows for a wide range of instruction operands, such as more registers or larger immediate values.
 
 \begin{table}[h]
-\def\arraystretch{1.5}
+\def\arraystretch{1.3}
 \centering
 \begin{tabular}{|p{4cm}|c|c|c|c|}
 \hline 
@@ -831,7 +836,7 @@ Type 3 & 15-11 & \multicolumn{3}{c|}{10-0} \\
 
 \subsection{Instructions}
 \begin{table}[H]
-	\def\arraystretch{1.5}
+	\def\arraystretch{1.3}
     \begin{tabularx}{\textwidth}{|p{4cm}|c|c|c|c|X|}
     \hline
     Type 1 & 15-11 & 10-8 & 7-5 & 4-0 & Semantics\\ 
@@ -851,7 +856,7 @@ Type 3 & 15-11 & \multicolumn{3}{c|}{10-0} \\
     SUB		& 01010 & Rd & Ra & X & Rd $<$= Rd - Ra \\ \hline
     SUBI 	& 01011 & Rd & \multicolumn{2}{c|}{Simm8}  & Rd $<$= Rd - Simm8 \\ \hline
     JMP		& 01100 & Rd & \multicolumn{2}{c|}{Imm8} & See {\nameref{sect:isa_jmp}}. \\ \hline
-    CMP		& 01101 & Rd & Ra & Rb & Set SR flags \\ \hline
+    CMP		& 01101 & Rd & Ra & X & Set SR flags \\ \hline
     HALT	& 10010 & \multicolumn{3}{c|}{X} & Stop the processor. \\ \hline
     WRITE	& 10011 & Rd & \multicolumn{2}{c|}{Imm8} & See {\nameref{core_write}} \\ \hline
     READ	& 10100 & Rd & \multicolumn{2}{c|}{Imm8} & See {\nameref{core_read}} \\ \hline
@@ -1306,7 +1311,7 @@ The \scname{} processor places strings and global values at the start of low mem
 
 A limitation in memory addressing and storage within the \scname{} processor prevents memory cells being indexed at byte boundaries. Due to limited time, it was decided with the project supervisor to store each byte character in a 2-byte cell. This keeps the functionality but reduces memory density.
 
-\begin{figure}[!h]
+\begin{figure}[H]
     \begin{minipage}{0.5\textwidth}
         \centering
 \begin{minted}[linenos]{text}
@@ -1433,7 +1438,7 @@ Assembling code is found in \verb|assembler_labels()| at \verb|arch/template_imp
 \begin{center}
 \includegraphics[scale=0.4]{prco_memory_layout}
 \end{center}
-\caption{\scname{} memory layout.}
+\caption{\scname{} memory layout showing Global, Instruction, and Stack memory sections.}
 \label{fig:asm_mem_layout}
 %\end{wrapfigure}
 \end{figure}
