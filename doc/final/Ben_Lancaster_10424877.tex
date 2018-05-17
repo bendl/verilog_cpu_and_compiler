@@ -317,15 +317,15 @@ A project post-mortem is performed to reflect on the achievements of the project
 
 \newpage
 \renewcommand*\contentsname{Table of Contents}
-
+%TC:ignore
 {\hypersetup{linkcolor=black}
 \tableofcontents
 \listoffigures
 \listoftables}
 \newpage
- 
+
 \subsection*{Word Count}
-Words count: 7740
+Words count: 10512
 
 \subsection*{Sources}
 \begin{description}[style=nextline]
@@ -354,6 +354,7 @@ Words count: 7740
 \item[Simm5]{5-bit signed immediate value}
 \item[CMake]{A cross-platform project generator}
 \end{description}
+%TC:endignore
 
 \newpage
 \chapter*{Preface}
@@ -466,8 +467,6 @@ These core (C) deliverables are the base requirement for the project to be relea
 \item{To provide a high-level context-free code compiler to run user-code on the processor.}
 \end{enumerate}
 
-\unsure{These are slightly different to the PID, is this OK?}
-
 \subsection{Extended Deliverables}
 These extended (E) deliverables may not be achievable in the time frame specific in section \ref{sect:proj_time} as they may require extra time to design and implement, require more experience or skill, or require resources currently unattainable.
 \begin{enumerate}[label=\bfseries E\arabic*.]
@@ -493,7 +492,7 @@ The \scname{} processor will be able to read and write to all data passing throu
 \subsection{Fit for Purpose}
 The \scname{} processor is \textbf{not} designed to run general purpose operating systems, such as Linux or embedded RTOS systems. All memory devices attached to the FPGA are fully accessible to the processor core and instructions/programs running through it, meaning that operating systems or secure applications storing private and sensitive information is not protected by modern processor features such as privilege modes and virtual memory sections. The processor lacks common components required to run modern operating systems, such as a memory management unit (MMU) and privilege modes, and so \textbf{should not be run on the processor}.
 
-The \scname{} processor is \textbf{not} designed to run in high-reliability or safety-critical environments that require established safety standards, such as the UK Defence Standard 00-56 \cite{defstan_0056_2} and IEC 61508 \cite{iec61508}.\improvement{Cite actual standards documents, not papers describing them.}
+The \scname{} processor is \textbf{not} designed to run in high-reliability or safety-critical environments that require established safety standards, such as the UK Defence Standard 00-56 \cite{defstan_0056_2} and IEC 61508 \cite{iec61508}.
 
 The \scname{} processor is \textbf{not} designed for implementation in silicon and makes no guarantees of reliability or performance in this format.
 \newline\newline
@@ -705,22 +704,16 @@ The instruction decoder is a core part of all processors; they deconstruct incom
 Like the decoder, the ALU was required to implement changing instruction definitions, such as status register bits and comparison operands. Initially, the status register was included in the register set as a dedicated register, but it was later changed to a local register accessible only to the ALU. This was because the register set 
 
 \item [Stage 2.3: Core dev. GPIO, Comms implementation]
-Foo bar.
+UART and GPIO interfaces are implemented in the processor. These can be accessed by using the \verb|READ| and \verb|WRITE| instructions.
 
 \item [Stage 2.4: Core verification]
-Foo bar.
-
-
+To ensure quality requirements (\ref{quality}) are achieved, multiple verification and testing strategies were employed, such as simulation, unit testing, and emulation. These are described in further detail in section \ref{sect:core_test}.
 \end{description}
 
 
-\todo{Describe the stages related to the processor design and how/why chosen.}
-
 \newpage
 \section{High Level Design}
-The \scname{} processor is a modularised processor with independent components for the ALU, Registers, RAM, and it's peripherals. 
-
-\todo[inline]{Also need a lower-level block diagram showing communication between components (ALU, decoder, etc.)}
+The \scname{} processor is a modularised processor with independent components for the ALU, Registers, RAM, and it's peripherals.  Figure \ref{fig:core_hld} below shows how the processor core can be integrated onto the MiniSpartan-6+ development kit and connected to peripherals.
 
 \begin{figure}[H]
 \begin{center}
@@ -911,12 +904,12 @@ With the introduction of the \verb|SETC| instruction late in development, the nu
 
 
 \section{Pipeline Architecture}
+\label{core:pipeline}
 The \scname{} processor employs a \textit{feed-forward} pipeline strategy. 
 This pipeline supports:
 \begin{itemize}
 \item{Time-varying processes: Multi-clock cycle decoding; Memory access; ALU ops.}
-\item{Module re-ordering: Instruction dependencies; Module skipping; Output redirection. }
-\item{Interruption (see section \ref{sect:interrupts}: {\nameref{sect:interrupts}}).\todo{fix}}
+\item{Module re-ordering: Instruction dependencies; Module skipping; Output redirection. }.
 \end{itemize}
 
 As the pipeline is feed-forward, no information is sent back to previous modules to tell them of their status. This means that if a module is stalled (due to mutli-cycle processes or future modules are stalled), and the previous module is ready, the previous module will signal the next module that information is ready and it should take it, but the current module is unable to as it is busy. The pipeline resolves this issue by it's cyclic nature. This means that only 1 module at any time is processing data. Of-course, the downside to this approach is that instruction parallelism is reduced.
@@ -1020,29 +1013,49 @@ The \scname{} processor is similar to AMD's Am386 (1991) processor with 9 MIPS a
 \newpage
 \section{Sub-project Review}
 \subsection{Project Deliverables}
-\begin{enumerate}[label=\bfseries CPD\arabic*.]
-\item{Support a wide range of executable programs.}
-\item{Provide a 16-bit instruction set capable of supporting simple programs.}
-\item{Support simple arithmetic and bitwise operations.}
-\item{Operate on 16-bit data sizes.}
-\item{Fully synthesize-able on FPGA hardware.}
-\item{Implement a simple pipeline architecture.}
-\end{enumerate}
-\todo[inline]{Discuss if deliverable was achieved and how.}
+\begin{description}[style=nextline]
+\item [CPD1. Support a wide range of executable programs.]
+This has been achieved. A number of applications have been written for the processor (located in \verb|prco_compiler/test/tests/|) ranging from string manipulation, integer division, and console printing. The combination of these programs can result in a wide range of large and complex applications.
+
+\item [CPD2. Provide a 16-bit instruction set capable of supporting simple programs.]
+This has been achieved. The complete instruction listing can be found in {\nameref{appendix:isa}}.
+
+\item [CPD3. Support simple arithmetic and bitwise operations.]
+This has been achieved. Although only addition and subtraction have been implemented in hardware, multiplication, division, and modulo, can be performed in software using multiple simple instructions.
+
+\item [CPD4. Operate on 16-bit data sizes.]
+This has been achieved. All register sizes, memory cell sizes, and ALU outputs are of 16-bit words.
+Operands using only 8-bits are bit-extended to 16-bits by the ALU.
+
+\item [CPD5. Fully synthesize-able on FPGA hardware.]
+This has been achieved. Section \ref{ise_impl} details the implementation on the XC6SLX9 FPGA.
+
+\item [CPD6. Implement a simple pipeline architecture.]
+This has been achieved. The pipeline is described and reviewed in section \ref{core:pipeline}  {\nameref{core:pipeline}}.
+\end{description}
+
 
 \subsection{Extended Deliverables}
 The following Extended Processor Deliverables (EPD) are deliverables that must be implemented for the processor to be deemed functional.
-\begin{enumerate}[label=\bfseries EPD\arabic*.]
-\item{Provide multiplication, division, modulus, instructions.}
-\item{Provide SIMD style instructions for faster vector manipulation.}
-\item{Provide in/out GPIO and UART modules for external communication.}
-\item{Provide an interrupt system allowing asynchronous events to be handled.}
-\item{Implement a super-scalar pipeline architecture.}
-\end{enumerate}
-\todo[inline]{Discuss if deliverable was achieved and how.}
 
+\begin{description}[style=nextline]
+\item [EPD1. Provide multiplication, division, modulus, instructions.]
+Not achieved. Due to limited time and the complexity of these operations, these instructions were not implemented in hardware. They can be implemented fully in software however.
 
+\item [EPD2. Provide SIMD style instructions for faster vector manipulation.]
+Not achieved. Due to limited time, the ALU is limited to operating on only 2 registers simultaneously and no instructions are provided to achieve SIMD style processing.
 
+\item [EPD3. Provide in/out GPIO and UART modules for external communication.]
+Mostly achieved. UART transmit capabilities are present but reading and writing GPIO ports is not fully implemented. Instructions exist for it (\verb|READ| and \verb|WRITE|) but their implementation is not.
+
+\item [EPD4. Provide an interrupt system allowing asynchronous events to be handled.]
+Not achieved. Although theoretically simple in design, limited time resulted in it not be scheduled for implementation.
+
+\item [EPD5. Implement a super-scalar pipeline architecture]
+Not achieved. The current pipeline can execute 1 instruction every 5 clock cycles (0.2 IPC). To become super-scalar, the pipeline design would need re-factoring so that it does not use global and shared registers.
+\end{description}
+
+Overall, the processor design has been a success. Although not implementing performance features such as hardware multiplication and division or a faster pipeline, the processor is able to execute simple programs and be integrated fairly easily into existing FPGA designs.
 
 
 
@@ -1641,6 +1654,7 @@ I believe these technologies and their implementation details should be shared a
 \newpage
 %TC:ignore
 \chapter{Appendices}
+\linespread{1.0}
 {\hypersetup{linkcolor=black}
 \startcontents[chapters]
 \printcontents[chapters]{}{1}{}
@@ -1761,8 +1775,7 @@ Following this is the list of executed instructions. Instruction execution start
 
 \newpage
 \subsection{\scname{} Processor Instruction Set Architecture}
-\todo[inline]{Some are missing}
-\todo[inline]{Some are outdated}
+\label{appendix:isa}
 \input{isa.tex}
 
 \newpage
