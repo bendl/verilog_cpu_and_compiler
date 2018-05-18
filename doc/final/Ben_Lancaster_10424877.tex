@@ -325,7 +325,7 @@ A project post-mortem is performed to reflect on the achievements of the project
 \newpage
 
 \subsection*{Word Count}
-Words count: 10512
+Words count: 10527
 
 \subsection*{Sources}
 \begin{description}[style=nextline]
@@ -481,7 +481,6 @@ These extended (E) deliverables may not be achievable in the time frame specific
 \item{Memory management modules to provide protected and virtual memory lookup tables.}
 \end{enumerate}
 
-Project 
 
 
 \newpage
@@ -1509,10 +1508,8 @@ An example output of the continuous integration test runner is located in sectio
 \newpage
 \section{Sub-project Review}
 \subsection{Core Deliverables}
-
-\todo[inline]{Must be a better way to display this...}
 \begin{table}[H]
-\def\arraystretch{1.5}
+\def\arraystretch{1.0}
 \caption{Compiler Core Deliverables Review}
 \begin{tabularx}{\textwidth}{|p{4cm}|c|c|X|}
 \hline 
@@ -1537,9 +1534,8 @@ Assembling 		& Yes & 1.40 & Basic offset calculation and re-encoding.\\
 
 
 \subsection{Extended Deliverables}
-\todo[inline]{Must be a better way to display this...}
 \begin{table}[H]
-\def\arraystretch{1.5}
+\def\arraystretch{1.0}
 \caption{Compiler Extended Deliverables Review}
 \begin{tabularx}{\textwidth}{|p{4cm}|c|c|X|}
 \hline 
@@ -1593,20 +1589,24 @@ As discussed in section {\nameref{ise_impl}}, the \scname{} processor has been s
 
 
 \item[C4. To provide a high-level context-free code compiler to run user-code on the processor.]
-A C-life grammar compiler was designed, implemented, and verified. The compiler accepted a context-free grammar similar to C's grammar. The grammar featured terminal symbols for variables and arithmetic operators, and non-terminal  symbols for complex patterns like \textit{for} loops and function definitions.
+A C-like grammar compiler was designed, implemented, and verified. The compiler accepted a context-free grammar similar to C's grammar. The grammar featured terminal symbols for variables and arithmetic operators, and non-terminal  symbols for complex patterns like \textit{for} loops and function definitions.
 
 The compiler would represent this input grammar in an abstract syntax tree structure. This structure allowed for easy rearrangement and modification for optimisations to be performed. Simple optimisations like constant-folding and dead-code elimination were implemented.
 
 The compiler successfully output machine code in a format accepted by the \scname{} processor. Example programs were provided showing implementation of simple tasks, such as string length finding, variables, and UART transmitting.
 \end{description}
 
-
+\newpage
 \section{Project Post-mortem}
+\subsection*{Research and Requirements Elicitation}
+Due to the high complexity of the project and availability of existing processor designs, I was able to easily find thoroughly documented processor designs and specifications. These are normally in the form of developer-facing technical manuals which detail the operation and characteristics of the processor. By reading multiple processor specifications, I quickly built up an understanding of existing processor designs and how they are technically presented to developers to integrate into their own projects. The application of this knowledge can be seen throughout this project: the \scname{} processor high-level design; and the ISA.
+
 \subsection*{Development Process}
 The combination of PRINCE2 with Agile was a success. (using the PID, plans, and risks) (weekly sprints, constant reviews)
+\todo[inline]{Review project management methods}
 
 \subsection*{Technology Review}
-Using LaTex for all documentation aided the project greatly. LaTex, being a text-based document editor, worked great when combined with version control, such as Git. This allowed for easier tracking, reviewing, and merging of document changes throughout the project. Although requiring an initial learning curve, once passed, documents could be edited quickly and professionally with skill.
+Using LaTex for all documentation aided the project greatly. LaTex, being a text-based document editor, worked great when combined with version control, such as Git. This allowed for easier tracking, reviewing, and merging of document changes throughout the project. Although requiring an initial learning curve, however once passed, documents could be edited quickly and professionally with skill.
 
 Verilog was chosen for the processor code development. Other HDL languages were available, such as VHDL, but my experience with those is negative; little documentation and varying quality resources for learning. Verilog, is also closer to C than VHDL, which makes learning and writing the language easier to transition too. Although Verilog will implicitly transform code, such as register length conversions, I did not find this to be an issue and the processor core worked as designed.
 
@@ -1615,17 +1615,19 @@ C was used for the compiler and emulator. Higher level languages could have been
 \subsection*{Personal Contribution Review}
 I am pleased with the outcomes of this project and my contributions to it. I wanted to improve my knowledge and experience with FPGAs, computer architecture, and low-level programming, and so a project requiring these skills was developed. Easier technologies could have been used (for example, Python for the compiler), but this would have abstracted important processes, such as AST transformations and instruction encoding, away from me resulting in less experience gained.
 
-The project required 2 complex systems that needed to interact with each other
+Throughout this project, I have learnt and improved upon my Verilog and C programming skills as well as new debugging techniques, such as HDL simulation and emulation.
 
 
 \subsection*{Future Improvements}
 This was my first attempt at a compiler capable of generating and assembling machine code and an embedded FPGA-based processor. Although much as been learned, the design and implementation shows that a number of improvements can be made. Firstly, the design of the processor's pipeline was not parallel, meaning that only 1 instruction could be fetched, executed, and written to, at any time. This was because the processors components (decoder, registers, RAMs), used global wires connecting them, instead of a wires connecting them from module to module. This would enable a scalar pipeline to be implemented.
 
-The compiler was only able to transform high-level code into machine code. Even though the compiler would display assembly like code representing the machine code, users could not write or compile it; it was merely there to help debug the generated code by making it easier to read the machine code. Enabling parsing of assembly like code would enable specific routines to be created which would enable more complex applications, such as operating system kernels and reliably timed routines.
+The compiler was only able to transform high-level code into machine code. Even though the compiler would display assembly like code representing the machine code, users could not write or compile it; it was merely there to help debug the generated code by making it easier to read the machine code. Enabling parsing of assembly like code would enable specific routines to be created which would enable more complex applications to be created, such as operating system kernels and reliably timed routines.
 
 
 \section{Conclusion}
-This project aimed at producing two complex technical systems: an embedded processor and a compiler. Both systems were developed and the output is an extremely valuable educational resource. The technologies created from this project spawning from the compiler include:
+This project aimed at producing two complex technical systems: an embedded processor and a compiler. Both systems were developed and the output is an extremely valuable educational resource. 
+
+The technologies created from this project spawning from the compiler include:
 \begin{itemize}
 \item{an easily extendible recursive-descent text parser;}
 \item{an AST optimiser for constant-folding and unreachable code elimination;}
@@ -1637,9 +1639,11 @@ And from the embedded processor:
 \item{a 16-bit instruction set and it's implementation;}
 \item{and a feed-forward pipeline architecture.}
 \end{itemize}
+
+A wide-range of test programs were written that implement common programming features such as \verb|for| and \verb|while| loops, functions, and variables. These features are combined to perform general and complex programs such as string length finding, UART printing, and variable modification. From the range of these test programs, it clearly shows the potential of the processor and compiler and it's ability to perform a wide range of programs. 
+
 I believe these technologies and their implementation details should be shared as an open, educational resource for future projects and people interested in low-level code generation and embedded processor architecture.
 
-\todo[inline]{Review project management methods}
 
 
 
@@ -1647,8 +1651,6 @@ I believe these technologies and their implementation details should be shared a
 
 \newpage
 \bibliography{prco304}
-\todo[inline]{more}
-
 
 
 \newpage
