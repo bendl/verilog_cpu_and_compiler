@@ -186,6 +186,27 @@
     \end{tabularx}
 \end{table}
 
+
+\subsubsection*{SETC}
+\begin{description}[align=right,labelwidth=4cm]
+\item [Description] Set register Rd to 0 or 1 depending on the Status Register and Immediate value.
+\item [Assembly] SETC \$0x08, \%Rd
+\item [Pseudocode]Rd $<$= 1 if Imm8 and Status Register equal, else 0.
+\item [Registers altered] Rd
+\item [Clock cycles] 5 (FETCH, DECODE, READ, EXEC, WRITE)
+\end{description}
+
+\begin{table}[H]
+\def\arraystretch{1.3}%  1 is the default, change whatever you need
+    \begin{tabularx}{\textwidth}{|p{4cm}|p{3cm}|X|}
+    \hline
+    15:11 & 10:8 & 7:0 \\
+	\specialrule{2pt}{-2pt}{0pt}
+	10101 & Rd & Imm8 (See JMP Imm8)
+	\\ \hline
+    \end{tabularx}
+\end{table}
+
 \newpage
 \subsubsection*{JMP}\label{isa_jmp}
 \begin{description}[align=right,labelwidth=4cm]

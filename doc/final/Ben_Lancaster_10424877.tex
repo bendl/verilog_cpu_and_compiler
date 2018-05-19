@@ -184,8 +184,6 @@
 \begin{document}
 \arrayrulecolor{blue9}
 
-\listoftodos
-
 \makeatletter
 \DeclareRobustCommand*{\nameref}{%
 \color{blue}%
@@ -274,6 +272,7 @@ PRCO304 - Final Stage Computing Project
     Date & Version & Changes \\
     \arrayrulecolor{blue9}
 	\specialrule{2pt}{-2pt}{0pt}
+	19/05/2018 & 3.13 & Update abstract to align with guidelines. \\ \hline
 	19/05/2018 & 3.12 & Fix ISA pseudo-codes. \\ \hline
 	15/05/2018 & 3.11 & Correct CMP (\ref{isa:cmp}) instruction bits. \\ \hline
 	04/05/2018 & 3.10 & Add section \ref{sect:core_analysis} {\nameref{sect:core_analysis}} to describe performance of the embedded processor. \\ \hline
@@ -311,7 +310,7 @@ This report outlines the design decisions of the new embedded processor's instru
 \\\\
 A combination of PRINCE2 and Agile methodologies are employed, allowing for incremental development of both core and compiler, yet with risk, quality, and development stages identified. Descriptions of the project management processes and drawings are provided throughout the report.
 \\\\
-A project post-mortem is performed to reflect on the achievements of the project with respect to the initial project objectives and to discuss further improvements to the project management, design, implementation, and verification, of the project. It was found that the combination of Agile and PRINCE2 methodologies aided the development of the project. The core was fully implemented on a Spartan-6 FPGA hardware, with a performance of 10 MIPS and 0.2 IPC at 40MHz, but was found to utilise too many slice resources. The compiler was able to produce optimised machine code but failed to identify some types of common optimisations, resulting in larger program sizes.
+A project post-mortem is performed to reflect on the achievements of the project with respect to the initial project objectives and to discuss further improvements to the project management, design, implementation, and verification, of the project. It was found that the combination of Agile and PRINCE2 methodologies aided the development of the project. The core was fully implemented on Spartan-6 FPGA hardware, with a performance of 10 MIPS and 0.2 IPC at 40MHz, but was found to utilise too many slice resources. The compiler was able to produce optimised machine code but failed to identify some types of common optimisations, resulting in larger program sizes.
 \\\\
 The processor specification, compiler usage guides, and other project management and documents are provided in the appendices.
 
