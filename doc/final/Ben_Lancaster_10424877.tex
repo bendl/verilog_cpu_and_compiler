@@ -387,64 +387,16 @@ Modern computing and electronics equipment, like function generators, oscillosco
 The aim of this project is to implement this side-microprocessor into the FPGA to save on BOM costs, PCB  space,  and  power  costs,  which  contribute  to  higher  development  and  product  costs.  While  savings can  be  made  by  the  lack  of  side  microprocessor,  the  product  may  need  a  larger  FPGA  to  accommodate the embedded microprocessor.  The project will produce a small, soft-core, CPU design and compiler. Although there is no direct client in this project, I believe this project will produce an attractive product
 for FPGA-based product designers wishing to employ an embedded processor solution.
 
-This report details the design considerations, implementation, and verification, 
-%\lipsum[0-1]
+This report details the design considerations, implementation, and verification, of a new embedded processor architecture and a high-level code-compiler targeting it.
 
 \section{Background}
-\subsection{Existing Embedded Processors}
-\label{current_impl}
+Embedded processors are becoming more and more present in many products, ranging from toys to outdoor recording systems to test and measurement tools. In addition, FPGA-devices are being utilised in an increasing number of new areas, such as machine vision for image processing and machine learning.
+ 
+\subsection{Embedded Processors}
 There exists many commercial and open-source embedded processors, each providing different features and specialities such as digital signal processing, analogue components, instruction set architectures, and interfaces.
 
-Popular embedded processors include:
-\begin{itemize}
-\item{\textit{Xilinx MicroBlaze \cite{microblaze}.} MicroBlaze features a 32-bit big-endian RISC architecture targeting FPGA devices. 
+Research has been performed to identify existing embedded processor features and characteristics. This research has been used to identify requirements and desired functionality of this new processor architecture. This research can be found in section \ref{current_impl} {\nameref{current_impl}}.
 
-The processor's instruction set contains over 100 instructions, covering traditional RISC operations such as arithmetic (ADD), comparison (CMP), floating point operations (FADD), bitwise (XOR), memory operations (LW, SW). Interestingly, the processor allows full control of the program counter, and provides multiple instructions for controlling it.
-
-MicroBlaze features 32 32-bit general purpose registers similar to other RISC architectures (ARMv8-A) with 32 32-bit general purpose registers). The high register count allows for storing of more values over the lifetime of programs, increasing performance by reducing timely memory operations.
-
-The processor can included in FPGA designs using a graphical configuration tool, the MicroBlaze Configuration Wizard. This allows the designer to customise the features and implementation of the processor in their design. Designers can choose to integrate: commercial interface features, such as PCI Express interfaces; additional functionality, such as memory management units and floating point units; and performance features, such as instruction caching, and hardware multipliers/dividers.
-
-\begin{figure}[H]
-\centering
-\includegraphics[scale=0.5]{mcw2}
-\caption{The MicroBlaze Configuration Wizard, showing options for clock frequency, memory sizes, UART, GPIO, interrupts, and more. Source: \url{https://embeddedmicro.com/blogs/tutorials/embedded-processors}}
-\end{figure}
-}
-
-
-
-\item{\textit{ARM Cortex-A9 MPCore} \cite{cortexa9}. The Cortex-A9 implements ARM's 32-bit Thumb-2 RISC instruction set. This architecture supports 15 32-bit registers, half of what MicroBlaze supports.
-
-In addition to FPGA-based implementation, the Cortex-A9 is also designed for silicon based SoC designs. The processor is implemented in many commercial SoC products such as Broadcom's BCM11311, STMicroelectronics' SPEAr1310, and Apple's A5 mobile chip. }
-
-\item{\textit{Xilinx PicoBlaze \cite{picoblaze}.} PicoBlaze is an  8-bit RISC embedded microcontroller, designed by Ken Chapman \cite{merchant2009platform}, originally named KCPSM ("Ken Chapman's Programmable State Machine") \cite{kamat2009unleash}.
-
-An important characteristic of the PicoBlaze embedded processor is that it only requires a minimum of 26 FPGA slices, meaning that implementation on a Spartan-6 (XC6SLX9) FPGA that has 1430 slices, where each consists of 4-LUTs and 8 Flip Flops  \cite{spartan6}, results in only 1.8\% of the resources being used, allowing for more complex logic to be bundled alongside the processor. This low resource requirement is a key characteristic that designers use when considering embedded processors and will be considered in the design of the new embedded processor.
-}
-\end{itemize}
-
-\subsection{Current Compiler Toolchains}
-To run functional and complex programs on the processor, a high-level code compiler will be required. This compiler must be able to take a high-level grammar as input and output an executable that the new processor can run. Only open-source compilers will be considered due to having better documentation and source code, which reduces risk in the project. The source code will need to be open and modifiable as this project requires a backend to be implemented.
-
-\begin{itemize}
-\item{\textit{LLVM} \cite{llvm}. LLVM is a set of reusable compiler technologies that allows developers to build frontends, backends, and optimisers, for different projects. LLVM uses a text-based intermediate representation (IR). This IR is relocatable, allowing front-ends of multiple input grammars to be compiled to it, and back-ends to accept it to generate implementation specific code. 
-
-LLVM, while a large project and still actively developed and used by many programming languages, such as Clang, Haskell, and Swift, suffers from poor and outdated documentation. This will be a large risk factor if chosen for this project as additional time will be required for learning it.
-}
-
-
-\item{\textit{8cc} \cite{8ccgithub}. 8cc is a small, open-source, C compiler built by Rui Ueyama.
-
-The compiler is the simplest of the above mentioned compilers as it was only developed in 40 days \cite{8cc}. Although not fully implementing a standards compliant language,  the compiler is still functional and has the ability to compile itself (self-hosting) which is a great achievement.
-
-The compiler does not assemble an executable file, but rather outputs x86\_64 AT\&T syntax assembly language. This is then assembled by a third-party assembler such as GCC's \textit{as} tool.
-
-The project's source code is "written to be as concise and easy-to-read as possible" \cite{8cc} and this is indeed true looking at the contents. Although little documentation is available, the code generation functions of importance to this project in \textit{gen.c}, can be easily modified to emit our new instruction set architecture machine code.
-
-Utilising this compiler will allow this processor to run more complex and functional programs. The disadvantage lies in the complexity of the C programming language, in that it requires many code generation routines for different variations of each program. To even compile a simple addition function, I will first need to implement many unused code generation routines such as datatype conversions, variable allocations, and more. In addition, some of these routines may not be implementable on the new processor and will result in undefined behaviour. This is a large risk to the project as an unknown amount of time will need to be allocated to create a backend for the compiler.
-}
-\end{itemize}
 
 \newpage
 
@@ -1778,9 +1730,82 @@ Following this is the list of executed instructions. Instruction execution start
 
 \newpage
 \section{Appendix C. Other Documents}
+\subsection{Existing Embedded Processor and Compiler Research}
+\label{current_impl}
+There exists many commercial and open-source embedded processors, each providing different features and specialities such as digital signal processing, analogue components, instruction set architectures, and interfaces.
+
+Popular embedded processors include:
+\begin{itemize}
+\item{\textit{Xilinx MicroBlaze \cite{microblaze}.} MicroBlaze features a 32-bit big-endian RISC architecture targeting FPGA devices. 
+
+The processor's instruction set contains over 100 instructions, covering traditional RISC operations such as arithmetic (ADD), comparison (CMP), floating point operations (FADD), bitwise (XOR), memory operations (LW, SW). Interestingly, the processor allows full control of the program counter, and provides multiple instructions for controlling it.
+
+MicroBlaze features 32 32-bit general purpose registers similar to other RISC architectures (ARMv8-A) with 32 32-bit general purpose registers). The high register count allows for storing of more values over the lifetime of programs, increasing performance by reducing timely memory operations.
+
+The processor can included in FPGA designs using a graphical configuration tool, the MicroBlaze Configuration Wizard. This allows the designer to customise the features and implementation of the processor in their design. Designers can choose to integrate: commercial interface features, such as PCI Express interfaces; additional functionality, such as memory management units and floating point units; and performance features, such as instruction caching, and hardware multipliers/dividers.
+
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.5]{mcw2}
+\caption{The MicroBlaze Configuration Wizard, showing options for clock frequency, memory sizes, UART, GPIO, interrupts, and more. Source: \url{https://embeddedmicro.com/blogs/tutorials/embedded-processors}}
+\end{figure}
+}
+
+
+
+\item{\textit{ARM Cortex-A9 MPCore} \cite{cortexa9}. The Cortex-A9 implements ARM's 32-bit Thumb-2 RISC instruction set. This architecture supports 15 32-bit registers, half of what MicroBlaze supports.
+
+In addition to FPGA-based implementation, the Cortex-A9 is also designed for silicon based SoC designs. The processor is implemented in many commercial SoC products such as Broadcom's BCM11311, STMicroelectronics' SPEAr1310, and Apple's A5 mobile chip. }
+
+\item{\textit{Xilinx PicoBlaze \cite{picoblaze}.} PicoBlaze is an  8-bit RISC embedded microcontroller, designed by Ken Chapman \cite{merchant2009platform}, originally named KCPSM ("Ken Chapman's Programmable State Machine") \cite{kamat2009unleash}.
+
+An important characteristic of the PicoBlaze embedded processor is that it only requires a minimum of 26 FPGA slices, meaning that implementation on a Spartan-6 (XC6SLX9) FPGA that has 1430 slices, where each consists of 4-LUTs and 8 Flip Flops  \cite{spartan6}, results in only 1.8\% of the resources being used, allowing for more complex logic to be bundled alongside the processor. This low resource requirement is a key characteristic that designers use when considering embedded processors and will be considered in the design of the new embedded processor.
+}
+\end{itemize}
+
+\subsection{Current Compiler Toolchains}
+To run functional and complex programs on the processor, a high-level code compiler will be required. This compiler must be able to take a high-level grammar as input and output an executable that the new processor can run. Only open-source compilers will be considered due to having better documentation and source code, which reduces risk in the project. The source code will need to be open and modifiable as this project requires a backend to be implemented.
+
+\begin{itemize}
+\item{\textit{LLVM} \cite{llvm}. LLVM is a set of reusable compiler technologies that allows developers to build frontends, backends, and optimisers, for different projects. LLVM uses a text-based intermediate representation (IR). This IR is relocatable, allowing front-ends of multiple input grammars to be compiled to it, and back-ends to accept it to generate implementation specific code. 
+
+LLVM, while a large project and still actively developed and used by many programming languages, such as Clang, Haskell, and Swift, suffers from poor and outdated documentation. This will be a large risk factor if chosen for this project as additional time will be required for learning it.
+}
+
+
+\item{\textit{8cc} \cite{8ccgithub}. 8cc is a small, open-source, C compiler built by Rui Ueyama.
+
+The compiler is the simplest of the above mentioned compilers as it was only developed in 40 days \cite{8cc}. Although not fully implementing a standards compliant language,  the compiler is still functional and has the ability to compile itself (self-hosting) which is a great achievement.
+
+The compiler does not assemble an executable file, but rather outputs x86\_64 AT\&T syntax assembly language. This is then assembled by a third-party assembler such as GCC's \textit{as} tool.
+
+The project's source code is "written to be as concise and easy-to-read as possible" \cite{8cc} and this is indeed true looking at the contents. Although little documentation is available, the code generation functions of importance to this project in \textit{gen.c}, can be easily modified to emit our new instruction set architecture machine code.
+
+Utilising this compiler will allow this processor to run more complex and functional programs. The disadvantage lies in the complexity of the C programming language, in that it requires many code generation routines for different variations of each program. To even compile a simple addition function, I will first need to implement many unused code generation routines such as datatype conversions, variable allocations, and more. In addition, some of these routines may not be implementable on the new processor and will result in undefined behaviour. This is a large risk to the project as an unknown amount of time will need to be allocated to create a backend for the compiler.
+}
+\end{itemize}
+
+\begin{table}[H]
+\def\arraystretch{1.5}
+\begin{tabularx}{\textwidth}{|l|l|l|l|p{2cm}|X|}
+\hline 
+Processor & Architecture & Bits & Registers & Branching & Other \\ 
+\specialrule{2pt}{-2pt}{0pt}
+
+MicroBlaze & RISC & 32 & 32 & Branch on Condition, Condition & Interrupt Vector \\ 
+\hline
+ARMv8 & RISC & 32 & 31 & Condition & Interrupt Vector \\ 
+\hline 
+PicoBlaze & RISC & 8 & 16 & Condition & Internal 64-byte scratch memory;\newline 1KB Instruction on-chip storage;\newline Interrupts; 0.5 IPC \\ 
+\hline 
+\end{tabularx}
+\caption{Comparison of existing embedded processor architectures.}
+\label{sect:existing_isa_cmp}
+\end{table} 
+
+\newpage
 \subsection{Compiler Functional Requirements}
 \label{sect:compiler_func_req}
-
 \begin{figure}[H]
 \begin{center}
 \includegraphics[scale=0.5]{compiler_dependencies}
@@ -1821,25 +1846,6 @@ Starting at \textit{F1}, we can see that the compiler needs to support strings, 
     \label{fig:}
 \end{figure}
 
-\newpage
-\subsection{Existing Embedded Processor Comparison}
-\label{sect:existing_isa_cmp}
-\begin{table}[H]
-\def\arraystretch{1.5}
-\begin{tabularx}{\textwidth}{|l|l|l|l|p{2cm}|X|}
-\hline 
-Processor & Architecture & Bits & Registers & Branching & Other \\ 
-\specialrule{2pt}{-2pt}{0pt}
-
-MicroBlaze & RISC & 32 & 32 & Branch on Condition, Condition & Interrupt Vector \\ 
-\hline
-ARMv8 & RISC & 32 & 31 & Condition & Interrupt Vector \\ 
-\hline 
-PicoBlaze & RISC & 8 & 16 & Condition & Internal 64-byte scratch memory;\newline 1KB Instruction on-chip storage;\newline Interrupts; 0.5 IPC \\ 
-\hline 
-\end{tabularx}
-\caption{Comparison of existing embedded processor architectures.}
-\end{table} 
 
 %TC:endignore
 \end{document}
