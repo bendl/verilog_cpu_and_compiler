@@ -330,7 +330,7 @@ Words count: 10527
 
 \subsection*{Sources}
 \begin{description}[style=nextline]
-\item[GitHub (with git repository metadata)]{\info{How early can I make this repository public?}\url{https://github.com/bendl/prco304}}
+\item[GitHub (with git repository metadata)]{\url{https://github.com/bendl/prco304}}
 \item[OneDrive (raw files)]{\url{https://liveplymouthac-my.sharepoint.com/:f:/g/personal/ben_lancaster_students_plymouth_ac_uk/EmzpOaOZhyZIvDhGLSUQC8oBbRX5iO6Ujwe81TUa1VlV-A?e=Ndd677}}
 \end{description}
 
@@ -1598,8 +1598,7 @@ The compiler successfully output machine code in a format accepted by the \scnam
 Due to the high complexity of the project and availability of existing processor designs, I was able to easily find thoroughly documented processor designs and specifications. These are normally in the form of developer-facing technical manuals which detail the operation and characteristics of the processor. By reading multiple processor specifications, I quickly built up an understanding of existing processor designs and how they are technically presented to developers to integrate into their own projects. The application of this knowledge can be seen throughout this project: the \scname{} processor high-level design; and the ISA.
 
 \subsection*{Development Process}
-The combination of PRINCE2 with Agile was a success. (using the PID, plans, and risks) (weekly sprints, constant reviews)
-\todo[inline]{Review project management methods}
+The combination of PRINCE2 with Agile was a success. The alignment of Agile's sprints and PRINCE2's highlight reports and stages made developing the project easier. A Kanban board was created to track stages, requirements, and bugs, and to  organise and present them clearly. In addition, milestones were created allowing tasks to be better scoped.
 
 \subsection*{Technology Review}
 Using LaTex for all documentation aided the project greatly. LaTex, being a text-based document editor, worked great when combined with version control, such as Git. This allowed for easier tracking, reviewing, and merging of document changes throughout the project. Although requiring an initial learning curve, however once passed, documents could be edited quickly and professionally with skill.
@@ -1613,13 +1612,18 @@ I am pleased with the outcomes of this project and my contributions to it. I wan
 
 Throughout this project, I have learnt and improved upon my Verilog and C programming skills as well as learning new debugging techniques, such as HDL simulation and emulation.
 
+\subsection*{Changes}
+The project has utilised agile development to review and introduce unseen features as needed. For example, the need for a new instruction SETC was identified and was introduced in the project, as well new ISA types for special instructions. 
+
+As seen in the highlight reports, there was originally planned to provide a processor documentation guide. Due to time constraints however, this document has been split up merged into the Report and Appendix. It originally featured content about the ISA and pipeline.
+
 
 \subsection*{Future Improvements}
 This was my first attempt at a compiler capable of generating and assembling machine code and an embedded FPGA-based processor. Although much as been learned, the design and implementation shows that a number of improvements can be made. Firstly, the design of the processor's pipeline was not parallel, meaning that only 1 instruction could be fetched, executed, and written to, at any time. This was because the processors components (decoder, registers, RAMs), used global wires connecting them, instead of a wires connecting them from module to module. This would enable a scalar pipeline to be implemented.
 
 The compiler was only able to transform high-level code into machine code. Even though the compiler would display assembly like code representing the machine code, users could not write or compile it; it was merely there to help debug the generated code by making it easier to read the machine code. Enabling parsing of assembly like code would enable specific routines to be created which would enable more complex applications to be created, such as operating system kernels and reliably timed routines.
 
-It was found that debugging the implemented processor was difficult to debug and troubleshoot. This is an important problem in FPGA-based products. A common solution employed in processors and FPGA-based products is to employ a debugging interface into the design, such as JTAG or other scoped-bus. This would be too timely to fit into this projects timeline, but will be crucial if complex features are to be added to the processor.
+It was found that the implemented processor was difficult to debug and troubleshoot. This is an important problem in FPGA-based products. A common solution employed in processors and FPGA-based products is to employ a debugging interface in the design, such as JTAG or other scoped-buses. This would be too timely to fit into this projects timeline, but will be crucial if complex features are to be added to the processor.
 
 \newpage
 \section{Conclusion}
