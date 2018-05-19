@@ -14,7 +14,7 @@ cmake ..
 cmake --build .
 ```
 
-or to run all tests:
+or to run all tests (recommended):
 ```bash
 cd prco_compiler/test
 ./travis-ci.sh
