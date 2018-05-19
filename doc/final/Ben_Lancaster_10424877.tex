@@ -654,7 +654,7 @@ The \scname{} Processor Design is the first of two deliverable sub-projects requ
 Using research gathered from existing embedded processor designs (see section \ref{current_impl}), and consideration of constraints such as time and resources (see section \ref{sect:proj_time}), the following core and extended deliverables have been decided:
 
 \subsection{Core Deliverables}
-The following Core Processor Deliverables (CPD) are deliverables that must be implemented for the processor to be deemed functional.
+The following Core Processor Deliverables (CPD) are deliverables that must be implemented for the processor to be deemed functional. These goals were designed with SMART methodologies in mind.
 
 \begin{enumerate}[label=\bfseries CPD\arabic*.]
 \item{Support a wide range of executable programs.}
@@ -675,7 +675,6 @@ The following Extended Processor Deliverables (EPD) are deliverables that must b
 \item{Implement a super-scalar pipeline architecture (execute more than 1 instruction per clock).}
 \end{enumerate}
 
-\todo[inline]{Justify and explain sources of these deliverables - existing processors provide these etc.}
 \subsection{Applicable Stages}
 The design, implementation, and verification of the new processor consist of the  project stages 1.2 to 2.4. Initially described above in section \ref{stages}, below details additional technical considerations, challenges, and changes that occurred during these stages.
 
@@ -689,7 +688,7 @@ This stage covers the implementation of the register set in Verilog, as per the 
 After this stage, the processor will be able to read and write 16-bit values in the dual port register set.
 
 \item [Stage 2.1: Core dev. Decoder implementation]
-The instruction decoder is a core part of all processors; they deconstruct incoming instructions and identify operands within the instruction, such as immediate values, opcodes, and register selects.
+The instruction decoder is a core part of all processors; they deconstruct incoming instructions and identify operands within the instruction, such as immediate values, opcodes, and register selects. The decoder went through an iterative development utilising Agile sprints. This allowed new instructions to be iteratively added to the module to support new features.
 
 
 
@@ -712,7 +711,7 @@ The \scname{} processor is a modularised processor with independent components f
 \begin{center}
 \includegraphics[scale=0.5]{hld}
 \end{center}
-\caption{\scname{} processor block diagram showing.}
+\caption{\scname{} processor block diagram showing component interconnections within the processor, FPGA, and development board.}
 \label{fig:core_hld}
 \end{figure}
 
@@ -737,13 +736,12 @@ Registers A through E are designed for general purpose use and are safe to store
 Instructions that require a destination register, such as CMP, can reference any register (even special registers if that is your requirement). For the CMP instruction as an example, the processor will put the result of the comparison instruction in the destination register, overwriting any value present in that register.
 
 \subsection{Special Registers}
-\todo{Remove? Latest update removes these registers - only Status register remains and isnt addressable.}
 Registers F through H are special registers within the processor. The processor cannot guarantee that a value written or read in these registers will persist over the run-time of the processor. Erroneously writing to these registers may severely affect program and processor behaviour.
 
 Even though all registers can be used at the will of the programmer, it is recommended to isolate a few registers to provide special features, such as RAM stack management, interrupts, and IO multiplexing.
 
 \begin{table}[h]
-\def\arraystretch{1.3}%  1 is the default, change whatever you need
+\def\arraystretch{1.3}
     \begin{tabularx}{\textwidth}{|p{2cm}|l|X|}
     \hline
     Registers & Bits & Description \\
@@ -763,22 +761,22 @@ Even though all registers can be used at the will of the programmer, it is recom
 The Status Register is a dedicated register used by the ALU to provide additional information on results of instructions. Using the Status Register is essential for programs wanting to perform conditional branching or operate on dynamic data.
 
 \begin{table}[h]
-\def\arraystretch{1.3}%  1 is the default, change whatever you need
+\def\arraystretch{1.3}
     \begin{tabularx}{\textwidth}{|p{2cm}|l|X|}
     \hline
     Bit & Name & Description \\
 	\specialrule{2pt}{-2pt}{0pt}
 	0 & SR\_Z & Set if the result of a CMP instruction is 0.
 	\\ \hline
-	1 & SR\_S & Set if the result of a CMP instruction is signed (greatest bit is 1).
+	1 & SR\_S & Set if the result of a CMP instruction is signed (greatest bit is 1) (signed).
 	\\ \hline
-	2 & SR\_O & Set if the result's 17'bit of a CMP instruction's is set.
+	2 & SR\_O & Set if the result's 17'bit of a CMP instruction's is set (overflowed).
 	\\ \hline
     \end{tabularx}
     \caption{Status Register breakdown.}
 \end{table}
 
-By default, the JMP instruction will read the Status Register to compare against the instruction's conditional jump parameter. 
+These bits are chosen as they can be combined to represent different types of comparison, such as \textit{equal to}, \textit{greater than}, and \textit{less than or equal to}. 
 
 \subsubsection{Base Pointer}
 \label{sect:core_regs_bp}
@@ -800,7 +798,7 @@ The \scname{} processor implements it's own fixed 16-bit little-endian instructi
 
 
 \subsection{Instruction Types}
-It was decided to support the following 3 types of instructions. This allows for a wide range of instruction operands, such as more registers or larger immediate values.
+It was decided to support the following 3 types of instructions. This allows for a wide range of instruction operands, such as more registers selectors or larger immediate values.
 
 \begin{table}[h]
 \def\arraystretch{1.3}
@@ -872,7 +870,7 @@ Table \ref{tab:isa_jmp_bits} below details each conditional branch parameter and
     JS		& 01100 & Rd & \multicolumn{2}{c|}{0000 0111} & Jump Signed & SR\_S=1\\ \hline
     JNS		& 01100 & Rd & \multicolumn{2}{c|}{0000 1000} & Jump Not Signed & SR\_S=0 \\ \hline
     \end{tabularx}
-    \caption{Conditional jump immediate bits}
+    \caption{Conditional jump instructions showing how the Status Register is utilised.}
     \label{tab:isa_jmp_bits}
 \end{table}
 
@@ -901,8 +899,8 @@ With the introduction of the \verb|SETC| instruction late in development, the nu
 The \scname{} processor employs a \textit{feed-forward} pipeline strategy. 
 This pipeline supports:
 \begin{itemize}
-\item{Time-varying processes: Multi-clock cycle decoding; Memory access; ALU ops.}
-\item{Module re-ordering: Instruction dependencies; Module skipping; Output redirection. }.
+\item{Time-varying processes: Multi-clock cycle decoding; Memory access; ALU operations.}
+\item{Module re-ordering: Instruction dependencies; Module skipping; Output redirection.}
 \end{itemize}
 
 As the pipeline is feed-forward, no information is sent back to previous modules to tell them of their status. This means that if a module is stalled (due to mutli-cycle processes or future modules are stalled), and the previous module is ready, the previous module will signal the next module that information is ready and it should take it, but the current module is unable to as it is busy. The pipeline resolves this issue by it's cyclic nature. This means that only 1 module at any time is processing data. Of-course, the downside to this approach is that instruction parallelism is reduced.
@@ -920,7 +918,7 @@ The Decoder module will decode instruction words from memory and will output app
 \newline\newline
 To improve instruction performance, the decoder can also choose what modules are required and when they are called. For example, for the {\nameref{isa_movi}} (move immediate) instruction the Decoder will assign the following modules in the following order: ALU and Register write, resulting in a total of 5 stages (including PC, Fetch, and Decode). The last module in this pipeline, the Register write, will raise the \textit{q\_pipe\_end} signal indicating that the pipeline has finished and to start fetching the next instruction.
 
-For the {\nameref{isa_nop}} instruction, the decoder identifies that the instruction requires no dependencies and will hence signal the \textit{q\_pc\_inc} signal resulting in only 3 pipeline stages.
+For the NOP instruction, the decoder identifies that the instruction requires no dependencies and will hence raise the \textit{q\_pc\_inc} signal resulting in only 3 pipeline stages.
 
 For instructions that require RAM access, a typical pipeline order might look like: PC, Fetch, Decoder, Register Read, ALU, RAM, resulting in 6 stages being used.
 
@@ -931,11 +929,10 @@ For instructions that require RAM access, a typical pipeline order might look li
 \caption{\scname{} processor instruction cycle time diagram.}
 \label{fig:dft_algorithm}
 \end{figure}
-\todo{Outdated. Change to reflect new pipelines varying time processes.}
 
 \section{Testing and Verification}
 \label{sect:core_test}
-Each module within the \scname{} processor has a corresponding Verilator and iSim testbench.
+Multiple forms of verification and validation are performed on the processor to satisfy the quality requirements (\ref{quality}) of the project.
 
 \begin{itemize}
 \item{\textbf{Verilator testbenches} are used to automatically verify correct behaviour of the RTL code. These testbenches use the Verilator framework to compile and simulate Verilog modules. These tests produce an output report detailing test results and real register values. 
@@ -1002,33 +999,31 @@ The \scname{} processor is similar to AMD's Am386 (1991) processor with 9 MIPS a
 
 
 \newpage
-\section{Sub-project Review}
+\section{\scname{} Processor Review}
 \subsection{Project Deliverables}
 \begin{description}[style=nextline]
 \item [CPD1. Support a wide range of executable programs.]
-This has been achieved. A number of applications have been written for the processor (located in \verb|prco_compiler/test/tests/|) ranging from string manipulation, integer division, and console printing. The combination of these programs can result in a wide range of large and complex applications.
+Achieved. A number of applications have been written for the processor (located in \verb|prco_compiler/test/tests/|) ranging from string manipulation, integer division, and console printing. The combination of these programs can result in a wide range of large and complex applications.
 
 \item [CPD2. Provide a 16-bit instruction set capable of supporting simple programs.]
-This has been achieved. A few instructions were added in addition to the original ISA design. The complete instruction listing can be found in {\nameref{appendix:isa}}.
+Achieved. A few instructions were added in addition to the original ISA design. The complete instruction listing can be found in {\nameref{appendix:isa}} user guide.
 
 \item [CPD3. Support simple arithmetic and bitwise operations.]
-This has been achieved. Although only addition and subtraction have been implemented in hardware, multiplication, division, and modulo, can be performed in software using multiple simple instructions.
+Achieved. Although only addition and subtraction have been implemented in hardware, multiplication, division, and modulo, can be performed in software using multiple simple instructions.
 
 \item [CPD4. Operate on 16-bit data sizes.]
-This has been achieved. All register sizes, memory cell sizes, and ALU outputs are of 16-bit words.
+Achieved. All register sizes, memory cell sizes, and ALU outputs are of 16-bit words.
 Operands using only 8-bits are bit-extended to 16-bits by the ALU.
 
 \item [CPD5. Fully synthesize-able on FPGA hardware.]
-This has been achieved. Section \ref{ise_impl} details the implementation on the XC6SLX9 FPGA.
+Achieved. Section \ref{ise_impl} reviews the implementation on the XC6SLX9 FPGA.
 
 \item [CPD6. Implement a simple pipeline architecture.]
-This has been achieved. The pipeline is described and reviewed in section \ref{core:pipeline}  {\nameref{core:pipeline}}.
+Achieved. The pipeline is described and reviewed in section \ref{core:pipeline}  {\nameref{core:pipeline}}.
 \end{description}
 
 
 \subsection{Extended Deliverables}
-The following Extended Processor Deliverables (EPD) are deliverables that must be implemented for the processor to be deemed functional.
-
 \begin{description}[style=nextline]
 \item [EPD1. Provide multiplication, division, modulus, instructions.]
 Not achieved. Due to limited time and the complexity of these operations, these instructions were not implemented in hardware. They can be implemented fully in software however.
@@ -1664,24 +1659,6 @@ I believe these technologies and their implementation details should be shared a
 \printcontents[chapters]{}{1}{}
 }
 
-\section{Appendix X. Existing Embedded Processor Comparison}
-\label{sect:existing_isa_cmp}
-\begin{table}[H]
-\begin{tabularx}{\textwidth}{|l|l|l|l|p{2cm}|X|}
-\hline 
-Processor & Architecture & Bits & Registers & Branching & Other \\ 
-\specialrule{2pt}{-2pt}{0pt}
-
-MicroBlaze & RISC & 32 & 32 & Branch on Condition, Condition & Interrupt Vector \\ 
-\hline
-ARMv8 & RISC & 32 & 31 & Condition & Interrupt Vector \\ 
-\hline 
-PicoBlaze & RISC & 8 & 16 & Condition & Internal 64-byte scratch memory;\newline 1KB Instruction on-chip storage;\newline Interrupts; 0.5 IPC \\ 
-\hline 
-\end{tabularx}
-\caption{Comparison of existing processor architectures.}
-\end{table} 
-
 \section{Appendix A. User Guides}
 \subsection{\scname{} Core Reference Guide}
 \subsubsection*{Instantiating the core in your FPGA design}
@@ -1828,7 +1805,6 @@ Starting at \textit{F1}, we can see that the compiler needs to support strings, 
 \caption{UML sequence diagram for the \scname{} compiler. This diagram shows the compiler's program flow. The CLI is the only component the user is required to interact with. The user passes the input file to the CLI which in-turn invokes the compiler to parse and generate output machine code.}
 \label{fig:hld}
 \end{figure}
-%TC:endignore
 
 \newpage
 \subsection{ISE XC6SLX9 Implementation Report}
@@ -1848,5 +1824,25 @@ Starting at \textit{F1}, we can see that the compiler needs to support strings, 
     \label{fig:}
 \end{figure}
 
+\newpage
+\subsection{Existing Embedded Processor Comparison}
+\label{sect:existing_isa_cmp}
+\begin{table}[H]
+\def\arraystretch{1.5}
+\begin{tabularx}{\textwidth}{|l|l|l|l|p{2cm}|X|}
+\hline 
+Processor & Architecture & Bits & Registers & Branching & Other \\ 
+\specialrule{2pt}{-2pt}{0pt}
 
+MicroBlaze & RISC & 32 & 32 & Branch on Condition, Condition & Interrupt Vector \\ 
+\hline
+ARMv8 & RISC & 32 & 31 & Condition & Interrupt Vector \\ 
+\hline 
+PicoBlaze & RISC & 8 & 16 & Condition & Internal 64-byte scratch memory;\newline 1KB Instruction on-chip storage;\newline Interrupts; 0.5 IPC \\ 
+\hline 
+\end{tabularx}
+\caption{Comparison of existing embedded processor architectures.}
+\end{table} 
+
+%TC:endignore
 \end{document}
