@@ -2,10 +2,10 @@
 subsubsection*{NOP}
 \label{isa_nop}
 \begin{description}[align=right,labelwidth=4cm]
-\item [Description] The NOP instruction performs no action for 1 instruction cycle (see section  \ref{sect:isa_timings}).
+\item [Description] The NOP instruction performs no action for 1 instruction cycle.
 \item [Assembly] NOP
 \item [Pseudocode]
-\item [Registers altered]
+\item [Registers altered] None
 \item [Clock cycles] 2 (FETCH, DECODE)
 \end{description}
 
@@ -64,7 +64,7 @@ subsubsection*{NOP}
 
 \subsubsection*{MOVR}
 \begin{description}[align=right,labelwidth=4cm]
-\item [Description] The MOVR instruction copies a 16-bit register value to another register.
+\item [Description] Copies a 16-bit register value to another register.
 \item [Assembly] MOVR \%Ra, \%Rd 
 \item [Pseudocode] Rd $<=$ Ra
 \item [Registers altered] Rd
@@ -84,9 +84,9 @@ subsubsection*{NOP}
 
 \subsubsection*{MOVI}\label{isa_movi}
 \begin{description}[align=right,labelwidth=4cm]
-\item [Description] The MOVR instruction copies a 16-bit register value to another register.
+\item [Description] Copies an 8-bit immediate to a Register
 \item [Assembly] MOVR \%Ra, \%Rd 
-\item [Pseudocode] Rd $<=$ Ra
+\item [Pseudocode] Rd $<=$ Imm8
 \item [Registers altered] Rd
 \item [Clock cycles] 5 (FETCH, DECODE, READ, EXECUTE, WRITE)
 \end{description}
@@ -105,9 +105,9 @@ subsubsection*{NOP}
 
 \subsubsection*{ADD}
 \begin{description}[align=right,labelwidth=4cm]
-\item [Description] The ADD instruction adds an immediate value to a destination register, Rd.
-\item [Assembly] ADDI \$255, \%Rd
-\item [Pseudocode]Rd $<=$ Rd + Imm8
+\item [Description] Add the value of register Ra to Rd.
+\item [Assembly] ADD \%Rd, \%Ra
+\item [Pseudocode]Rd $<=$ Rd + Ra
 \item [Registers altered] Rd
 \item [Clock cycles] 5 (FETCH, DECODE, READ, EXEC, WRITE)
 \end{description}
@@ -125,7 +125,7 @@ subsubsection*{NOP}
 
 \subsubsection*{ADDI}
 \begin{description}[align=right,labelwidth=4cm]
-\item [Description] The ADD instruction adds an immediate value to a destination register, Rd.
+\item [Description] Adds an immediate value to a destination register, Rd.
 \item [Assembly] ADDI \$255, \%Rd
 \item [Pseudocode]Rd $<=$ Rd + Imm8
 \item [Registers altered] Rd
@@ -146,7 +146,7 @@ subsubsection*{NOP}
 
 \subsubsection*{SUBI}
 \begin{description}[align=right,labelwidth=4cm]
-\item [Description] The SUB instruction subtracts an immediate value from a destination register, Rd.
+\item [Description] Subtracts an immediate value from a destination register, Rd.
 \item [Assembly] SUBI \$255, \%Rd
 \item [Pseudocode]Rd $<=$ Rd - Imm8
 \item [Registers altered] Rd
@@ -168,7 +168,7 @@ subsubsection*{NOP}
 \subsubsection*{CMP}
 \label{isa:cmp}
 \begin{description}[align=right,labelwidth=4cm]
-\item [Description] Sets register, Rd, to the value of Ra - Rb.
+\item [Description] Sets status register bits depending on the result of Rd - Ra
 \item [Assembly] CMP Rd, Ra
 \item [Pseudocode]{\nameref{sect:core_regs_sr}} $<=$ CMP(Ra, Rb)
 \item [Registers altered] Rd
@@ -189,9 +189,9 @@ subsubsection*{NOP}
 \newpage
 \subsubsection*{JMP}\label{isa_jmp}
 \begin{description}[align=right,labelwidth=4cm]
-\item [Description] Jumps the {\nameref{sect:pc}} if the condition is met within the {\nameref{sect:sr}} register.
+\item [Description] Jumps the Program Counter (PC) if the condition is met within the Status Register.
 \item [Assembly] JMP Rd, Imm8
-\item [Pseudocode] {\nameref{sect:pc}} $<=$ Rd if ({\nameref{sect:sr}} \& Imm8).
+\item [Pseudocode] PC $<=$ Rd if Status Register \& Imm8).
 \item [Registers altered] None
 \item [Clock cycles] 5 (FETCH, DECODE, READ, EXEC, BRANCH)
 \end{description}

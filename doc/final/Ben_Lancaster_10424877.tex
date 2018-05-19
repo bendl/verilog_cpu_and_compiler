@@ -521,11 +521,11 @@ Development of the \textbf{core} and \textbf{compiler} will be done in separate 
 
 This project will be split into 4 main stages: First is the requirements and information gathering as well as finalising core and compiler features (such as registers and instructions). The second stage consists of the design, implementation, and verification  of the embedded processor core. The third stage consists of the implementation of the compiler and verification for it. The final stage is dedicated to reviewing the project and the final report. This is further described in section \ref{stages}.
 
-This project combines the benefits of Agile and PRINCE2 methodologies. In particular, we align highlight reports with development stages
+This project combines the benefits of Agile and PRINCE2 methodologies. In particular, we align highlight reports with the projects stages and work on each stage in sprints. The contents and review of each sprint can be found in the highlight reports.
 
-A combination of prince2 and agile methodologies.
+In addition, a Kanban board is used to track current sprint challenges, such as bugs and feature implementation statuses. Figure \ref{kanban} shows the project's Kanban board with tasks for open bugs and features.
 
-Employ agile sprints
+
 
 \section{Resources and Dependencies}
 For the first half of the development cycle, the core can be developed and verified using the Verilog simulator and test suite, \textbf{Verilator}, and VHDL and Verilog simulator, \textbf{iSim}.
@@ -846,11 +846,11 @@ Type 3 & 15-11 & \multicolumn{3}{c|}{10-0} \\
     JMP		& 01100 & Rd & \multicolumn{2}{c|}{Imm8} & See {\nameref{sect:isa_jmp}}. \\ \hline
     CMP		& 01101 & Rd & Ra & X & Set SR flags \\ \hline
     HALT	& 10010 & \multicolumn{3}{c|}{X} & Stop the processor. \\ \hline
-    WRITE	& 10011 & Rd & \multicolumn{2}{c|}{Imm8} & See {\nameref{core_write}} \\ \hline
-    READ	& 10100 & Rd & \multicolumn{2}{c|}{Imm8} & See {\nameref{core_read}} \\ \hline
+    WRITE	& 10011 & Rd & \multicolumn{2}{c|}{Imm8} & PORT[Imm8] $<$= Rd \\ \hline
+    READ	& 10100 & Rd & \multicolumn{2}{c|}{Imm8} & Rd $<$= PORT[Imm8] \\ \hline
     SETC	& 10101 & Rd & \multicolumn{2}{c|}{Imm8} & Set Rd to 1 if Imm8 is set in {\nameref{sect:core_regs_sr}} from last CMP instruction, else 0. \\ \hline
     \end{tabularx}
-    \caption{All \scname{} processor instructions and their semantics.}
+    \caption{All \scname{} processor instructions and their semantics. Detailed descriptions of each instruction is provided in {\nameref{appendix:isa}}.}
 \end{table}
 
 \subsection{Conditional Branching}
@@ -987,16 +987,14 @@ The full implementation report for the \scname{} processor is listed in \ref{ise
 
 It can be seen that the number of slices used for single-port and dual-port memories is 0. This is likely the cause of the high slice count. The \scname{} processor has 256 words of internal single-port RAM memory and 8 words of duel-port register memory. This means that my design of these components were not successfully inferred to physical block RAMs on the the FPGA and were instead implemented by the synthesis tool as LUTs.
 
-A good result is that 0 latches are created. Latches are often created when conditional or combinational statements are not assigned under all conditions, and a state must be 'latched' to account for it. These latches can lead to longer routing delays on the implemented design, reducing maximum clock speeds which leads to more constricted space and timing constraints.
+A good result is that zero latches are created. Latches are often created when conditional or combinational statements are not assigned under all conditions, and a state must be 'latched' to account for it. These latches can lead to longer routing delays on the implemented design and can reduce maximum clock speeds which leads to more constricted space and timing constraints.
 
 Overall, the report is acceptable, but future improvements should primarily be aimed at reducing this resource footprint. This would allow the processor to be deployed on even smaller FPGAs and also leave more resources for the user's FPGA logic.
 
 \subsection{Performance}
-\textit{Instructions Per Cycle} (IPC) and \textit{Million Instructions Per Second} (MIPS) are two measurements used to measure the performance of a processor.
-
-The downside of these measurements is that they assume each instruction executes in constant time. This is not the case in the \scname{} processor and other modern processors.
+\textit{Instructions Per Cycle} (IPC) and \textit{Million Instructions Per Second} (MIPS) are two measurements used to measure the performance of a processor. These measurements are used to determine average processor performance. The downside of these measurements is that they assume each instruction executes in constant time. This is not the case in the \scname{} processor and other modern processors.
 \\\\
-The \scname{} processor can execute instructions in 3 to 10 clock cycles, depending on the instruction. Instructions that require no and few dependencies (ALU, RAM, registers, etc.) such as NOP, HALT, and PORT, can be executed in as little as 3 clock cycles (20ns per clock at 50MHz) resulting in 0.67 IPC and 16.7 DMIPS. Instructions requiring many dependencies and off-chip resources (RAM) can take up to 10 clock cycles, resulting in an IPC value of 0.1 and 5 DMIPS.
+The \scname{} processor can execute instructions in 3 to 10 clock cycles, depending on the instruction. Instructions that require no and few dependencies (ALU, RAM, registers, etc.) such as NOP, HALT, and PORT, can be executed in as little as 3 clock cycles (20ns per clock at 50MHz) resulting in 0.67 IPC and 16.7 DMIPS. Instructions requiring many dependencies and off-chip resources (RAM) can take up to 10 clock cycles, resulting in an IPC value of 0.1 and 5 MIPS.
 
 The most used instructions, MOVI, MOV, ADD, ADDI, JMP, and CMP, take around 5 clock cycles each, resulting in 0.2 IPC and 10 DMIPS.
 \\\\
@@ -1013,7 +1011,7 @@ The \scname{} processor is similar to AMD's Am386 (1991) processor with 9 MIPS a
 This has been achieved. A number of applications have been written for the processor (located in \verb|prco_compiler/test/tests/|) ranging from string manipulation, integer division, and console printing. The combination of these programs can result in a wide range of large and complex applications.
 
 \item [CPD2. Provide a 16-bit instruction set capable of supporting simple programs.]
-This has been achieved. The complete instruction listing can be found in {\nameref{appendix:isa}}.
+This has been achieved. A few instructions were added in addition to the original ISA design. The complete instruction listing can be found in {\nameref{appendix:isa}}.
 
 \item [CPD3. Support simple arithmetic and bitwise operations.]
 This has been achieved. Although only addition and subtraction have been implemented in hardware, multiplication, division, and modulo, can be performed in software using multiple simple instructions.
@@ -1468,7 +1466,6 @@ ORI   %Ax,     $0xCA
 JMP   %Ax,     JE_UC (unconditional)
 \end{minted}
 %TC:endignore
-\todo{Explain what each line is doing.}
 This is described in GitHub issue \href{https://github.com/bendl/prco304/issues/20}{\#20}.
 
 \section{Testing and Verification}
@@ -1503,9 +1500,14 @@ An example output of the continuous integration test runner is located in sectio
 
 \newpage
 \section{Sub-project Review}
-\subsection{Core Deliverables}
+This section reviews the design, implementation, verification, and management of the \scname{} compiler.
+
+\subsection{Functional Requirements}
+All functional requirements, (F1-F7), have been achieved. 
+
+\subsection{Core Compiler Components}
 \begin{table}[H]
-\def\arraystretch{1.0}
+\def\arraystretch{1.3}
 \caption{Compiler Core Deliverables Review}
 \begin{tabularx}{\textwidth}{|p{4cm}|c|c|X|}
 \hline 
@@ -1529,7 +1531,7 @@ Assembling 		& Yes & 1.40 & Basic offset calculation and re-encoding.\\
 \end{table}
 
 
-\subsection{Extended Deliverables}
+\subsection{Extended Compiler Components}
 \begin{table}[H]
 \def\arraystretch{1.0}
 \caption{Compiler Extended Deliverables Review}
@@ -1611,7 +1613,7 @@ C was used for the compiler and emulator. Higher level languages could have been
 \subsection*{Personal Contribution Review}
 I am pleased with the outcomes of this project and my contributions to it. I wanted to improve my knowledge and experience with FPGAs, computer architecture, and low-level programming, and so a project requiring these skills was developed. Easier technologies could have been used (for example, Python for the compiler), but this would have abstracted important processes, such as AST transformations and instruction encoding, away from me resulting in less experience gained.
 
-Throughout this project, I have learnt and improved upon my Verilog and C programming skills as well as new debugging techniques, such as HDL simulation and emulation.
+Throughout this project, I have learnt and improved upon my Verilog and C programming skills as well as learning new debugging techniques, such as HDL simulation and emulation.
 
 
 \subsection*{Future Improvements}
@@ -1619,7 +1621,9 @@ This was my first attempt at a compiler capable of generating and assembling mac
 
 The compiler was only able to transform high-level code into machine code. Even though the compiler would display assembly like code representing the machine code, users could not write or compile it; it was merely there to help debug the generated code by making it easier to read the machine code. Enabling parsing of assembly like code would enable specific routines to be created which would enable more complex applications to be created, such as operating system kernels and reliably timed routines.
 
+It was found that debugging the implemented processor was difficult to debug and troubleshoot. This is an important problem in FPGA-based products. A common solution employed in processors and FPGA-based products is to employ a debugging interface into the design, such as JTAG or other scoped-bus. This would be too timely to fit into this projects timeline, but will be crucial if complex features are to be added to the processor.
 
+\newpage
 \section{Conclusion}
 This project aimed at producing two complex technical systems: an embedded processor and a compiler. Both systems were developed and the output is an extremely valuable educational resource. 
 
@@ -1791,6 +1795,7 @@ Following this is the list of executed instructions. Instruction execution start
 \centering
 \includegraphics[scale=0.55]{kanban2}
 \caption{Project Kanban board showing the status of different tasks of the project, processor core, and compiler. In addition, their requirements are shown (\textit{core-deliverable} and \textit{extended-deliv}), their task status (open, closed, merged), and who is assigned to each task. This kanban board can viewed at: \url{https://github.com/bendl/prco304/projects/1}.}
+\label{kanban}
 \end{figure}
 \end{landscape}
 
@@ -1818,7 +1823,7 @@ Starting at \textit{F1}, we can see that the compiler needs to support strings, 
 \begin{center}
 \includegraphics[scale=0.4]{fig_compiler_uml_seq}
 \end{center}
-\caption{UML sequence diagram for the \scname{} compiler.}
+\caption{UML sequence diagram for the \scname{} compiler. This diagram shows the compiler's program flow. The CLI is the only component the user is required to interact with. The user passes the input file to the CLI which in-turn invokes the compiler to parse and generate output machine code.}
 \label{fig:hld}
 \end{figure}
 %TC:endignore
