@@ -372,7 +372,7 @@ This report discusses the design, implementation, and verification, of an FPGA-b
 
 A field-programmable gate array (FPGA) is a reprogrammable logic device that enables digital electronic designs to be realised and executed on-chip. FPGAs utilise configurable logic blocks (CLB) that can be configured to emulate primitive gates. Connecting these primitive gates with others allows the engineer to realise complex logic such as combinational gates, multiplexers, and lookup-tables. Modern FPGA devices also include components such as block-RAMs, DLLs, and DSP blocks.
 
-The embedded processor will be designed using the Verilog hardware description language (HDL). A HDL can be thought of as a front-end to a software compiler. Other HDL front-ends exist such as VHDL. The HDL is synthesised into an retargetable intermediate form consisting of nets - a form describing the gates, flip-flops, and their interconnections. After this synthesis takes place, the intermediate net list form is transformed into implementation specific forms. As this processor is designed for FPGA implementation, processes such as "place and route" are utilised to map the net list to physical resources on the FPGA. Different processes are performed for difference implementations, such as for ASICs and CPLDs.
+An embedded processor will be designed using the Verilog hardware description language (HDL). A HDL can be thought of as a front-end to a software compiler. Other HDL front-ends exist such as VHDL. The HDL is synthesised into an retargetable intermediate form consisting of nets - a form describing the gates, flip-flops, and their interconnections. After this synthesis takes place, the intermediate net list form is transformed into implementation specific forms. As this processor is designed for FPGA implementation, processes such as "place and route" are utilised to map the net list to physical resources on the FPGA. Different processes are performed for different implementations, such as for ASICs and CPLDs.
 
 \newpage
 \chapter{Embedded Processors and Compilers}
@@ -391,19 +391,21 @@ This report details the design considerations, implementation, and verification,
 \section{Background}
 Embedded processors are becoming more and more present in many products, ranging from toys to outdoor sensory recording systems to test and measurement tools. Embedded processors are specifically designed for remote and constrained environments, where power consumption, operating temperature, and form factor are extremely constricted. 
 
-FPGAs are being utilised in an increasing number of new areas, such as machine vision for image processing and machine learning for faster learning  \cite{fpgacloud}
+FPGAs are powerful devices. They allow virtually any digital electronics design to be programmed post-manufacturing to the device. This makes FPGAs safer and cheaper to implement complex digital logic and are great alternatives to ASICs, which cannot be reprogrammed and have steep initial development costs. FPGAs are being utilised in an increasing number of new areas, such as machine vision for image processing and machine learning for faster learning  \cite{fpgacloud}.
  
 \subsection{Soft-core Embedded Processors}
 There exists many commercial and open-source embedded processors, each providing different features and specialities such as digital signal processing, analogue components, instruction set architectures, and interfaces.
 
-Research has been performed to identify existing embedded processor features and characteristics. This research has been used to identify requirements and desired functionality of this new processor architecture. This research can be found in section \ref{current_impl} {\nameref{current_impl}}.
+Research has been performed to identify existing embedded processor features and characteristics. This research has been used to identify requirements and desired functionality of this new processor architecture. This research can be found in appendix \ref{current_impl} {\nameref{current_impl}}.
 
-From this research, it was clear that the new processor architecture was to be RISC
+From this research, it was clear that the new processor was to be a lightweight design with RISC architecture. PicoBlaze, with it's on-chip scratch memory and low resource footprint, is a primary inspiration for this new processor. 
 
 \subsection{Compilers}
-Compilers are used to transform high-level code into a lower form. This is particularly useful for large applications where abstracting low-level details can result in faster development and better optimisation.
+Compilers are used to transform high-level code into a lower form. This is particularly useful for large applications where abstracting low-level details can result in faster development and better optimisation. Most modern open-source compilers today have retargetable front-end, optimisation, and back-end components that allow new architectures and grammars to be implemented while still utilising existing compiler features. 
 
-From this research, and consideration of the 
+Research into existing compilers has been performed. This research is required to identify a suitable compiler that would allow easy creation of a back-end for the new processor architecture. 
+
+After comparing compilers such as LLVM and 8CC, it was decided to build a new compiler from scratch rather than implement a back-end for an existing compiler. This was to satisfy a chief requirement of the project: to improve my learning and experience in processor architecture, low-level programming, and compilers.
 
 \newpage
 
