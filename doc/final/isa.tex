@@ -2,15 +2,15 @@
 \subsubsection*{NOP}
 \label{isa_nop}
 \begin{description}[align=right,labelwidth=4cm]
-\item [Description] The NOP instruction performs no action for 1 instruction cycle (see section  \ref{sect:isa_timings}).
+\item [Description] The NOP instruction performs no action for 1 instruction cycle.
 \item [Assembly] NOP
 \item [Pseudocode]
-\item [Registers altered]
+\item [Registers altered] None
 \item [Clock cycles] 2 (FETCH, DECODE)
 \end{description}
 
 \begin{table}[h]
-\def\arraystretch{1.5}%  1 is the default, change whatever you need
+\def\arraystretch{1.3}%  1 is the default, change whatever you need
     \begin{tabularx}{\textwidth}{|p{4cm}|X|}
     \hline
     15:11 & 10:0 \\
@@ -31,7 +31,7 @@
 \end{description}
 
 \begin{table}[H]
-\def\arraystretch{1.5}%  1 is the default, change whatever you need
+\def\arraystretch{1.3}%  1 is the default, change whatever you need
     \begin{tabularx}{\textwidth}{|p{4cm}|p{2cm}|p{2cm}|X|}
     \hline
     15:11 & 10:8 & 7:5 & 4:0 \\
@@ -52,7 +52,7 @@
 \end{description}
 
 \begin{table}[H]
-\def\arraystretch{1.5}%  1 is the default, change whatever you need
+\def\arraystretch{1.3}%  1 is the default, change whatever you need
     \begin{tabularx}{\textwidth}{|p{4cm}|p{2cm}|p{2cm}|X|}
     \hline
     15:11 & 10:8 & 7:5 & 4:0 \\
@@ -64,7 +64,7 @@
 
 \subsubsection*{MOVR}
 \begin{description}[align=right,labelwidth=4cm]
-\item [Description] The MOVR instruction copies a 16-bit register value to another register.
+\item [Description] Copies a 16-bit register value to another register.
 \item [Assembly] MOVR \%Ra, \%Rd 
 \item [Pseudocode] Rd $<=$ Ra
 \item [Registers altered] Rd
@@ -72,7 +72,7 @@
 \end{description}
 
 \begin{table}[H]
-\def\arraystretch{1.5}%  1 is the default, change whatever you need
+\def\arraystretch{1.3}%  1 is the default, change whatever you need
     \begin{tabularx}{\textwidth}{|p{4cm}|p{2cm}|p{2cm}|X|}
     \hline
     15:11 & 10:8 & 7:5 & 4:0 \\
@@ -84,15 +84,15 @@
 
 \subsubsection*{MOVI}\label{isa_movi}
 \begin{description}[align=right,labelwidth=4cm]
-\item [Description] The MOVR instruction copies a 16-bit register value to another register.
+\item [Description] Copies an 8-bit immediate to a Register
 \item [Assembly] MOVR \%Ra, \%Rd 
-\item [Pseudocode] Rd $<=$ Ra
+\item [Pseudocode] Rd $<=$ Imm8
 \item [Registers altered] Rd
 \item [Clock cycles] 5 (FETCH, DECODE, READ, EXECUTE, WRITE)
 \end{description}
 
 \begin{table}[H]
-\def\arraystretch{1.5}%  1 is the default, change whatever you need
+\def\arraystretch{1.3}%  1 is the default, change whatever you need
     \begin{tabularx}{\textwidth}{|p{4cm}|p{3cm}|X|}
     \hline
     15:11 & 10:8 & 7:0 \\
@@ -105,15 +105,15 @@
 
 \subsubsection*{ADD}
 \begin{description}[align=right,labelwidth=4cm]
-\item [Description] The ADD instruction adds an immediate value to a destination register, Rd.
-\item [Assembly] ADDI \$255, \%Rd
-\item [Pseudocode]Rd $<=$ Rd + Imm8
+\item [Description] Add the value of register Ra to Rd.
+\item [Assembly] ADD \%Rd, \%Ra
+\item [Pseudocode]Rd $<=$ Rd + Ra
 \item [Registers altered] Rd
 \item [Clock cycles] 5 (FETCH, DECODE, READ, EXEC, WRITE)
 \end{description}
 
 \begin{table}[H]
-\def\arraystretch{1.5}%  1 is the default, change whatever you need
+\def\arraystretch{1.3}%  1 is the default, change whatever you need
     \begin{tabularx}{\textwidth}{|p{4cm}|p{2cm}|p{2cm}|X|}
     \hline
     15:11 & 10:8 & 7:5 & 4:0 \\
@@ -125,7 +125,7 @@
 
 \subsubsection*{ADDI}
 \begin{description}[align=right,labelwidth=4cm]
-\item [Description] The ADD instruction adds an immediate value to a destination register, Rd.
+\item [Description] Adds an immediate value to a destination register, Rd.
 \item [Assembly] ADDI \$255, \%Rd
 \item [Pseudocode]Rd $<=$ Rd + Imm8
 \item [Registers altered] Rd
@@ -133,7 +133,7 @@
 \end{description}
 
 \begin{table}[H]
-\def\arraystretch{1.5}%  1 is the default, change whatever you need
+\def\arraystretch{1.3}%  1 is the default, change whatever you need
     \begin{tabularx}{\textwidth}{|p{4cm}|p{3cm}|X|}
     \hline
     15:11 & 10:8 & 7:0 \\
@@ -146,7 +146,7 @@
 
 \subsubsection*{SUBI}
 \begin{description}[align=right,labelwidth=4cm]
-\item [Description] The SUB instruction subtracts an immediate value from a destination register, Rd.
+\item [Description] Subtracts an immediate value from a destination register, Rd.
 \item [Assembly] SUBI \$255, \%Rd
 \item [Pseudocode]Rd $<=$ Rd - Imm8
 \item [Registers altered] Rd
@@ -154,7 +154,7 @@
 \end{description}
 
 \begin{table}[H]
-\def\arraystretch{1.5}%  1 is the default, change whatever you need
+\def\arraystretch{1.3}%  1 is the default, change whatever you need
     \begin{tabularx}{\textwidth}{|p{4cm}|p{3cm}|X|}
     \hline
     15:11 & 10:8 & 7:0 \\
@@ -166,8 +166,9 @@
 
 
 \subsubsection*{CMP}
+\label{isa:cmp}
 \begin{description}[align=right,labelwidth=4cm]
-\item [Description] Sets register, Rd, to the value of Ra - Rb.
+\item [Description] Sets status register bits depending on the result of Rd - Ra
 \item [Assembly] CMP Rd, Ra
 \item [Pseudocode]{\nameref{sect:core_regs_sr}} $<=$ CMP(Ra, Rb)
 \item [Registers altered] Rd
@@ -175,29 +176,49 @@
 \end{description}
 
 \begin{table}[H]
-\def\arraystretch{1.5}%  1 is the default, change whatever you need
-    \begin{tabularx}{\textwidth}{|p{4cm}|p{2cm}|p{2cm}|p{2cm}|X|}
+\def\arraystretch{1.3}%  1 is the default, change whatever you need
+    \begin{tabularx}{\textwidth}{|p{4cm}|p{2cm}|p{2cm}|X|}
     \hline
-    15:12 & 11:9 & 8:6 & 5:3 & 2:0 \\
+    15:11 & 10:8 & 7:5 & 4:0 \\
 	\specialrule{2pt}{-2pt}{0pt}
-	0003 & Rd & Ra & Rb & X
+	01101 & Rd & Ra &  X
 	\\ \hline
     \end{tabularx}
 \end{table}
-\todo{Wrong bits}
+
+
+\subsubsection*{SETC}
+\begin{description}[align=right,labelwidth=4cm]
+\item [Description] Set register Rd to 0 or 1 depending on the Status Register and Immediate value.
+\item [Assembly] SETC \$0x08, \%Rd
+\item [Pseudocode]Rd $<$= 1 if Imm8 and Status Register equal, else 0.
+\item [Registers altered] Rd
+\item [Clock cycles] 5 (FETCH, DECODE, READ, EXEC, WRITE)
+\end{description}
+
+\begin{table}[H]
+\def\arraystretch{1.3}%  1 is the default, change whatever you need
+    \begin{tabularx}{\textwidth}{|p{4cm}|p{3cm}|X|}
+    \hline
+    15:11 & 10:8 & 7:0 \\
+	\specialrule{2pt}{-2pt}{0pt}
+	10101 & Rd & Imm8 (See JMP Imm8)
+	\\ \hline
+    \end{tabularx}
+\end{table}
 
 \newpage
 \subsubsection*{JMP}\label{isa_jmp}
 \begin{description}[align=right,labelwidth=4cm]
-\item [Description] Jumps the {\nameref{sect:pc}} if the condition is met within the {\nameref{sect:sr}} register.
+\item [Description] Jumps the Program Counter (PC) if the condition is met within the Status Register.
 \item [Assembly] JMP Rd, Imm8
-\item [Pseudocode] {\nameref{sect:pc}} $<=$ Rd if ({\nameref{sect:sr}} \& Imm8).
+\item [Pseudocode] PC $<=$ Rd if Status Register \& Imm8).
 \item [Registers altered] None
 \item [Clock cycles] 5 (FETCH, DECODE, READ, EXEC, BRANCH)
 \end{description}
 
 \begin{table}[H]
-\def\arraystretch{1.5}%  1 is the default, change whatever you need
+\def\arraystretch{1.3}%  1 is the default, change whatever you need
     \begin{tabularx}{\textwidth}{|p{4cm}|p{3cm}|X|}
     \hline
     15:11 & 10:8 & 7:0 \\
@@ -209,7 +230,7 @@
 An 8 bit immediate (7-0) can be set in the JMP instruction to create conditional jumps.
 
 \begin{table}[h]
-	\def\arraystretch{1.5}%  1 is the default, change whatever you need
+	\def\arraystretch{1.3}%  1 is the default, change whatever you need
     \begin{tabularx}{\textwidth}{|c|c|c|c|c|X|X|}
     \hline
     & 15-11 & 10-8 & \multicolumn{2}{c|}{7-0} & Semantics & Status Register \\

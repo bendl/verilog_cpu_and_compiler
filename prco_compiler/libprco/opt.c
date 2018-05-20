@@ -21,6 +21,8 @@ opt_cf(struct ast_item *node)
         // Replacement AST node
         struct ast_num          *new_num;
 
+        struct ast_item         *block_it;
+
         switch(node->type) {
 
         // RHS of assignments might be foldable
@@ -40,17 +42,36 @@ opt_cf(struct ast_item *node)
                 // output
                 if(tmp_if->cond->type == AST_NUM) {
                         tmp_num = tmp_if->cond->expr;
-                        // If condition is true, replace with
-                        // true body
+                        // If condition is true, replace with true body
                         if(tmp_num->val != 0) {
                                 ret = tmp_if->then;
-                                ret->next = node->next;
+                                ret->next = ret->next;
+
+                                block_it = ret;
+                                while(1) {
+                                        if(block_it->next == NULL) {
+                                                block_it->next = node->next;
+                                                break;
+                                        }
+                                        block_it = block_it->next;
+                                }
                         }
                         // Else its always false, replace it with
                         // the false body
-                        else {
+                        else if(tmp_if->els) {
                                 ret = tmp_if->els;
-                                ret->next = node->next;
+                                ret->next = ret->next;
+
+                                block_it = ret;
+                                while(1) {
+                                        if(block_it->next == NULL) {
+                                                block_it->next = node->next;
+                                                break;
+                                        }
+                                        block_it = block_it->next;
+                                }
+                        } else {
+                                ret = node->next;
                         }
                 }
                 break;

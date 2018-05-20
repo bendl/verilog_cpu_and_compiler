@@ -1,5 +1,6 @@
 
 \subsection{Project Initiation Document}
+\label{pid}
 \subsection*{Introduction}
 Field-Programmable Gate Array (FPGA) devices are an incredibly powerful and versatile solution to many electronics applications including digital signal processing and high-speed test and measurement tools. I will use this project opportunity to learn more about FPGA development and CPU architecture and apply knowledge learnt to create a solution to the need of a side-microprocessor in many FPGA-based applications.
 
@@ -24,12 +25,17 @@ The outcome of the project will be to design a small, portable, FPGA-based, CPU 
 
 \subsubsection*{Core Deliverables}
 \begin{enumerate}[label=\bfseries P\arabic*.]
-\item{(Project deliverable) To improve my knowledge and experience of FPGA  development, CPU architecture, and low-level programming.}
-\item{(Project deliverable) To build a working and operational soft-core CPU core capable of performing simple tasks.}
-\item{(Project deliverable) To provide product designers with an affordable alternative to a side-microprocessor in their FPGA-based products.}
-\item{(Project deliverable) To provide a technical documentation and specification for the embedded core.}
+\item{To improve my knowledge and experience of FPGA development, processor architecture, compilers, and embedded systems engineering.}
+\label{c1}
+\item{To build a working and operational soft-core processor core capable of performing simple tasks.}
+\item{Implementation of the soft-core processor design on real hardware (FPGA).}
+\item{To provide a high-level context-free code compiler to run user-code on the processor.}
+\end{enumerate}
+
+\subsection*{Extended Deliverables}
+\begin{enumerate}[label=\bfseries P\arabic*.]
 \item{(Project-sub deliverable) To provide embedded products a convenient solution to in-field updating.}
-\item{(Project-sub deliverable) To provide easy interfacing between the FPGA design and the embedded core.}  
+\item{(Project-sub deliverable) To provide easy interfacing between the FPGA design and the embedded core.}  \item{To provide a high-level context-free code compiler to run user-code on the processor.}
 \end{enumerate}
 
 \subsection*{Initial Scope}
@@ -156,7 +162,7 @@ Project risks and challenges are identified in subsection \ref{sect:risk} along 
 \subsection*{Initial Risk Assessment}\label{sect:risk}
 The following subsection outlines potential projects risks (R) and their suitable management strategy.
 
-\begin{enumerate}[label=\bfseries R\arabic*.]
+\begin{enumerate}[label=\bfseries R\arabic*]
 \item{
 \textbf{Real hardware synthesis. }
 
@@ -198,6 +204,7 @@ In the event of the FPGA development kit failing, be it a component on the board
 
 
 \subsection*{Quality Plan}
+\label{quality}
 The following quality strategies will be employed to achieve a successful project and product.
 
 \begin{table}[h]
@@ -224,5 +231,11 @@ The following quality strategies will be employed to achieve a successful projec
 \subsection*{Legal, Social, and Ethical Considerations}\label{sect:legal}
 Legal considerations need to be taken into account due to already existing commercial soft-processor designs. Existing soft-processor designs include the ARM family of soft-cores \citep{arm} and Xilinx's MicroBlaze soft-core \citep{microblaze}. Emulating another soft-core processor's architecture may result in legal challenges even if I do not distribute the final product. As this is a learning project, instead of emulating another architecture, I will design my own architecture from the ground up to learn first-hand the design considerations, implementation, and verification of CPU designs.
 
-Social and ethical considerations are not applicable for this project.
-\todo[inline]{OLD. New legal ethics section in main report. Tell?}
+The processor core and compiler do not require access to the internet or any third-party service. All usage of these deliverables is performed in their self-contained executables.
+
+The processor core will have access to any peripherals connected to it, such as RAMs and UART devices. As the processor does not implement memory protection techniques, the processor will have unrestricted read/write access to all memory regions connected to it. The processor does not internally record statistics, such as instruction counts and their frequency. It will also not perform optimisations such as branch-prediction and speculative-execution.
+
+
+The compiler is not designed to produce code for safety-critical or high-reliability environments. The compiler will not obfuscate or randomise output machine code and the output will be in a predictable format which is trivial to reverse-engineer.
+
+The compiler does not insert any telemetry or statistic tracking in any generated code or the compiler itself.

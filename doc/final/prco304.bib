@@ -22,7 +22,7 @@
   publisher={IET}
 }
 @article{iec61508,
-  title={Introduction to IEC 61508},
+  title={Introduction to {IEC} 61508},
   author={Bell, Ron},
   booktitle={Proceedings of the 10th Australian workshop on Safety critical systems and software-Volume 55},
   pages={3--12},
@@ -30,17 +30,20 @@
   organization={Australian Computer Society, Inc.}
 }
 
-@misc{scarabhardware,
+@manual{scarabhardware,
 title={MiniSpartan6+}, 
 journal={{Scarab Hardware}},
+organization = {Scarab Hardware},
+publisher = {Scarab Hardware},
 url={https://www.scarabhardware.com/minispartan6/},
 year=2014
 }
-@misc{arty,
-title={Arty Artix-7 FPGA Development Board}, 
-journal={{Avnet}},
-url={https://uk.rs-online.com/web/p/programmable-logic-development-kits/1346478/},
-year=2015
+@manual{arty,
+    organization = {Digilent, Inc.},
+    title={Arty Artix-7 FPGA Development Board}, 
+    journal={{Avnet}},
+    url={https://uk.rs-online.com/web/p/programmable-logic-development-kits/1346478/},
+    year=2015
 }
 @misc{arndt2002algorithms,
   title={Algorithms For Programmers},
@@ -57,13 +60,6 @@ publisher={Da Vinci Engineering Press}
 @misc{arm, title={ARM in the World of FPGA-Based Prototyping}, url={https://community.arm.com/processors/b/blog/posts/arm-in-the-world-of-fpga-based-prototyping}, journal={Arm Community},
 year={2016}}
 
-@book{microblaze,
-title={MicroBlaze 
-Processor Reference 
-Guide},
-journal={Xilinx},
-year={2017}
-}
 
 @misc{crenshaw1988let,
   title={Let's Build a Compiler!},
@@ -81,7 +77,7 @@ year={2017}
 
 
 @techreport{elf_standard,
-    author = {{ARM Limited}},
+    author = {{ARM Holdings}},
     title = {ELF for the ARM Architecture},
     year = {2015},
 }
@@ -130,4 +126,93 @@ OPTannote = {•}
   pages={97},
   year={1991},
   publisher={IDG Enterprise}
+}
+
+@manual{microblaze,
+	title={MicroBlaze Processor Reference Guide},
+	organization={{Xilinx, Inc.}},
+	year={2009},
+	note = "UG081 (v10.3)"
+}
+
+@manual{cortexa9,
+	organization = {{ARM Holdings}},
+	title = "ARM Cortex-A9",
+	year = "2016",
+	note = "r4p1",
+}
+@manual{picoblaze,
+	organization = {{Xilinx, Inc.}},
+	title = "PicoBlaze 8-bit Embedded Microcontroller User Guide",
+	year = 2011,
+	month = 6,
+	note = "UG129",
+}
+@inproceedings{merchant2009platform,
+  title={Platform independent 8-bit soft-core for sopc},
+  author={Merchant, Farhad and Pujari, Shashank and Patil, Manish},
+  booktitle={Proceedings of the International MultiConference of Engineers and Computer Scientists},
+  volume={2},
+  pages={18--20},
+  year={2009}
+}
+
+@book{kamat2009unleash,
+  title={Unleash the System On Chip using FPGAs and Handel C},
+  author={Kamat, R.K. and Shinde, S.A. and Shelake, V.G.},
+  isbn={9781402093623},
+  lccn={2008942203},
+  url={https://books.google.co.uk/books?id=74szgruGW3EC},
+  year={2009},
+  publisher={Springer Netherlands}
+}
+
+@manual{spartan6,
+	organization = {Xilinx, Inc.},
+	title = "Spartan-6 Family Overview",
+	year = 2011,
+	month = 10,
+	note = "DS160 (v2.0)",
+}
+
+@misc{8cc,
+title={How I wrote a self-hosting C compiler in 40 days}, 
+author = {Rui Ueyama},
+url={https://www.sigbus.info/how-i-wrote-a-self-hosting-c-compiler-in-40-days.html},
+year=2015
+}
+
+@misc{8ccgithub,
+title={8cc}, 
+publisher = {GitHub},
+journal = {GitHub repository},
+author = {Rui Ueyama},
+howpublished = {\url{https://github.com/rui314/8cc}},
+year=2015,
+commit = {b8a46abdb5f0633bdbff314820daf560cb987377},
+}
+
+
+@misc{llvm,
+title={The LLVM Compiler Infrastructure}, 
+publisher = {University of Illinois},
+author = {LLVM Project},
+howpublished = {\url{https://llvm.org/ProjectsWithLLVM/}},
+}
+
+
+@article{ethics,
+    title={University of {Plymouth} - {Research} {Ethics} {Policy}},
+    publisher = {University of Plymouth},
+    organization = {University of Plymouth},
+    url = {https://www1.plymouth.ac.uk/research/ourresearch/Documents/Plymouth%20University%20Research%20Ethics%20Policy.pdf},
+    year = {2015},
+}
+
+@misc{travisci,
+title={Travis CI - Test and Deploy Your Code with Confidence}, 
+publisher = {Travis CI},
+organization = {Travis CI},
+author = {Travis CI},
+howpublished = {\url{https://travis-ci.org/}},
 }

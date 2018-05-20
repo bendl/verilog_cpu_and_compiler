@@ -1,0 +1,16 @@
+Questions:
+1. Add 2 numbers together
+2. Print a character to the screen using UART1
+3. Create a function, call it, and get the result
+
+4. Print your name to the screen
+5. Write a delay function
+
+6. Multiply 2 numbers
+7. Divide 2 numbers
+
+8. Print fibonacci sequence up to 10
+
+
+User comments:
+Language, documentation, tools, anything, etc.
