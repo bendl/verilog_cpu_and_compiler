@@ -4,7 +4,7 @@
 \begin{description}[align=right,labelwidth=4cm]
 \item [Description] The NOP instruction performs no action for 1 instruction cycle.
 \item [Assembly] NOP
-\item [Pseudocode]
+\item [Pseudocode] PC $<$= PC + 1;
 \item [Registers altered] None
 \item [Clock cycles] 2 (FETCH, DECODE)
 \end{description}
@@ -207,7 +207,6 @@
     \end{tabularx}
 \end{table}
 
-\newpage
 \subsubsection*{JMP}\label{isa_jmp}
 \begin{description}[align=right,labelwidth=4cm]
 \item [Description] Jumps the Program Counter (PC) if the condition is met within the Status Register.

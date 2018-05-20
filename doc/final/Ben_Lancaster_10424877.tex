@@ -96,7 +96,7 @@
 
 %% Report variables
 \newcommand{\scname}{PRCO304}
-\newcommand{\dlatestv}{3.12}
+\newcommand{\dlatestv}{3.14}
 
 \definecolor{babyblueeyes}{rgb}{0.63, 0.79, 0.95}
 \definecolor{ballblue}{rgb}{0.13, 0.67, 0.8}
@@ -272,6 +272,7 @@ PRCO304 - Final Stage Computing Project
     Date & Version & Changes \\
     \arrayrulecolor{blue9}
 	\specialrule{2pt}{-2pt}{0pt}
+	20/05/2018 & 3.14 & Add background research to appendix. \\ \hline
 	19/05/2018 & 3.13 & Update abstract to align with guidelines. \\ \hline
 	19/05/2018 & 3.12 & Fix ISA pseudo-codes. \\ \hline
 	15/05/2018 & 3.11 & Correct CMP (\ref{isa:cmp}) instruction bits. \\ \hline
@@ -312,7 +313,7 @@ A combination of PRINCE2 and Agile methodologies are employed, allowing for incr
 \\\\
 A project post-mortem is performed to reflect on the achievements of the project with respect to the initial project objectives and to discuss further improvements to the project management, design, implementation, and verification, of the project. It was found that the combination of Agile and PRINCE2 methodologies aided the development of the project. The core was fully implemented on Spartan-6 FPGA hardware, with a performance of 10 MIPS and 0.2 IPC at 40MHz, but was found to utilise too many slice resources. The compiler was able to produce optimised machine code but failed to identify some types of common optimisations, resulting in larger program sizes.
 \\\\
-The processor specification, compiler usage guides, and other project management and documents are provided in the appendices.
+The processor specification, compiler usage guides, and other project management  documents are provided in the appendices.
 
 \newpage
 \renewcommand*\contentsname{Table of Contents}
@@ -324,7 +325,7 @@ The processor specification, compiler usage guides, and other project management
 \newpage
 
 \subsection*{Word Count}
-Words count: 10908
+Words count: 10600
 
 \subsection*{Sources}
 \begin{description}[style=nextline]
@@ -372,7 +373,7 @@ This report discusses the design, implementation, and verification, of an FPGA-b
 
 A field-programmable gate array (FPGA) is a reprogrammable logic device that enables digital electronic designs to be realised and executed on-chip. FPGAs utilise configurable logic blocks (CLB) that can be configured to emulate primitive gates. Connecting these primitive gates with others allows the engineer to realise complex logic such as combinational gates, multiplexers, and lookup-tables. Modern FPGA devices also include components such as block-RAMs, DLLs, and DSP blocks.
 
-The embedded processor will be designed using the Verilog hardware description language (HDL). A HDL can be thought of as a front-end to a software compiler. Other HDL front-ends exist such as VHDL. The HDL is synthesised into an retargetable intermediate form consisting of nets - a form describing the gates, flip-flops, and their interconnections. After this synthesis takes place, the intermediate net list form is transformed into implementation specific forms. As this processor is designed for FGPA implementation, processes such as "place and route" are utilised to map the net list to physical resources on the FPGA. Different processes are performed for difference implementations, such as for ASICs and CPLDs.
+An embedded processor will be designed using the Verilog hardware description language (HDL). A HDL can be thought of as a front-end to a software compiler. Other HDL front-ends exist such as VHDL. The HDL is synthesised into an retargetable intermediate form consisting of nets - a form describing the gates, flip-flops, and their interconnections. After this synthesis takes place, the intermediate net list form is transformed into implementation specific forms. As this processor is designed for FPGA implementation, processes such as "place and route" are utilised to map the net list to physical resources on the FPGA. Different processes are performed for different implementations, such as for ASICs and CPLDs.
 
 \newpage
 \chapter{Embedded Processors and Compilers}
@@ -384,19 +385,28 @@ The embedded processor will be designed using the Verilog hardware description l
 \section{Introduction}
 Modern computing and electronics equipment, like function generators, oscilloscopes, and spectrum analysers, use FPGAs to implement their compute intensive logic. These FPGAs are often accompanied by a small, low-cost, microprocessor to supervise and provide interfaces to external peripherals.
 
-The aim of this project is to implement this side-microprocessor into the FPGA to save on BOM costs, PCB  space,  and  power  costs,  which  contribute  to  higher  development  and  product  costs.  While  savings can  be  made  by  the  lack  of  side  microprocessor,  the  product  may  need  a  larger  FPGA  to  accommodate the embedded microprocessor.  The project will produce a small, soft-core, CPU design and compiler. Although there is no direct client in this project, I believe this project will produce an attractive product
-for FPGA-based product designers wishing to employ an embedded processor solution.
+The aim of this project is to implement this side-microprocessor into the FPGA to save on BOM costs, PCB  space,  and  power  costs,  which  contribute  to  higher  development  and  product  costs.  While  savings can  be  made  by  the  lack  of  side  microprocessor,  the  product  may  need  a  larger  FPGA  to  accommodate the embedded microprocessor.  The project will produce a small, soft-core, CPU design and compiler. Although there is no direct client in this project, I believe this project will produce an attractive product for FPGA-based product designers wishing to employ an embedded processor solution as well as improve my knowledge and experience in this field.
 
 This report details the design considerations, implementation, and verification, of a new embedded processor architecture and a high-level code-compiler targeting it.
 
 \section{Background}
-Embedded processors are becoming more and more present in many products, ranging from toys to outdoor recording systems to test and measurement tools. In addition, FPGA-devices are being utilised in an increasing number of new areas, such as machine vision for image processing and machine learning.
+Embedded processors are becoming more and more present in many products, ranging from toys to outdoor sensory recording systems to test and measurement tools. Embedded processors are specifically designed for remote and constrained environments, where power consumption, operating temperature, and form factor are extremely constricted. 
+
+FPGAs are powerful devices. They allow virtually any digital electronics design to be programmed post-manufacturing to the device. This makes FPGAs safer and cheaper to implement complex digital logic and are great alternatives to ASICs, which cannot be reprogrammed and have steep initial development costs. FPGAs are being utilised in an increasing number of new areas, such as machine vision for image processing and machine learning for faster learning  \cite{fpgacloud}.
  
 \subsection{Soft-core Embedded Processors}
 There exists many commercial and open-source embedded processors, each providing different features and specialities such as digital signal processing, analogue components, instruction set architectures, and interfaces.
 
-Research has been performed to identify existing embedded processor features and characteristics. This research has been used to identify requirements and desired functionality of this new processor architecture. This research can be found in section \ref{current_impl} {\nameref{current_impl}}.
+Research has been performed to identify existing embedded processor features and characteristics. This research has been used to identify requirements and desired functionality of this new processor architecture. This research can be found in appendix \ref{current_impl} {\nameref{current_impl}}.
 
+From this research, it was clear that the new processor was to be a lightweight design with RISC architecture. PicoBlaze, with it's on-chip scratch memory and low resource footprint, is a primary inspiration for this new processor. 
+
+\subsection{Compilers}
+Compilers are used to transform high-level code into a lower form. This is particularly useful for large applications where abstracting low-level details can result in faster development and better optimisation. Most modern open-source compilers today have retargetable front-end, optimisation, and back-end components that allow new architectures and grammars to be implemented while still utilising existing compiler features. 
+
+Research into existing compilers has been performed. This research is required to identify a suitable compiler that would allow easy creation of a back-end for the new processor architecture. 
+
+After comparing compilers such as LLVM and 8CC, it was decided to build a new compiler from scratch rather than implement a back-end for an existing compiler. This was to satisfy a chief requirement of the project: to improve my learning and experience in processor architecture, low-level programming, and compilers.
 
 \newpage
 
@@ -465,9 +475,9 @@ The code generated by the compiler is \textbf{not guaranteed} to:
 }
 
 \section{Method of Approach}
-Development of the \textbf{core} and \textbf{compiler} will be done in separate stages of the project (see section \ref{sect:proj_time}). The two deliverables will be split into 2 sub-projects. Both sub-projects will employ the \textbf{Agile development process}, using Agile's sprints to split up tasks into sub-tasks and Agile's scrums to discuss progress, features, and changes. This technique allows revisiting of tasks to tweak and iterate over their implementation which will be key when for incrementally adding features to both sub-projects, for example, adding to the core's ALU module to add conditional branching, or adding new instructions to the core's decoder module if required.
+Development of the \textbf{core} and \textbf{compiler} will be done in separate stages of the project (see section \ref{sect:proj_time}). The two deliverables will be split into 2 sub-projects. Both sub-projects will employ the Agile development process, using Agile's sprints to split up tasks into sub-tasks and Agile's scrums to discuss progress, features, and changes. This technique allows revisiting of tasks to tweak and iterate over their implementation which will be key when for incrementally adding features to both sub-projects, for example, adding to the core's ALU module to add conditional branching, or adding new instructions to the core's decoder module if required.
 
-This project will be split into 4 main stages: First is the requirements and information gathering as well as finalising core and compiler features (such as registers and instructions). The second stage consists of the design, implementation, and verification  of the embedded processor core. The third stage consists of the implementation of the compiler and verification for it. The final stage is dedicated to reviewing the project and the final report. This is further described in section \ref{stages}.
+This project will be split into 4 main stages: First is the requirements and information gathering as well as finalising core and compiler features (such as registers and instructions). The second stage consists of the design, implementation, and verification  of the embedded processor core. The third stage consists of the implementation of the compiler and verification for it. The final stage is dedicated to reviewing the project and the final report. These stages are  further described in section \ref{stages}.
 
 This project combines the benefits of Agile and PRINCE2 methodologies. In particular, we align highlight reports with the projects stages and work on each stage in sprints. The contents and review of each sprint can be found in the highlight reports.
 
@@ -512,7 +522,7 @@ Although the Arty Artix-7 FPGA development board was identified as the most bene
 The project will require a computer or laptop to develop the core and compiler on and continuous integration systems to perform testing on the incremental builds. For the project demo, an oscilloscope (already owned) or digital logic analyser may be required to demonstrate some of the core's features.
 
 \subsection{Source Control}
-Version control will be utilised to improve work-flow, reference and review code changes, and protect the project from data loss and corruption. GitHub, a git hosting provider, will be utilised to host all project files, including documentation and design files.
+Version control will be utilised to improve work-flow, reference and review code changes, and protect the project from data loss and corruption. GitHub, a Git hosting provider, will be utilised to host all project files, including documentation and design files.
 
 The repository can be found here: \href{https://github.com/bendl/prco304}{https://github.com/bendl/prco304}
 
@@ -625,6 +635,7 @@ The following Extended Processor Deliverables (EPD) are deliverables that must b
 \item{Implement a super-scalar pipeline architecture (execute more than 1 instruction per clock).}
 \end{enumerate}
 
+\newpage
 \subsection{Applicable Stages}
 The design, implementation, and verification of the new processor consist of the  project stages 1.2 to 2.4. Initially described above in section \ref{stages}, below details additional technical considerations, challenges, and changes that occurred during these stages.
 
@@ -939,16 +950,15 @@ Overall, the report is acceptable, but future improvements should primarily be a
 \subsection{Performance}
 \textit{Instructions Per Cycle} (IPC) and \textit{Million Instructions Per Second} (MIPS) are two measurements used to measure the performance of a processor. These measurements are used to determine average processor performance. The downside of these measurements is that they assume each instruction executes in constant time. This is not the case in the \scname{} processor and other modern processors.
 \\\\
-The \scname{} processor can execute instructions in 3 to 10 clock cycles, depending on the instruction. Instructions that require no and few dependencies (ALU, RAM, registers, etc.) such as NOP, HALT, and PORT, can be executed in as little as 3 clock cycles (20ns per clock at 50MHz) resulting in 0.67 IPC and 16.7 DMIPS. Instructions requiring many dependencies and off-chip resources (RAM) can take up to 10 clock cycles, resulting in an IPC value of 0.1 and 5 MIPS.
+The \scname{} processor can execute instructions in 3 to 10 clock cycles, depending on the instruction. Instructions that require no and few dependencies (ALU, RAM, registers, etc.) such as NOP, HALT, and PORT, can be executed in as little as 3 clock cycles (20ns per clock at 50MHz) resulting in 0.67 IPC and 16.7 MIPS. Instructions requiring many dependencies and off-chip resources (RAM) can take up to 10 clock cycles, resulting in an 0.1 IPC and 5 MIPS.
 
-The most used instructions, MOVI, MOV, ADD, ADDI, JMP, and CMP, take around 5 clock cycles each, resulting in 0.2 IPC and 10 DMIPS.
+The most used instructions, MOVI, MOV, ADD, ADDI, JMP, and CMP, take around 5 clock cycles each, resulting in 0.2 IPC and 10 MIPS.
 \\\\
 Comparing this against Xilinx's MicroBlaze embedded processor which features 1.3 DMIPS/MHz (65 DMIPS/50 MHz) shows the performance benefits of super-scalar processor architectures. 
 
 The \scname{} processor is similar to AMD's Am386 (1991) processor with 9 MIPS and 0.225 IPC when run at 40 MHz \cite{am386}.
 
 
-\newpage
 \section{\scname{} Processor Review}
 \subsection{Project Deliverables}
 \begin{description}[style=nextline]
@@ -1090,7 +1100,7 @@ It should be noted that the grammar and compiler do not have any terminals for d
 \subsection{Text Parser}
 The compiler implements it's own recursive descent parser for the grammar described in \ref{sect:compiler_grammar}. The parser is able to recognise all context free grammars and therefore would be capable of parsing more complete programming languages such as C and Python. 
 
-The text parser is inspired by Jack Crenshaw's "Let's Build a Compiler" book, \cite{crenshaw1988let}.
+The text parser is inspired by Jack Crenshaw's "Let's Build a Compiler" book \cite{crenshaw1988let}.
 
 While parser generators already exist, such as Bison and Java's ANTLR, it was decided to implement the parser by hand using recursive descent principles as a matter of learning rather than ease of use. Although parsing a more complex grammar would easily be more achievable using a parser generator, the overhead of generating compliant assembly for that complex grammar would be too time consuming and is hence out of scope (see extended deliverable \ref{sect:deliv:ed:gcc}).
 
@@ -1440,7 +1450,6 @@ This method accomplishes verification requirement (C). By running automatic test
 
 An example output of the continuous integration test runner is located in section \ref{appendix:travisci} {\nameref{appendix:travisci}}. The continuous integration results can be viewed here: \url{https://travis-ci.com/bendl/prco304/}.
 
-\newpage
 \section{\scname{} Compiler Review}
 This section reviews the design, implementation, verification, and management of the \scname{} compiler project.
 
@@ -1455,13 +1464,13 @@ All functional requirements, (F1 - F7), have been achieved.
 \hline 
 Deliverable & Implemented & Version & Comment \\ 
 \specialrule{2pt}{-2pt}{0pt}
-CFG Text Parser & Yes & 1.00 & Recursive descent parser.\\ 
+CFG Text Parser & Yes & 1.00 & Primitive recursive descent parser.\\ 
 \hline 
-AST Intermediate Representation & Yes & 1.00 & \\ 
+AST Intermediate Representation & Yes & 1.00 & A singly-linked-list of \verb|struct ast_item|. This proved to be a good decision as it allowed for easy manipulation of the AST tree, for example to perform optimisations.\\ 
 \hline 
 Basic arithmetic Operators & Yes & 1.10 & Features operator precedence. \\ 
 \hline 
-IF statements 	& Yes & 1.30 & \verb|if ( <expr> ) { ... }| \\ \hline 
+IF statements 	& Yes & 1.30 & \verb|if ( <expr> ) { ... }|. Similar syntax to C.\\ \hline 
 IF ELSE statements & Yes & 1.30 & \verb|if ( <expr> ) { ... } else { ... }|. Else must be followed by an opening bracket character so no \verb|else if| statements, although you can nest them instead. \\ \hline 
 FOR statements 	& Yes & 1.30 & Similar syntax to C's for loop.\\ \hline 
 Functions	 	& Yes & 1.20 & Stack frame creation for each function allows for recursive and nested calling. \\ \hline 
@@ -1487,7 +1496,7 @@ Optimisation: Constant Folding & Yes & 2.00 & Limited to compile time constants.
 See \verb|prco_compiler/libprco/opt.c:9|. \\ \hline 
 Optimisation: Unreachable-code elimination & Yes & 2.00 & Limited to IF statement constants. 
 See \verb|prco_compiler/libprco/opt.c:33|. \\ \hline
-String variables      & Limited & 2.10 & All strings are placed in low memory, not on stack. Limited to alphanumeric identities (easily fixable).\\ \hline 
+String variables      & Limited & 2.10 & All strings are placed in low memory, not on stack. This also means that local arrays are not possible. Limited to alphanumeric identities (easily fixable).\\ \hline 
 Dereferencing         & Yes & 2.10 & Uses low precedence \verb|@| symbol. Unsafe like C's \verb|*| dereferencing functionality. See \verb|prco_compiler/test/tests/control_for_3.prco|. \\ \hline 
 \textit{Pointer} arithmetic & Yes & 2.10 & Inferred by dereferencing implementation. 
 E.g. \verb|@(a+1)| returns contents of memory address at value \verb|a+1|. 
@@ -1496,6 +1505,12 @@ Assembler memory layout & Yes & 2.10 & First instructions (low memory) jump into
 \\ \hline 
 \end{tabularx} 
 \end{table}
+
+Overall, the compiler project was a great success. The iterative Agile development approach allowed revisiting of existing features to tweak and improve them. This resulted in a complex yet easily usable and functional compiler. 
+
+Due to additional time being available, the inclusion of simple optimisations allowed the compiler to produce more optimised code. Due to RISCs dependency on software, rather than CISC which depends more on complex hardware, producing faster and smaller output machine code greatly improves the performance of the \scname{} processor.
+
+If additional time was available, it should be spent on introducing data structures and arrays. This would extend the range of programs created by the compiler even further.
 
 \chapter{End-Project Report}
 {\hypersetup{linkcolor=black}
@@ -1571,16 +1586,14 @@ It was found that the implemented processor was difficult to debug and troublesh
 
 \newpage
 \section{Conclusion}
-This project aimed at producing two complex technical systems: an embedded processor and a compiler. Both systems were developed and the output is an extremely valuable educational resource. 
-
-The technologies created from this project spawning from the compiler include:
+This project aimed at producing two complex technical systems: an embedded processor and a compiler. Both systems were developed and the output is an extremely valuable educational resource. The technologies created from this project spawning from the compiler include:
 \begin{itemize}
 \item{an easily extendible recursive-descent text parser;}
 \item{an AST optimiser for constant-folding and unreachable code elimination;}
 \item{a machine code generator and assembler;}
 \item{and an emulator (not originally planned, but was a key tool required later in the project).}
 \end{itemize}
-And from the embedded processor:
+And from the embedded processor project:
 \begin{itemize}
 \item{a 16-bit instruction set and it's implementation;}
 \item{and a feed-forward pipeline architecture.}
@@ -1611,6 +1624,7 @@ I believe these technologies and their implementation details should be shared a
 \section{Appendix A. User Guides}
 \subsection{\scname{} Core Reference Guide}
 \subsubsection*{Instantiating the core in your FPGA design}
+The \scname{} processor has only been verified on a 50MHz \verb|i_clk|. 
 The \scname{} processor core can be instantiated in an FPGA design with the following code snippet:
 \begin{minted}{verilog}
 // Instantiate a processor core
@@ -1634,7 +1648,7 @@ prco_core inst_core (
     .q_debug()
 );
 \end{minted}
-
+You are able to connect wires \verb|q_tx_byte|, \verb|q_debug|, and \verb|i_step| to control and interact with the processor.
 
 \subsection{\scname{} Compiler Reference Guide}
 \subsubsection*{Building the Compiler}
@@ -1672,8 +1686,10 @@ cmake --build . --target install
 
 \end{description}
 
-
+\newpage
 \subsection{\scname{} Emulator Reference Guide}
+The emulator is a tool developed to improve debugging and verification of programs output by the compiler. Although highly reliable, users should continue to verify the program on an implemented solution.
+
 \label{sect:emulator_cli}
 \begin{description}[style=nextline]
 \item [Name]
@@ -1699,7 +1715,12 @@ Next follows the initial memory layout of the processor. This shows where each i
 Following this is the list of executed instructions. Instruction execution starts at PC  (program counter) \verb|0x00|. On the right side, the contents of each memory is displayed. For complex instructions such as \verb|LW/SW| and \verb|WRITE| additional information is printed to verify correct ALU operation.
 \normalsize
 
+\newpage
 \subsection{\scname{} Compiler Continuous Integration Tests}
+Continuous integration (CI) testing is used to meet quality requirements of the project. For every code change, a wide range of test programs are run through the compiler, and the output is emulated to determine correct runtime of the program. If the output of the emulator matches the expected value for the test input, the test passes. If not, the test fails and the code change is marked as \textit{breaking}.
+
+Users can run the test scripts (recommended) using the \verb|prco_compiler/test/travis-ci.sh| test script.
+
 \label{appendix:travisci}
 \inputminted{text}{compiler_ci.txt}
 
