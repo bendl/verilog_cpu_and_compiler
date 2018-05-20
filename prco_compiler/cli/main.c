@@ -45,16 +45,18 @@ int
 main(int argc, char **argv)
 {
         // Compiler variables
-        struct module           *module;
-        struct text_parser      *parser;
+        struct module           *module      = NULL;
+        struct text_parser      *parser      = NULL;
         FILE                    *file_output = NULL;
+
         char *src_name = NULL;
         int src_size;
+        int O = 0;
         char *out_name = "out.s";
+
         int parse_result = 0;
         int module_dump_output = 0;
-        int O = 0;
-        struct ast_func *function_list;
+        struct ast_func *function_list = NULL;
 
         // Parse command line
         int opt;
@@ -82,7 +84,7 @@ main(int argc, char **argv)
         if (!src_name) {
                 dbprintf(D_ERR, "-i parameter missing.\r\n");
                 parse_result = 2;
-                goto main_exit;
+                goto bad_exit;
         }
 
         dbprintf(D_INFO, "LIBPRCO Compiler. Version %f\r\n\r\n",
@@ -128,5 +130,7 @@ main_exit:
         // Free the module
         module_free(module);
         fclose(g_file_out);
+
+bad_exit:
         return parse_result;
 }
