@@ -1,0 +1,13 @@
+
+fnc main()
+{
+    while (1) {
+        UART1(97);
+        UART1(98);
+        UART1(99);
+        UART1(100);
+        UART1(101);
+        UART1(13);
+        UART1(10);
+    }
+}

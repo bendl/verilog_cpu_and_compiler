@@ -29,7 +29,8 @@ module prco_lmem (
         // Load compiled program into memory
         //*
         $readmemh(
-            "/home/ise/XilinxVM/prco304/prco_compiler/test/verilog_memh.txt",
+            //"/home/ise/XilinxVM/prco304/prco_compiler/test/verilog_memh.txt",
+            "Z:\\uni\\prco304\\prco_compiler\\test\\verilog_memh.txt",
             r_lmem);
         //*/
         
