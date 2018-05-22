@@ -1,0 +1,57 @@
+Demonstration:
+
+
+Introduction 	10 mins
+Demonstration 	30 mins
+Q&A 		15 Mins
+
+Introduction:
+No client - improve my knowledge and experience in FPGAs, SoCs, low-level programming and compilers.
+
+To do this - design an FPGA-based embedded processor that features common components of microcontrollers, such as GPIO, UART, RISC etc.
+
+RISC computers rely heavily on software - so a compiler was built.
+
+Compiler built from scratch - to improve knowledge and experience
+Also easier than creating a backend
+
+Processor features:
+- RISC architecture
+- Feed-forward pipeline
+- UART transmitting
+- New ISA
+- Single-step hardware mode
+
+Compiler features:
+- Parse a CFG grammar - C like
+  using recursive descent
+- AST immediate representation
+- AST optimisations (CF, dead code (if))
+- Assembling
+- Memory layout - program structure - low high memory
+
+Assessed upon:
+- Processor design (features)
+- Processor usage (what can it be used for)
+- Compiler structure
+- Compiler optimisations
+- Compiler parsing
+- Compiler assembling
+
+
+
+
+Demonstration:
+
+
+
+
+
+
+
+
+
+
+
+
+- 
