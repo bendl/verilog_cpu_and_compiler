@@ -650,6 +650,10 @@ cg_call_template(struct ast_call *c)
         asm_push(op_call);
         asm_push(opcode_jmp_r(Cx));
         asm_comment("JMP TO FUNC");
+
+        // ASM_CALL_NEXT points here
+        // After function, pop arguments from stack
+        asm_push(opcode_add_ri(Sp, c->argc));
 }
 
 void

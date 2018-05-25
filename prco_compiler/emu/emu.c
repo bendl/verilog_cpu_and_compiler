@@ -384,8 +384,7 @@ int emu_run(struct prco_emu_core *core)
                 // Decode the instruction
                 core->current_op = emu_decode(core->lmem[core->pc]);
 
-                if(core->current_op.op == HALT
-                   || core->exec_count > 20000)
+                if(core->current_op.op == HALT)
                         break;
 
                 // Execute the instruction
